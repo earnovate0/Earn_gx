@@ -7,6 +7,9 @@
     
     <!-- Third-party Ad SDK - Required for the claimReward function -->
 <script src='//libtl.com/sdk.js' data-zone='10012357' data-sdk='show_10012357'></script>
+
+    <!-- Telegram Web App SDK - Added for TMA integration -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -488,6 +491,10 @@
         const dailyCheckBtn = document.getElementById('daily-check-btn');
         const dailyCheckBtnTask = document.getElementById('daily-check-btn-task');
 
+        // Utility to check if running inside Telegram Mini App
+        function isTelegramApp() {
+            return window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
+        }
 
         window.onload = () => {
             lucide.createIcons();
@@ -640,16 +647,34 @@
             tkBalanceEl.textContent = balance.toFixed(2);
             accountTkBalanceEl.textContent = balance.toFixed(2);
 
-            profileNameEl.textContent = userData.name || 'User Profile';
-            profileEmailEl.textContent = userData.email || 'No Email';
+            // --- UPDATED: Telegram TMA Integration for Profile Name/Picture ---
+            const tgUser = isTelegramApp() ? Telegram.WebApp.initDataUnsafe.user : null;
             
-            // --- FIX: Profile Avatar Logic (Always display the fixed logo placeholder) ---
-            const logoUrl = "https://placehold.co/80x80/10b981/ffffff?text=LOGO"; // Simulating logo1.jpg.png
-            if (profileAvatarEl) {
-                 profileAvatarEl.src = logoUrl; 
-                 // We rely on the robustness of the placehold.co link, no complex fallback needed.
+            if (tgUser) {
+                // Set name from Telegram data (first_name + last_name)
+                profileNameEl.textContent = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || 'Telegram User';
+
+                // Set profile picture from Telegram photo_url
+                if (tgUser.photo_url) {
+                    profileAvatarEl.src = tgUser.photo_url;
+                } else {
+                    // Fallback to default Logo if no Telegram photo
+                    profileAvatarEl.src = "https://placehold.co/80x80/10b981/ffffff?text=LOGO"; 
+                }
+                profileEmailEl.textContent = `@${tgUser.username || 'N/A'} (Telegram)`;
+            } else {
+                // Fallback to Firebase/DB data
+                profileNameEl.textContent = userData.name || 'User Profile';
+                profileEmailEl.textContent = userData.email || 'No Email';
+                // Fallback Avatar Logic (simulating logo1.jpg.png)
+                const logoUrl = "https://placehold.co/80x80/10b981/ffffff?text=LOGO"; 
+                const initial = userData.name?.charAt(0)?.toUpperCase() || userData.email?.charAt(0)?.toUpperCase() || 'U';
+                const initialFallbackUrl = `https://placehold.co/80x80/10b981/ffffff?text=${initial}`;
+                
+                profileAvatarEl.src = logoUrl; 
+                profileAvatarEl.onerror = () => { profileAvatarEl.src = initialFallbackUrl; }; 
             }
-            // --- END FIX ---
+            // --- END UPDATED TMA LOGIC ---
 
             // Referral link uses the updated Telegram bot structure
             const referralLink = `${appConfig.referralUrlBase}${userData.referralCode}`;
