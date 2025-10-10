@@ -495,6 +495,16 @@
         function isTelegramApp() {
             return window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
         }
+        
+        // Utility to check if a timestamp is within the current calendar day
+        function isSameDay(timestamp) {
+            if (!timestamp) return false;
+            const date1 = new Date(timestamp);
+            const date2 = new Date(); // Current time
+            return date1.getFullYear() === date2.getFullYear() &&
+                   date1.getMonth() === date2.getMonth() &&
+                   date1.getDate() === date2.getDate();
+        }
 
         window.onload = () => {
             lucide.createIcons();
@@ -559,7 +569,13 @@
                     userData.dailyAdCount = 0;
                     userData.lastAdWatchDate = today;
                 } else {
+                    // Start today's earning with ad revenue
                     todayEarning = userData.dailyAdCount * appConfig.rewardPerAd; 
+                }
+                
+                // FIX for Today's Earn: Add Daily Check Bonus if claimed today (uses the new isSameDay utility)
+                if (userData.lastDailyCheckTime && isSameDay(userData.lastDailyCheckTime)) {
+                     todayEarning += appConfig.dailyCheckBonus;
                 }
                 
                 updateUI();
@@ -596,7 +612,9 @@
                     
                     // Check URL for initial referral code
                     const urlParams = new URLSearchParams(window.location.search);
-                    const referrerCode = urlParams.get('r'); 
+                    // Use 'r' for web referral, or check the Telegram format 'start=ref_...'
+                    const referrerCode = urlParams.get('r') || (urlParams.get('start')?.startsWith('ref_') ? urlParams.get('start').substring(4) : null);
+                    
                     if (referrerCode) {
                         defaultUserData.referredBy = referrerCode;
                         // Apply bonus to referrer only on initial sign up if referredBy is set
@@ -685,7 +703,7 @@
             updateAdsLeftCount();
             updateDailyCheckButtonState();
             
-            // Update Social Task Buttons (Changed "Claim" to "Get")
+            // Update Social Task Buttons
             const socialTasks = ['telegram', 'bot', 'facebook'];
             socialTasks.forEach(key => {
                 const btn = document.getElementById(`claim-${key}-btn`);
@@ -697,7 +715,6 @@
                         btn.classList.add('bg-gray-400', 'cursor-not-allowed');
                     } else {
                          btn.disabled = false;
-                         // Use 'Get' as requested
                          btn.textContent = `Get ৳${appConfig.rewardPerSocialTask || 7}`;
                          btn.classList.add('bg-accent', 'hover:bg-green-600');
                          btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
@@ -715,7 +732,7 @@
             updateDynamicPaymentFields();
         }
         
-        // NEW: Updates the state of the Daily Check button based on 24-hour cool down
+        // Updates the state of the Daily Check button based on 24-hour cool down
         function updateDailyCheckButtonState() {
             const now = Date.now();
             const lastCheckTime = userData.lastDailyCheckTime || 0;
@@ -734,7 +751,12 @@
                     const timeLeft = lastCheckTime + coolDownDuration - now;
                     const hours = Math.floor(timeLeft / (1000 * 60 * 60));
                     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    btn.textContent = `Next: ${hours}h ${minutes}m`;
+                    // Prevent displaying negative time if server/client clock drift causes issues
+                    if (hours < 0 || minutes < 0) {
+                        btn.textContent = `Ready Soon`;
+                    } else {
+                        btn.textContent = `Next: ${hours}h ${minutes}m`;
+                    }
                     btn.classList.add('bg-gray-400', 'cursor-not-allowed');
                     btn.classList.remove('bg-yellow-500');
                 }
@@ -802,8 +824,6 @@
             document.getElementById('signup-btn').addEventListener('click', handleSignup);
             document.getElementById('login-btn').addEventListener('click', handleLogin);
             
-            // LOGOUT BUTTON LISTENER REMOVED AS REQUESTED
-            
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -832,7 +852,7 @@
                 const userRef = doc(db, "users", userCredential.user.uid);
                 
                 const urlParams = new URLSearchParams(window.location.search);
-                const referrerCode = urlParams.get('r'); 
+                const referrerCode = urlParams.get('r') || (urlParams.get('start')?.startsWith('ref_') ? urlParams.get('start').substring(4) : null);
                 
                 const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
                 const defaultUserData = {
@@ -873,11 +893,6 @@
             } finally {
                 loader.style.display = 'none';
             }
-        }
-
-        async function handleLogout() { 
-            // NOTE: This function is kept for safety but is not attached to any UI element per user request.
-            await signOut(auth); 
         }
 
         async function loadWithdrawalHistory() {
@@ -1064,14 +1079,21 @@
             try {
                 // 1. Update user data in Firestore
                 const userRef = doc(db, "users", currentUser.uid);
+                const newBalance = (userData.tkBalance || 0) + rewardAmount;
+                
                 await updateDoc(userRef, { 
-                    tkBalance: (userData.tkBalance || 0) + rewardAmount,
+                    tkBalance: newBalance,
                     lastDailyCheckTime: now // Store current time as last claimed time
                 });
                 
                 // 2. Update local state
-                userData.tkBalance += rewardAmount;
+                userData.tkBalance = newBalance;
                 userData.lastDailyCheckTime = now;
+                
+                // FIX: Add the daily check bonus to the todayEarning counter
+                if (isSameDay(now)) {
+                    todayEarning += rewardAmount;
+                }
                 
                 showAlert(`Daily Check Bonus claimed! You earned ৳${rewardAmount.toFixed(2)}.`);
                 
@@ -1190,6 +1212,8 @@
         }
 
         window.claimReward = async function(taskType) {
+            if (!currentUser) return showAlert("Please log in to perform this task.");
+
             const today = new Date().toISOString().split('T')[0];
             const userRef = doc(db, "users", currentUser.uid);
 
@@ -1249,6 +1273,7 @@
                     // Update balance
                     const updateSuccess = await updateBalance(rewardAmount);
                     if (updateSuccess) {
+                        // FIX: Ensure todayEarning is updated for ad rewards
                         todayEarning += rewardAmount;
                         showAlert(`Congratulations! You have earned ৳${rewardAmount.toFixed(2)}.`);
                     }
@@ -1261,6 +1286,7 @@
                 }
                 
                 updateAdsLeftCount();
+                todayEarningCountEl.textContent = `৳${todayEarning.toFixed(2)}`; // Refresh display immediately
 
             } catch(e) {
                 console.error("Ad error:", e);
