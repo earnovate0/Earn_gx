@@ -468,7 +468,7 @@
         const profileEmailEl = document.getElementById('profile-email');
         const profileAvatarEl = document.getElementById('profile-avatar');
         const referralLinkDisplayEl = document.getElementById('referral-link-display');
-        const userReferralCodeEl = document.getElementById('user-referral-code'); // New element
+        const userReferralCodeEl = document.getElementById('user-referral-code'); 
         const withdrawMethodSelect = document.getElementById('withdraw-method');
         const notificationDot = document.getElementById('notification-dot');
         const adsLeftCountEl = document.getElementById('ads-left-count');
@@ -609,11 +609,7 @@
                 showAlert("Error loading user data in real-time.");
             });
             
-            // 2. Referral Count Listener 
-            // This is set up inside updateUI as the referralCode might change/load later
-            // We ensure it is run once initial user data loads
-            
-            // 3. Notifications Check Listener (Simplified check for new items)
+            // 2. Notifications Check Listener (Simplified check for new items)
             const notificationQuery = query(getNotificationsCollection(), limit(1));
             if (unsubscribeNotifications) unsubscribeNotifications(); // Unsubscribe old listener
             unsubscribeNotifications = onSnapshot(notificationQuery, () => {
@@ -623,7 +619,48 @@
             });
         }
         
-        // --- User Data Initialization ---
+        // --- Referral Code Uniqueness Fix ---
+        
+        /**
+         * Generates a unique referral code by checking against existing codes in Firestore.
+         */
+        async function generateUniqueReferralCode(tgUser) {
+            let code = '';
+            let isUnique = false;
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            while (!isUnique && attempts < maxAttempts) {
+                attempts++;
+                
+                // Generate a code based on Telegram username prefix or a strong random fallback
+                if (tgUser && tgUser.username) {
+                    const usernamePrefix = tgUser.username.substring(0, 4).toLowerCase().replace(/[^a-z0-9]/g, 'a'); // Sanitize prefix
+                    const randomDigits = Math.floor(100 + Math.random() * 900).toString(); // 3 random digits (100-999)
+                    code = (usernamePrefix + randomDigits).toUpperCase(); 
+                } else {
+                    // Stronger random fallback (6 characters)
+                    code = Math.random().toString(36).substring(2, 8).toUpperCase();
+                }
+
+                // Check if the code already exists
+                const q = query(getUsersCollection(), where("referralCode", "==", code), limit(1));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    isUnique = true;
+                } else if (attempts === maxAttempts) {
+                     console.error("Failed to generate unique code after max attempts.");
+                     code = 'FALLBACK' + Date.now().toString().slice(-4); 
+                     isUnique = true;
+                }
+            }
+            return code;
+        }
+
+        /**
+         * Initializes user data on first sign-in, applies referral if link used.
+         */
         async function initializeUserData(user) {
             const userRef = getUserRef(user.uid);
             try {
@@ -631,24 +668,17 @@
                 if (userSnap.exists()) return; // Already exists, just wait for onSnapshot to fire
                 
                 const tgUser = isTelegramApp() ? Telegram.WebApp.initDataUnsafe.user : null;
-                let ownReferralCode = '';
-
-                if (tgUser && tgUser.username) {
-                    // NEW LOGIC: first 4 of username + 3 random digits
-                    const usernamePrefix = tgUser.username.substring(0, 4).toLowerCase();
-                    const randomDigits = Math.floor(100 + Math.random() * 900).toString(); // 3 random digits (100-999)
-                    ownReferralCode = (usernamePrefix + randomDigits).toUpperCase(); 
-                } else {
-                    // Fallback for users without Telegram username
-                    ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                }
+                
+                // CRITICAL FIX: Generate unique code using the new function
+                const ownReferralCode = await generateUniqueReferralCode(tgUser); 
                 
                 const defaultUserData = {
                     uid: user.uid, 
                     name: tgUser ? `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() : user.displayName || 'New User', 
-                    email: tgUser ? `@${tgUser.username || 'N/A'}` : 'N/A', // Using Telegram username or N/A
-                    tkBalance: 5,
-                    referralCode: ownReferralCode, referredBy: null,
+                    email: tgUser ? `@${tgUser.username || 'N/A'}` : 'N/A', 
+                    tkBalance: 5, // Initial bonus
+                    referralCode: ownReferralCode, 
+                    referredBy: null,
                     lastNotificationCheck: serverTimestamp(),
                     createdAt: serverTimestamp(),
                     dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
@@ -659,13 +689,10 @@
                 // Check URL for initial referral code
                 const urlParams = new URLSearchParams(window.location.search);
                 let referrerCode = urlParams.get('start')?.startsWith('ref_') ? urlParams.get('start').substring(4) : null; 
-                
                 if (!referrerCode) referrerCode = urlParams.get('r'); 
 
                 if (referrerCode) {
                     defaultUserData.referredBy = referrerCode;
-                    // Apply bonus logic will be handled below or in a separate call
-                    // We pass the defaultUserData which has the initial ৳5 balance
                     await applyReferralBonus(referrerCode, false, defaultUserData); 
                 } else {
                     await setDoc(userRef, defaultUserData);
@@ -676,6 +703,7 @@
                 showAlert("Error initializing user data. Please try launching the app again.");
             }
         }
+        // --- END Referral Code Uniqueness Fix ---
         
         async function fetchAppConfig() {
             const configRef = getConfigRef();
@@ -762,7 +790,7 @@
             updateDynamicPaymentFields();
             
             // Re-setup the referral listener when user data is confirmed
-            if (!unsubscribeReferrals && userData.referralCode) {
+            if (userData.referralCode) {
                 // 2. Referral Count Listener (Ensure this is set up once the code is available)
                  const q = query(getUsersCollection(), where("referredBy", "==", userData.referralCode));
                  if (unsubscribeReferrals) unsubscribeReferrals(); // Unsubscribe old listener
@@ -817,8 +845,8 @@
         function updateDynamicPaymentFields() {
             const selectedMethod = withdrawMethodSelect.value.toLowerCase();
             let placeholder = "Enter Payment Number";
-            if (selectedMethod.includes('bkash')) placeholder = "Enter your bKash Number";
-            if (selectedMethod.includes('nagad')) placeholder = "Enter your Nagad Number";
+            if (selectedMethod.includes('bkash')) placeholder = "Enter your bKash Number (Personal/Agent)";
+            if (selectedMethod.includes('nagad')) placeholder = "Enter your Nagad Number (Personal/Agent)";
             paymentDetailsContainer.innerHTML = `<input id="payment-detail-input" type="text" placeholder="${placeholder}" class="w-full p-3 rounded-lg input-field">`;
         }
         
@@ -936,14 +964,19 @@
             if (!code) return showAlert("Please enter a code.");
             if (code === userData.referralCode) return showAlert("You cannot use your own code.");
             loader.style.display = 'flex';
-            await applyReferralBonus(code, true, userData);
+            
+            // Temporary user data object to pass to the function, ensuring current balance is used
+            const tempUserData = { ...userData };
+            await applyReferralBonus(code, true, tempUserData);
             codeInput.value = '';
             loader.style.display = 'none';
         }
 
         async function applyReferralBonus(referrerCode, isManualApply = false, targetUserData) {
-            const q = query(getUsersCollection(), where("referralCode", "==", referrerCode)); 
+            const q = query(getUsersCollection(), where("referralCode", "==", referrerCode), limit(1)); 
             const rewardAmount = appConfig.rewardPerReferral;
+            const newUserRef = getUserRef(targetUserData.uid); // Reference for the user being referred
+
             try {
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
@@ -954,13 +987,12 @@
                     // 1. Give bonus to referrer (Atomically)
                     await updateDoc(referrerRef, { tkBalance: (referrerData.tkBalance || 0) + rewardAmount });
                     
-                    // 2. Update new user's status and balance (Atomically)
-                    const newUserRef = getUserRef(targetUserData.uid);
+                    // 2. Update new user's status and balance
                     await setDoc(newUserRef, { 
                         ...targetUserData,
                         tkBalance: (targetUserData.tkBalance || 0) + rewardAmount, 
                         referredBy: referrerCode 
-                    }, { merge: true }); // Use merge true to ensure we only update fields
+                    }, { merge: true }); 
                     
                     if(isManualApply) showAlert(`Code applied successfully! You and the referrer received ৳${rewardAmount.toFixed(2)}.`);
                 } else {
@@ -977,6 +1009,7 @@
             const userRef = getUserRef(currentUser.uid);
             const newBalance = (userData.tkBalance || 0) + amount;
             try {
+                // Use field value increment if available, or manual update as fallback
                 await updateDoc(userRef, { tkBalance: newBalance });
                 return true;
             } catch (error) {
