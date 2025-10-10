@@ -450,8 +450,9 @@
         let currentUser = null;
         let userData = null;
         
-        // Configuration for Telegram Bot Referral Link
-        const TELEGRAM_BOT_USERNAME = "@greenIncomes_bot"; // Bot username provided by user
+        // --- FIX 1: Referral Link Configuration ---
+        // Configuration for Telegram Bot Referral Link (using the bot name inferred from the request)
+        const TELEGRAM_BOT_USERNAME = "greenIncomes_bot";
         
         let appConfig = {
             minWithdrawal: 500,
@@ -462,7 +463,8 @@
             rewardPerReferral: 30,
             dailyCheckBonus: 5,
             rewardPerSocialTask: 7, 
-            referralUrlBase: `https://t.me/${TELEGRAM_BOT_USERNAME.replace('@', '')}?start=ref_` 
+            // Correct format: https://t.me/BOT_USERNAME?start=ref_USER_CODE
+            referralUrlBase: `https://t.me/${TELEGRAM_BOT_USERNAME}?start=ref_` 
         };
 
         let todayEarning = 0; 
@@ -495,16 +497,6 @@
         function isTelegramApp() {
             return window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
         }
-        
-        // Utility to check if a timestamp is within the current calendar day
-        function isSameDay(timestamp) {
-            if (!timestamp) return false;
-            const date1 = new Date(timestamp);
-            const date2 = new Date(); // Current time
-            return date1.getFullYear() === date2.getFullYear() &&
-                   date1.getMonth() === date2.getMonth() &&
-                   date1.getDate() === date2.getDate();
-        }
 
         window.onload = () => {
             lucide.createIcons();
@@ -534,53 +526,61 @@
                 // 1. Attempt Custom Token Sign-In if in Canvas Environment and Anonymous
                 if (initialAuthToken && user.isAnonymous) {
                      try {
+                        // NOTE: If successful, this will trigger the onAuthStateChanged listener again
                         await signInWithCustomToken(auth, initialAuthToken);
-                        return; // Wait for the listener to fire again with the new user
+                        return; 
                     } catch(e) {
                         console.error("Custom token sign-in failed:", e);
                         if (user.isAnonymous) await signInAnonymously(auth); // Fallback
                     }
                 }
                 
-                // 2. Fetch data and proceed
-                await fetchUserData();
-                if (userData?.isBlocked) {
-                    showAlert("Your account has been blocked.");
-                    await signOut(auth);
-                    loader.style.display = 'none';
-                    return;
+                // --- FIX 2: Enhanced Data Synchronization (Preventing data mix-up) ---
+                // We ensure that we only proceed if currentUser is fully established and not transitioning
+                if (currentUser.uid) {
+                    await fetchUserData();
+                    
+                    if (!userData) {
+                        console.error("User data could not be loaded. Showing auth.");
+                        await signOut(auth); // Force sign out if data load fails
+                        loader.style.display = 'none';
+                        return;
+                    }
+
+                    if (userData?.isBlocked) {
+                        showAlert("Your account has been blocked.");
+                        await signOut(auth);
+                        loader.style.display = 'none';
+                        return;
+                    }
+                    
+                    await fetchAppConfig();
+                    await checkNewNotifications();
+                    await fetchReferralCount();
+                    
+                    // Daily ad earning reset check (uses date, not 24 hours)
+                    const today = new Date().toISOString().split('T')[0];
+                    if (userData.lastAdWatchDate !== today) {
+                        todayEarning = 0;
+                        const userRef = doc(db, "users", currentUser.uid);
+                        try {
+                            // Only reset dailyAdCount if it's a new day
+                            if (userData.dailyAdCount > 0) {
+                                await updateDoc(userRef, { dailyAdCount: 0, lastAdWatchDate: today });
+                            }
+                        } catch(e) { console.error("Error resetting daily count:", e); }
+                        userData.dailyAdCount = 0;
+                        userData.lastAdWatchDate = today;
+                    } else {
+                        todayEarning = userData.dailyAdCount * appConfig.rewardPerAd; 
+                    }
+                    
+                    updateUI();
+                    showMainView('app-container'); // Show the main application
+                    navigateTo('home-page'); 
                 }
-                
-                await fetchAppConfig();
-                await checkNewNotifications();
-                await fetchReferralCount();
-                
-                // Daily ad earning reset check (uses date, not 24 hours)
-                const today = new Date().toISOString().split('T')[0];
-                if (userData.lastAdWatchDate !== today) {
-                    todayEarning = 0;
-                    const userRef = doc(db, "users", currentUser.uid);
-                    try {
-                         // Only reset dailyAdCount if it's a new day
-                         if (userData.dailyAdCount > 0) {
-                             await updateDoc(userRef, { dailyAdCount: 0, lastAdWatchDate: today });
-                         }
-                    } catch(e) { console.error("Error resetting daily count:", e); }
-                    userData.dailyAdCount = 0;
-                    userData.lastAdWatchDate = today;
-                } else {
-                    // Start today's earning with ad revenue
-                    todayEarning = userData.dailyAdCount * appConfig.rewardPerAd; 
-                }
-                
-                // FIX for Today's Earn: Add Daily Check Bonus if claimed today (uses the new isSameDay utility)
-                if (userData.lastDailyCheckTime && isSameDay(userData.lastDailyCheckTime)) {
-                     todayEarning += appConfig.dailyCheckBonus;
-                }
-                
-                updateUI();
-                showMainView('app-container'); // Show the main application
-                navigateTo('home-page'); 
+                // -----------------------------------------------------------------
+
                 loader.style.display = 'none';
             } else {
                 currentUser = null;
@@ -596,6 +596,7 @@
             try {
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
+                    // Critical: Always overwrite global userData with fresh data from DB
                     userData = userSnap.data();
                 } else {
                     const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -607,17 +608,15 @@
                         createdAt: serverTimestamp(),
                         dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
                         lastDailyCheckTime: 0, 
-                        socialClaims: { telegram: false, bot: false, facebook: false } // NEW: Social task claims map
+                        socialClaims: { telegram: false, bot: false, facebook: false }
                     };
                     
                     // Check URL for initial referral code
                     const urlParams = new URLSearchParams(window.location.search);
-                    // Use 'r' for web referral, or check the Telegram format 'start=ref_...'
-                    const referrerCode = urlParams.get('r') || (urlParams.get('start')?.startsWith('ref_') ? urlParams.get('start').substring(4) : null);
-                    
+                    const referrerCode = urlParams.get('r'); 
                     if (referrerCode) {
                         defaultUserData.referredBy = referrerCode;
-                        // Apply bonus to referrer only on initial sign up if referredBy is set
+                        // Apply bonus to referrer and update new user's balance locally
                         await applyReferralBonus(referrerCode, false, defaultUserData); 
                     }
                     await setDoc(userRef, defaultUserData);
@@ -626,6 +625,8 @@
             } catch (error) {
                 console.error("Error fetching user data:", error);
                 showAlert("Error loading user data. Please try logging in again.");
+                // Ensure userData is null if loading fails to prevent data mixing
+                userData = null; 
             }
         }
 
@@ -644,6 +645,7 @@
         
         async function fetchReferralCount() {
             if (!userData || !userData.referralCode) return;
+            // Note: The data separation is handled here by querying based on the current user's unique referralCode
             const q = query(collection(db, "users"), where("referredBy", "==", userData.referralCode));
             try {
                 const querySnapshot = await getDocs(q);
@@ -665,18 +667,14 @@
             tkBalanceEl.textContent = balance.toFixed(2);
             accountTkBalanceEl.textContent = balance.toFixed(2);
 
-            // --- UPDATED: Telegram TMA Integration for Profile Name/Picture ---
+            // --- Telegram TMA Integration for Profile Name/Picture ---
             const tgUser = isTelegramApp() ? Telegram.WebApp.initDataUnsafe.user : null;
             
             if (tgUser) {
-                // Set name from Telegram data (first_name + last_name)
                 profileNameEl.textContent = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || 'Telegram User';
-
-                // Set profile picture from Telegram photo_url
                 if (tgUser.photo_url) {
                     profileAvatarEl.src = tgUser.photo_url;
                 } else {
-                    // Fallback to default Logo if no Telegram photo
                     profileAvatarEl.src = "https://placehold.co/80x80/10b981/ffffff?text=LOGO"; 
                 }
                 profileEmailEl.textContent = `@${tgUser.username || 'N/A'} (Telegram)`;
@@ -694,16 +692,18 @@
             }
             // --- END UPDATED TMA LOGIC ---
 
-            // Referral link uses the updated Telegram bot structure
+            // --- FIX 1: Referral Link Usage ---
+            // Ensures the referral link is always generated from the current user's unique referral code
             const referralLink = `${appConfig.referralUrlBase}${userData.referralCode}`;
             referralLinkDisplayEl.textContent = referralLink;
             referralLinkDisplayEl.dataset.link = referralLink;
+            // ---------------------------------
 
             todayEarningCountEl.textContent = `৳${todayEarning.toFixed(2)}`;
             updateAdsLeftCount();
             updateDailyCheckButtonState();
             
-            // Update Social Task Buttons
+            // Update Social Task Buttons 
             const socialTasks = ['telegram', 'bot', 'facebook'];
             socialTasks.forEach(key => {
                 const btn = document.getElementById(`claim-${key}-btn`);
@@ -732,8 +732,9 @@
             updateDynamicPaymentFields();
         }
         
-        // Updates the state of the Daily Check button based on 24-hour cool down
+        // NEW: Updates the state of the Daily Check button based on 24-hour cool down
         function updateDailyCheckButtonState() {
+            if (!userData) return;
             const now = Date.now();
             const lastCheckTime = userData.lastDailyCheckTime || 0;
             const coolDownDuration = 24 * 60 * 60 * 1000; // 24 hours in ms
@@ -751,12 +752,7 @@
                     const timeLeft = lastCheckTime + coolDownDuration - now;
                     const hours = Math.floor(timeLeft / (1000 * 60 * 60));
                     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    // Prevent displaying negative time if server/client clock drift causes issues
-                    if (hours < 0 || minutes < 0) {
-                        btn.textContent = `Ready Soon`;
-                    } else {
-                        btn.textContent = `Next: ${hours}h ${minutes}m`;
-                    }
+                    btn.textContent = `Next: ${hours}h ${minutes}m`;
                     btn.classList.add('bg-gray-400', 'cursor-not-allowed');
                     btn.classList.remove('bg-yellow-500');
                 }
@@ -767,6 +763,7 @@
         }
 
         function updateAdsLeftCount() {
+            if (!userData) return;
             const today = new Date().toISOString().split('T')[0];
             if (userData.lastAdWatchDate !== today) {
                 userData.dailyAdCount = 0; // Ensure local data reflects server check if not updated yet
@@ -824,13 +821,6 @@
             document.getElementById('signup-btn').addEventListener('click', handleSignup);
             document.getElementById('login-btn').addEventListener('click', handleLogin);
             
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    navigateTo(link.dataset.page);
-                });
-            });
-            
             document.getElementById('notification-bell').addEventListener('click', () => { navigateTo('notifications-page'); });
             document.getElementById('copy-link-btn').addEventListener('click', copyReferralLink);
             document.getElementById('share-btn').addEventListener('click', shareReferralLink);
@@ -852,27 +842,36 @@
                 const userRef = doc(db, "users", userCredential.user.uid);
                 
                 const urlParams = new URLSearchParams(window.location.search);
-                const referrerCode = urlParams.get('r') || (urlParams.get('start')?.startsWith('ref_') ? urlParams.get('start').substring(4) : null);
+                const referrerCode = urlParams.get('r'); 
                 
                 const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                
+                // Start with the base 5 TK + bonus if referred
+                let initialBalance = 5;
+                if (referrerCode) {
+                    initialBalance += appConfig.rewardPerReferral;
+                }
+
                 const defaultUserData = {
                     uid: userCredential.user.uid, name: name, email: email,
-                    tkBalance: 5,
+                    tkBalance: initialBalance, // New user's initial balance including referral bonus
                     referralCode: ownReferralCode, referredBy: referrerCode || null,
                     lastNotificationCheck: serverTimestamp(),
                     createdAt: serverTimestamp(),
                     dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
                     lastDailyCheckTime: 0,
-                    socialClaims: { telegram: false, bot: false, facebook: false } // NEW: Social task claims map
+                    socialClaims: { telegram: false, bot: false, facebook: false }
                 };
                 
-                // If there's a referrer code, apply the bonus to the referrer *before* setting the new user doc
+                // If there's a referrer code, apply the bonus ONLY to the referrer
                 if (referrerCode) {
-                    await applyReferralBonus(referrerCode, false, defaultUserData);
+                    await applyReferrerBonusOnly(referrerCode);
                 }
                 
+                // Save the new user's doc (which now includes their initial/referral balance)
                 await setDoc(userRef, defaultUserData);
-
+                
+                // onAuthStateChanged will now fire and load the correct, unique data.
                 
             } catch (error) {
                 showAlert(error.message);
@@ -903,6 +902,7 @@
                  return;
             }
             
+            // Note: The query uses the unique currentUser.uid for data separation
             const q = query(collection(db, "withdrawals"), where("userId", "==", currentUser.uid));
             
             try {
@@ -964,7 +964,34 @@
             codeInput.value = '';
             loader.style.display = 'none';
         }
-
+        
+        // Refactored to only update the referrer's balance when a new user signs up
+        async function applyReferrerBonusOnly(referrerCode) {
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("referralCode", "==", referrerCode));
+            const rewardAmount = appConfig.rewardPerReferral;
+            try {
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    const referrerDoc = querySnapshot.docs[0];
+                    const referrerRef = doc(db, "users", referrerDoc.id);
+                    const referrerData = referrerDoc.data();
+                    
+                    // 1. Give bonus to referrer
+                    await updateDoc(referrerRef, { 
+                        tkBalance: (referrerData.tkBalance || 0) + rewardAmount 
+                    });
+                    
+                    // 2. The new user's initial balance is already set in handleSignup
+                } else {
+                    console.warn(`Referrer code ${referrerCode} not found.`);
+                }
+            } catch(error) {
+                console.error("Error applying referrer bonus: ", error);
+            }
+        }
+        
+        // This function handles both manual application and initial sign-up (new user gets balance, referrer gets bonus)
         async function applyReferralBonus(referrerCode, isManualApply = false, targetUserData) {
             const usersRef = collection(db, "users");
             const q = query(usersRef, where("referralCode", "==", referrerCode));
@@ -979,19 +1006,19 @@
                     // 1. Give bonus to referrer
                     await updateDoc(referrerRef, { tkBalance: (referrerData.tkBalance || 0) + rewardAmount });
                     
-                    // 2. Update new user's status and balance
+                    // 2. Update new/current user's status and balance
                     const newUserRef = doc(db, "users", targetUserData.uid);
                     const newBalance = (targetUserData.tkBalance || 0) + rewardAmount;
                     await updateDoc(newUserRef, { tkBalance: newBalance, referredBy: referrerCode });
                     
-                    // 3. Update local state
-                    if (targetUserData.uid === currentUser?.uid) { // Check if this is the current user being updated
+                    // 3. Update local state if this is the current user (important for manual apply)
+                    if (targetUserData.uid === currentUser?.uid) { 
                         userData.tkBalance = newBalance; 
                         userData.referredBy = referrerCode;
+                        updateUI();
+                        await fetchReferralCount();
                     } 
                     
-                    updateUI();
-                    await fetchReferralCount();
                     if(isManualApply) showAlert(`Code applied successfully! You and the referrer received ৳${rewardAmount.toFixed(2)}.`);
                 } else {
                     if(isManualApply) showAlert("Invalid referral code.");
@@ -1079,21 +1106,14 @@
             try {
                 // 1. Update user data in Firestore
                 const userRef = doc(db, "users", currentUser.uid);
-                const newBalance = (userData.tkBalance || 0) + rewardAmount;
-                
                 await updateDoc(userRef, { 
-                    tkBalance: newBalance,
+                    tkBalance: (userData.tkBalance || 0) + rewardAmount,
                     lastDailyCheckTime: now // Store current time as last claimed time
                 });
                 
                 // 2. Update local state
-                userData.tkBalance = newBalance;
+                userData.tkBalance += rewardAmount;
                 userData.lastDailyCheckTime = now;
-                
-                // FIX: Add the daily check bonus to the todayEarning counter
-                if (isSameDay(now)) {
-                    todayEarning += rewardAmount;
-                }
                 
                 showAlert(`Daily Check Bonus claimed! You earned ৳${rewardAmount.toFixed(2)}.`);
                 
@@ -1212,8 +1232,8 @@
         }
 
         window.claimReward = async function(taskType) {
-            if (!currentUser) return showAlert("Please log in to perform this task.");
-
+            if (!currentUser) return showAlert("Please log in to claim.");
+            
             const today = new Date().toISOString().split('T')[0];
             const userRef = doc(db, "users", currentUser.uid);
 
@@ -1244,11 +1264,9 @@
                     case 'interstitial': 
                     case 'miniApp': 
                     case 'popup':
-                        // The SDK is assumed to handle different types based on context/configuration
                         window.show_10012357(); 
                         break;
                     case 'inApp': 
-                        // Simulate an in-app ad view without a direct reward
                         window.show_10012357({ type: 'inApp' }); 
                         break;
                     default: 
@@ -1273,7 +1291,6 @@
                     // Update balance
                     const updateSuccess = await updateBalance(rewardAmount);
                     if (updateSuccess) {
-                        // FIX: Ensure todayEarning is updated for ad rewards
                         todayEarning += rewardAmount;
                         showAlert(`Congratulations! You have earned ৳${rewardAmount.toFixed(2)}.`);
                     }
@@ -1286,7 +1303,6 @@
                 }
                 
                 updateAdsLeftCount();
-                todayEarningCountEl.textContent = `৳${todayEarning.toFixed(2)}`; // Refresh display immediately
 
             } catch(e) {
                 console.error("Ad error:", e);
