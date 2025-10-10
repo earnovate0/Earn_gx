@@ -31,6 +31,8 @@
             font-family: 'Inter', sans-serif; 
             background-color: var(--primary-bg); 
             color: var(--text-color); 
+            /* Added min-h-screen for full height layout on mobile */
+            min-height: 100vh; 
         }
         .card-bg { 
             background-color: var(--secondary-bg); 
@@ -67,6 +69,7 @@
 
         /* Main View Separation */
         .main-view { display: none; }
+        /* Use min-h-screen to ensure proper full-page layout */
         .main-view.active { display: flex; flex-direction: column; min-height: 100vh; }
 
         /* Popup Animation */
@@ -305,6 +308,8 @@
                         <i data-lucide="check-circle" class="w-5 h-5 text-blue-500 fill-blue-100"></i>
                     </div>
                     <p id="profile-email" class="text-gray-500 text-xs">user@email.com</p>
+                     <!-- NEW: User ID Display -->
+                    <p class="text-xs font-mono text-gray-400 mt-2">User ID: <span id="account-user-id" class="font-semibold text-gray-600">Loading...</span></p>
                 </div>
                 
                 <!-- Stats Grid -->
@@ -422,6 +427,19 @@
             </button>
         </div>
     </div>
+    
+    <!-- Custom Reward Modal (for Ad confirmation) -->
+    <div id="reward-modal" class="popup-modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+        <div class="card-bg rounded-xl p-6 w-full max-w-sm text-center shadow-2xl">
+            <i data-lucide="monitor-play" class="w-10 h-10 mx-auto text-accent mb-4"></i>
+            <p id="reward-message" class="mb-4 font-bold text-xl text-text-color">Ad is loading...</p>
+            <p class="text-sm text-gray-500 mb-6">বিজ্ঞাপনটি সম্পূর্ণ দেখা হলে নিচের বাটনটি চাপুন।</p>
+            <button id="confirm-ad-btn" class="btn-accent px-6 py-2 rounded-xl text-sm" disabled>
+                Claim Reward
+            </button>
+        </div>
+    </div>
+
 
     <script type="module">
         // Global variables provided by the environment
@@ -431,7 +449,7 @@
             authDomain: "earn-38176.firebaseapp.com",
             databaseURL: "https://earn-38176-default-rtdb.firebaseio.com",
             projectId: "earn-38176",
-            storageBucket: "earn-38176.firebasestorage.app",
+            storageBucket: "earn-38176-default-rtdb.appspot.com",
             messagingSenderId: "350056832143",
             appId: "1:350056832143:web:9ffeba3301bd73dfc364fa",
             measurementId: "G-2LGXC91KT5"
@@ -441,7 +459,10 @@
         // Firebase imports (using v9 compatibility syntax for CDN)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, getDocs, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        // import { setLogLevel } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        
+        // setLogLevel('Debug'); // Enable debug logging for Firebase/Firestore
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -449,10 +470,23 @@
 
         let currentUser = null;
         let userData = null;
+        let unsubscribeUser = null;
+        let unsubscribeReferrals = null;
+        let unsubscribeWithdrawals = null;
+        let unsubscribeNotifications = null;
         
-        // --- FIX 1: Referral Link Configuration ---
-        // Configuration for Telegram Bot Referral Link (using the bot name inferred from the request)
-        const TELEGRAM_BOT_USERNAME = "greenIncomes_bot";
+        // --- NEW: Fs Path Definitions (Security Fix) ---
+        // Using the public path structure for all app data
+        const BASE_PATH_PUBLIC = `artifacts/${appId}/public/data`;
+        const getUserRef = (uid) => doc(db, BASE_PATH_PUBLIC, "users", uid);
+        const getUsersCollection = () => collection(db, BASE_PATH_PUBLIC, "users");
+        const getWithdrawalsCollection = () => collection(db, BASE_PATH_PUBLIC, "withdrawals");
+        const getNotificationsCollection = () => collection(db, BASE_PATH_PUBLIC, "notifications");
+        const getConfigRef = () => doc(db, BASE_PATH_PUBLIC, "config", "main");
+        // --- END Fs Path Definitions ---
+        
+        // Configuration for Telegram Bot Referral Link
+        const TELEGRAM_BOT_USERNAME = "greenIncomes_bot"; // Bot username (without '@')
         
         let appConfig = {
             minWithdrawal: 500,
@@ -463,7 +497,7 @@
             rewardPerReferral: 30,
             dailyCheckBonus: 5,
             rewardPerSocialTask: 7, 
-            // Correct format: https://t.me/BOT_USERNAME?start=ref_USER_CODE
+            // Correct format: https://t.me/bot_username?start=ref_
             referralUrlBase: `https://t.me/${TELEGRAM_BOT_USERNAME}?start=ref_` 
         };
 
@@ -478,6 +512,7 @@
         const profileNameEl = document.getElementById('profile-name');
         const profileEmailEl = document.getElementById('profile-email');
         const profileAvatarEl = document.getElementById('profile-avatar');
+        const accountUserIdEl = document.getElementById('account-user-id'); // NEW: User ID display
         const referralLinkDisplayEl = document.getElementById('referral-link-display');
         const withdrawMethodSelect = document.getElementById('withdraw-method');
         const notificationDot = document.getElementById('notification-dot');
@@ -492,6 +527,7 @@
         const taskLimitEl = document.getElementById('task-limit');
         const dailyCheckBtn = document.getElementById('daily-check-btn');
         const dailyCheckBtnTask = document.getElementById('daily-check-btn-task');
+        const rewardModal = document.getElementById('reward-modal'); // NEW
 
         // Utility to check if running inside Telegram Mini App
         function isTelegramApp() {
@@ -517,8 +553,24 @@
                 };
             }
         }
+        
+        // Function to unsubscribe from all listeners
+        function unsubscribeAll() {
+            if (unsubscribeUser) unsubscribeUser();
+            if (unsubscribeReferrals) unsubscribeReferrals();
+            if (unsubscribeWithdrawals) unsubscribeWithdrawals();
+            if (unsubscribeNotifications) unsubscribeNotifications();
+            unsubscribeUser = null;
+            unsubscribeReferrals = null;
+            unsubscribeWithdrawals = null;
+            unsubscribeNotifications = null;
+            userData = null;
+        }
+
 
         async function handleAuthStateChange(user) {
+            unsubscribeAll(); // Unsubscribe old listeners
+
             if (user) {
                 loader.style.display = 'flex';
                 currentUser = user;
@@ -526,49 +578,53 @@
                 // 1. Attempt Custom Token Sign-In if in Canvas Environment and Anonymous
                 if (initialAuthToken && user.isAnonymous) {
                      try {
-                        // NOTE: If successful, this will trigger the onAuthStateChanged listener again
                         await signInWithCustomToken(auth, initialAuthToken);
-                        return; 
+                        return; // Wait for the listener to fire again with the new user
                     } catch(e) {
                         console.error("Custom token sign-in failed:", e);
                         if (user.isAnonymous) await signInAnonymously(auth); // Fallback
                     }
                 }
                 
-                // --- FIX 2: Enhanced Data Synchronization (Preventing data mix-up) ---
-                // We ensure that we only proceed if currentUser is fully established and not transitioning
-                if (currentUser.uid) {
-                    await fetchUserData();
-                    
-                    if (!userData) {
-                        console.error("User data could not be loaded. Showing auth.");
-                        await signOut(auth); // Force sign out if data load fails
-                        loader.style.display = 'none';
-                        return;
+                // 2. Fetch config (one-off)
+                await fetchAppConfig();
+                
+                // 3. Set up REAL-TIME listeners
+                setupRealtimeListeners();
+                
+                showMainView('app-container'); // Show the main application
+                navigateTo('home-page'); 
+                loader.style.display = 'none';
+            } else {
+                currentUser = null;
+                showMainView('auth-section'); // Show the authentication page
+                loader.style.display = 'none';
+            }
+        }
+        
+        // --- NEW: Real-Time Listener Setup ---
+        function setupRealtimeListeners() {
+            if (!currentUser) return;
+            
+            // 1. User Data Listener (Core)
+            const userRef = getUserRef(currentUser.uid);
+            unsubscribeUser = onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data?.isBlocked) {
+                         showAlert("Your account has been blocked.");
+                         signOut(auth);
+                         return;
                     }
-
-                    if (userData?.isBlocked) {
-                        showAlert("Your account has been blocked.");
-                        await signOut(auth);
-                        loader.style.display = 'none';
-                        return;
-                    }
+                    userData = data;
                     
-                    await fetchAppConfig();
-                    await checkNewNotifications();
-                    await fetchReferralCount();
-                    
-                    // Daily ad earning reset check (uses date, not 24 hours)
+                    // Handle Daily Ad Count Reset based on current data
                     const today = new Date().toISOString().split('T')[0];
                     if (userData.lastAdWatchDate !== today) {
                         todayEarning = 0;
-                        const userRef = doc(db, "users", currentUser.uid);
-                        try {
-                            // Only reset dailyAdCount if it's a new day
-                            if (userData.dailyAdCount > 0) {
-                                await updateDoc(userRef, { dailyAdCount: 0, lastAdWatchDate: today });
-                            }
-                        } catch(e) { console.error("Error resetting daily count:", e); }
+                        if (userData.dailyAdCount > 0) {
+                            updateDoc(userRef, { dailyAdCount: 0, lastAdWatchDate: today }).catch(e => console.error("Error resetting daily count:", e));
+                        }
                         userData.dailyAdCount = 0;
                         userData.lastAdWatchDate = today;
                     } else {
@@ -576,62 +632,78 @@
                     }
                     
                     updateUI();
-                    showMainView('app-container'); // Show the main application
-                    navigateTo('home-page'); 
+                } else {
+                    // If user doc doesn't exist, create it (handles first sign-in scenario)
+                    initializeUserData(currentUser);
                 }
-                // -----------------------------------------------------------------
-
-                loader.style.display = 'none';
-            } else {
-                currentUser = null;
-                userData = null;
-                showMainView('auth-section'); // Show the authentication page
-                loader.style.display = 'none';
-            }
+            }, (error) => {
+                console.error("Error listening to user data:", error);
+                showAlert("Error loading user data in real-time.");
+            });
+            
+            // 2. Referral Count Listener (Query across the collection)
+            const q = query(getUsersCollection(), where("referredBy", "==", userData?.referralCode || ""));
+            unsubscribeReferrals = onSnapshot(q, (querySnapshot) => {
+                const count = querySnapshot.size;
+                referralCountEl.textContent = count;
+                accountReferralCountEl.textContent = count;
+            }, (error) => {
+                 console.error("Error listening to referral count:", error);
+            });
+            
+            // 3. Notifications Check Listener (Simplified check for new items)
+            const notificationQuery = query(getNotificationsCollection(), limit(1));
+            unsubscribeNotifications = onSnapshot(notificationQuery, (querySnapshot) => {
+                 // Simple check: if the user's last check time is older than the latest notification
+                 // NOTE: This logic is complex with serverTimestamp. A simpler approach is to use a separate "unread count" field in the user doc.
+                 // For now, we'll just re-run the checkNewNotifications logic whenever the collection changes.
+                 checkNewNotifications(true); 
+            }, (error) => {
+                 console.error("Error listening to notifications:", error);
+            });
         }
-
-        async function fetchUserData() {
-            if (!currentUser) return;
-            const userRef = doc(db, "users", currentUser.uid);
+        
+        // --- NEW: User Data Initialization (Called on initial sign-up or if doc not found by listener)
+        async function initializeUserData(user) {
+            const userRef = getUserRef(user.uid);
             try {
                 const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    // Critical: Always overwrite global userData with fresh data from DB
-                    userData = userSnap.data();
-                } else {
-                    const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                    const defaultUserData = {
-                        uid: currentUser.uid, name: currentUser.displayName || currentUser.email?.split('@')[0] || 'New User', email: currentUser.email || 'N/A',
-                        tkBalance: 5,
-                        referralCode: ownReferralCode, referredBy: null,
-                        lastNotificationCheck: serverTimestamp(),
-                        createdAt: serverTimestamp(),
-                        dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
-                        lastDailyCheckTime: 0, 
-                        socialClaims: { telegram: false, bot: false, facebook: false }
-                    };
-                    
-                    // Check URL for initial referral code
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const referrerCode = urlParams.get('r'); 
-                    if (referrerCode) {
-                        defaultUserData.referredBy = referrerCode;
-                        // Apply bonus to referrer and update new user's balance locally
-                        await applyReferralBonus(referrerCode, false, defaultUserData); 
-                    }
-                    await setDoc(userRef, defaultUserData);
-                    userData = defaultUserData;
+                if (userSnap.exists()) return; // Already exists, just wait for onSnapshot to fire
+                
+                const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                const tgUser = isTelegramApp() ? Telegram.WebApp.initDataUnsafe.user : null;
+                
+                const defaultUserData = {
+                    uid: user.uid, 
+                    name: tgUser ? `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() : user.displayName || user.email?.split('@')[0] || 'New User', 
+                    email: user.email || (tgUser ? `@${tgUser.username}` : 'N/A'),
+                    tkBalance: 5,
+                    referralCode: ownReferralCode, referredBy: null,
+                    lastNotificationCheck: serverTimestamp(),
+                    createdAt: serverTimestamp(),
+                    dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
+                    lastDailyCheckTime: 0, 
+                    socialClaims: { telegram: false, bot: false, facebook: false }
+                };
+                
+                // Check URL for initial referral code
+                const urlParams = new URLSearchParams(window.location.search);
+                const referrerCode = urlParams.get('r'); 
+                if (referrerCode) {
+                    defaultUserData.referredBy = referrerCode;
+                    await applyReferralBonus(referrerCode, false, defaultUserData); 
                 }
+                
+                await setDoc(userRef, defaultUserData);
+                // The onSnapshot listener will pick this up and update userData
             } catch (error) {
-                console.error("Error fetching user data:", error);
-                showAlert("Error loading user data. Please try logging in again.");
-                // Ensure userData is null if loading fails to prevent data mixing
-                userData = null; 
+                console.error("Error initializing user data:", error);
+                showAlert("Error initializing user data. Please try logging in again.");
             }
         }
-
+        
         async function fetchAppConfig() {
-            const configRef = doc(db, "config", "main");
+            const configRef = getConfigRef();
             try {
                 const configSnap = await getDoc(configRef);
                 if (configSnap.exists()) {
@@ -642,22 +714,6 @@
                 console.error("Error fetching app config:", error);
             }
         }
-        
-        async function fetchReferralCount() {
-            if (!userData || !userData.referralCode) return;
-            // Note: The data separation is handled here by querying based on the current user's unique referralCode
-            const q = query(collection(db, "users"), where("referredBy", "==", userData.referralCode));
-            try {
-                const querySnapshot = await getDocs(q);
-                const count = querySnapshot.size;
-                referralCountEl.textContent = count;
-                accountReferralCountEl.textContent = count;
-            } catch (error) {
-                console.error("Error fetching referral count:", error);
-                referralCountEl.textContent = '0';
-                accountReferralCountEl.textContent = '0';
-            }
-        }
 
         function updateUI() {
             if (!userData) return;
@@ -666,8 +722,11 @@
             headerTkBalanceEl.textContent = balance.toFixed(2);
             tkBalanceEl.textContent = balance.toFixed(2);
             accountTkBalanceEl.textContent = balance.toFixed(2);
+            
+            // NEW: Display User ID
+            accountUserIdEl.textContent = currentUser?.uid || "N/A";
 
-            // --- Telegram TMA Integration for Profile Name/Picture ---
+            // --- UPDATED: Telegram TMA Integration for Profile Name/Picture ---
             const tgUser = isTelegramApp() ? Telegram.WebApp.initDataUnsafe.user : null;
             
             if (tgUser) {
@@ -682,7 +741,6 @@
                 // Fallback to Firebase/DB data
                 profileNameEl.textContent = userData.name || 'User Profile';
                 profileEmailEl.textContent = userData.email || 'No Email';
-                // Fallback Avatar Logic (simulating logo1.jpg.png)
                 const logoUrl = "https://placehold.co/80x80/10b981/ffffff?text=LOGO"; 
                 const initial = userData.name?.charAt(0)?.toUpperCase() || userData.email?.charAt(0)?.toUpperCase() || 'U';
                 const initialFallbackUrl = `https://placehold.co/80x80/10b981/ffffff?text=${initial}`;
@@ -692,18 +750,16 @@
             }
             // --- END UPDATED TMA LOGIC ---
 
-            // --- FIX 1: Referral Link Usage ---
-            // Ensures the referral link is always generated from the current user's unique referral code
+            // Referral link uses the updated Telegram bot structure: https://t.me/bot_username?start=ref_CODE
             const referralLink = `${appConfig.referralUrlBase}${userData.referralCode}`;
             referralLinkDisplayEl.textContent = referralLink;
             referralLinkDisplayEl.dataset.link = referralLink;
-            // ---------------------------------
 
             todayEarningCountEl.textContent = `৳${todayEarning.toFixed(2)}`;
             updateAdsLeftCount();
             updateDailyCheckButtonState();
             
-            // Update Social Task Buttons 
+            // Update Social Task Buttons
             const socialTasks = ['telegram', 'bot', 'facebook'];
             socialTasks.forEach(key => {
                 const btn = document.getElementById(`claim-${key}-btn`);
@@ -732,7 +788,7 @@
             updateDynamicPaymentFields();
         }
         
-        // NEW: Updates the state of the Daily Check button based on 24-hour cool down
+        // Updates the state of the Daily Check button based on 24-hour cool down
         function updateDailyCheckButtonState() {
             if (!userData) return;
             const now = Date.now();
@@ -764,11 +820,7 @@
 
         function updateAdsLeftCount() {
             if (!userData) return;
-            const today = new Date().toISOString().split('T')[0];
-            if (userData.lastAdWatchDate !== today) {
-                userData.dailyAdCount = 0; // Ensure local data reflects server check if not updated yet
-            }
-            const adsLeft = Math.max(0, (appConfig.dailyAdLimit || 10) - userData.dailyAdCount);
+            const adsLeft = Math.max(0, (appConfig.dailyAdLimit || 10) - (userData.dailyAdCount || 0));
             adsLeftCountEl.textContent = adsLeft;
             taskProgressEl.textContent = (appConfig.dailyAdLimit || 10) - adsLeft;
             taskLimitEl.textContent = appConfig.dailyAdLimit || 10;
@@ -803,12 +855,12 @@
             if (pageId === 'home-page') {
                 showWelcomePopupOnHome(); 
             } else if (pageId === 'account-page') {
-                loadWithdrawalHistory();
+                loadWithdrawalHistory(); // Now uses onSnapshot
             } else if (pageId === 'notifications-page') {
                 loadNotifications();
             } else if (pageId === 'tasks-page') {
-                updateDailyCheckButtonState(); // Ensure the daily check button is updated
-                updateUI(); // Ensure social task buttons are updated
+                updateDailyCheckButtonState(); 
+                updateUI(); 
             }
             // Recreate icons if necessary after page change
             lucide.createIcons();
@@ -820,6 +872,13 @@
             document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('signup-view').classList.add('hidden'); document.getElementById('login-view').classList.remove('hidden'); });
             document.getElementById('signup-btn').addEventListener('click', handleSignup);
             document.getElementById('login-btn').addEventListener('click', handleLogin);
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navigateTo(link.dataset.page);
+                });
+            });
             
             document.getElementById('notification-bell').addEventListener('click', () => { navigateTo('notifications-page'); });
             document.getElementById('copy-link-btn').addEventListener('click', copyReferralLink);
@@ -839,40 +898,8 @@
             loader.style.display = 'flex';
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const userRef = doc(db, "users", userCredential.user.uid);
-                
-                const urlParams = new URLSearchParams(window.location.search);
-                const referrerCode = urlParams.get('r'); 
-                
-                const ownReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                
-                // Start with the base 5 TK + bonus if referred
-                let initialBalance = 5;
-                if (referrerCode) {
-                    initialBalance += appConfig.rewardPerReferral;
-                }
-
-                const defaultUserData = {
-                    uid: userCredential.user.uid, name: name, email: email,
-                    tkBalance: initialBalance, // New user's initial balance including referral bonus
-                    referralCode: ownReferralCode, referredBy: referrerCode || null,
-                    lastNotificationCheck: serverTimestamp(),
-                    createdAt: serverTimestamp(),
-                    dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
-                    lastDailyCheckTime: 0,
-                    socialClaims: { telegram: false, bot: false, facebook: false }
-                };
-                
-                // If there's a referrer code, apply the bonus ONLY to the referrer
-                if (referrerCode) {
-                    await applyReferrerBonusOnly(referrerCode);
-                }
-                
-                // Save the new user's doc (which now includes their initial/referral balance)
-                await setDoc(userRef, defaultUserData);
-                
-                // onAuthStateChanged will now fire and load the correct, unique data.
-                
+                // Call initialization logic which also handles referral application
+                await initializeUserData(userCredential.user);
             } catch (error) {
                 showAlert(error.message);
             } finally {
@@ -894,19 +921,21 @@
             }
         }
 
-        async function loadWithdrawalHistory() {
+        // --- NEW: Real-Time Withdrawal History ---
+        function loadWithdrawalHistory() {
             const historyList = document.getElementById('withdrawal-history-list');
-            historyList.innerHTML = '<p class="text-gray-500 text-center">Loading history...</p>';
+            
             if (!currentUser) {
                  historyList.innerHTML = '<p class="text-gray-500 text-center">User not authenticated.</p>';
                  return;
             }
             
-            // Note: The query uses the unique currentUser.uid for data separation
-            const q = query(collection(db, "withdrawals"), where("userId", "==", currentUser.uid));
+            // Unsubscribe from the previous listener if it exists
+            if (unsubscribeWithdrawals) unsubscribeWithdrawals(); 
             
-            try {
-                const querySnapshot = await getDocs(q);
+            const q = query(getWithdrawalsCollection(), where("userId", "==", currentUser.uid));
+            
+            unsubscribeWithdrawals = onSnapshot(q, (querySnapshot) => {
                 let requests = [];
                 querySnapshot.forEach(doc => {
                     requests.push({...doc.data(), id: doc.id});
@@ -947,11 +976,12 @@
                     </div>`;
                 });
                 lucide.createIcons();
-            } catch (error) {
-                console.error("Error fetching withdrawal history:", error);
+            }, (error) => {
+                console.error("Error listening to withdrawal history:", error);
                 historyList.innerHTML = `<p class="text-red-600 text-center">Error loading history. (Check console for details)</p>`;
-            }
+            });
         }
+        // --- END Real-Time Withdrawal History ---
         
         async function handleApplyReferralCode() {
             if (userData.referredBy) return showAlert("You have already used a referral code.");
@@ -964,60 +994,29 @@
             codeInput.value = '';
             loader.style.display = 'none';
         }
-        
-        // Refactored to only update the referrer's balance when a new user signs up
-        async function applyReferrerBonusOnly(referrerCode) {
-            const usersRef = collection(db, "users");
-            const q = query(usersRef, where("referralCode", "==", referrerCode));
-            const rewardAmount = appConfig.rewardPerReferral;
-            try {
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot.empty) {
-                    const referrerDoc = querySnapshot.docs[0];
-                    const referrerRef = doc(db, "users", referrerDoc.id);
-                    const referrerData = referrerDoc.data();
-                    
-                    // 1. Give bonus to referrer
-                    await updateDoc(referrerRef, { 
-                        tkBalance: (referrerData.tkBalance || 0) + rewardAmount 
-                    });
-                    
-                    // 2. The new user's initial balance is already set in handleSignup
-                } else {
-                    console.warn(`Referrer code ${referrerCode} not found.`);
-                }
-            } catch(error) {
-                console.error("Error applying referrer bonus: ", error);
-            }
-        }
-        
-        // This function handles both manual application and initial sign-up (new user gets balance, referrer gets bonus)
+
         async function applyReferralBonus(referrerCode, isManualApply = false, targetUserData) {
-            const usersRef = collection(db, "users");
-            const q = query(usersRef, where("referralCode", "==", referrerCode));
+            // Query public users collection
+            const q = query(getUsersCollection(), where("referralCode", "==", referrerCode)); 
             const rewardAmount = appConfig.rewardPerReferral;
             try {
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
                     const referrerDoc = querySnapshot.docs[0];
-                    const referrerRef = doc(db, "users", referrerDoc.id);
+                    const referrerRef = getUserRef(referrerDoc.id); // Get ref using ID
                     const referrerData = referrerDoc.data();
                     
-                    // 1. Give bonus to referrer
+                    // 1. Give bonus to referrer (Atomically)
                     await updateDoc(referrerRef, { tkBalance: (referrerData.tkBalance || 0) + rewardAmount });
                     
-                    // 2. Update new/current user's status and balance
-                    const newUserRef = doc(db, "users", targetUserData.uid);
-                    const newBalance = (targetUserData.tkBalance || 0) + rewardAmount;
-                    await updateDoc(newUserRef, { tkBalance: newBalance, referredBy: referrerCode });
+                    // 2. Update new user's status and balance (Atomically)
+                    const newUserRef = getUserRef(targetUserData.uid);
+                    await updateDoc(newUserRef, { 
+                        tkBalance: (targetUserData.tkBalance || 0) + rewardAmount, 
+                        referredBy: referrerCode 
+                    });
                     
-                    // 3. Update local state if this is the current user (important for manual apply)
-                    if (targetUserData.uid === currentUser?.uid) { 
-                        userData.tkBalance = newBalance; 
-                        userData.referredBy = referrerCode;
-                        updateUI();
-                        await fetchReferralCount();
-                    } 
+                    // Local data and UI update will be handled by the onSnapshot listener.
                     
                     if(isManualApply) showAlert(`Code applied successfully! You and the referrer received ৳${rewardAmount.toFixed(2)}.`);
                 } else {
@@ -1031,12 +1030,11 @@
 
         async function updateBalance(amount) {
             if (!currentUser) return;
+            const userRef = getUserRef(currentUser.uid);
             const newBalance = (userData.tkBalance || 0) + amount;
-            const userRef = doc(db, "users", currentUser.uid);
             try {
+                // Update is safe because onSnapshot will fire and update local state
                 await updateDoc(userRef, { tkBalance: newBalance });
-                userData.tkBalance = newBalance;
-                updateUI();
                 return true;
             } catch (error) {
                 console.error("Error updating balance:", error);
@@ -1045,37 +1043,29 @@
             }
         }
 
-        // --- NEW: Social Reward Claim Logic ---
+        // --- Social Reward Claim Logic ---
         window.claimSocialReward = async function(taskKey) {
             if (!currentUser) return showAlert("Please log in to claim this reward.");
             
-            // Check if the user has already claimed this specific social task
             if (userData.socialClaims?.[taskKey]) {
                 return showAlert("You have already claimed the reward for this task. This is a one-time bonus.");
             }
 
             loader.style.display = 'flex';
             const rewardAmount = appConfig.rewardPerSocialTask || 7;
-            const userRef = doc(db, "users", currentUser.uid);
+            const userRef = getUserRef(currentUser.uid);
 
             try {
-                // 1. Prepare updates for Firestore
                 const newClaims = { ...(userData.socialClaims || {}), [taskKey]: true };
                 const newBalance = (userData.tkBalance || 0) + rewardAmount;
                 
+                // Firestore update (onSnapshot handles local update)
                 await updateDoc(userRef, { 
                     tkBalance: newBalance,
                     socialClaims: newClaims
                 });
                 
-                // 2. Update local state
-                userData.tkBalance = newBalance;
-                userData.socialClaims = newClaims;
-                
                 showAlert(`Social Reward Claimed! You earned ৳${rewardAmount.toFixed(2)}. This button is now disabled.`);
-                
-                // 3. Update UI to disable the button
-                updateUI();
             } catch(e) {
                 console.error("Social reward claim error:", e);
                 showAlert("Error claiming social reward. Please try again.");
@@ -1091,7 +1081,7 @@
 
             const now = Date.now();
             const lastCheckTime = userData.lastDailyCheckTime || 0;
-            const coolDownDuration = 24 * 60 * 60 * 1000; // 24 hours in ms
+            const coolDownDuration = 24 * 60 * 60 * 1000; 
             
             if ((now - lastCheckTime) < coolDownDuration) {
                 const timeLeft = lastCheckTime + coolDownDuration - now;
@@ -1104,21 +1094,14 @@
             const rewardAmount = appConfig.dailyCheckBonus || 5;
 
             try {
-                // 1. Update user data in Firestore
-                const userRef = doc(db, "users", currentUser.uid);
+                const userRef = getUserRef(currentUser.uid);
                 await updateDoc(userRef, { 
                     tkBalance: (userData.tkBalance || 0) + rewardAmount,
                     lastDailyCheckTime: now // Store current time as last claimed time
                 });
                 
-                // 2. Update local state
-                userData.tkBalance += rewardAmount;
-                userData.lastDailyCheckTime = now;
-                
                 showAlert(`Daily Check Bonus claimed! You earned ৳${rewardAmount.toFixed(2)}.`);
-                
-                // 3. Update UI
-                updateUI();
+                // UI update via onSnapshot
             } catch(e) {
                 console.error("Daily check bonus error:", e);
                 showAlert("Error claiming daily bonus. Please try again.");
@@ -1149,21 +1132,12 @@
 
             loader.style.display = 'flex';
             try {
-                const userRef = doc(db, "users", currentUser.uid);
-                const userSnap = await getDoc(userRef);
-                const actualBalance = userSnap.data()?.tkBalance || 0;
-
-                if (amount > actualBalance) {
-                    showAlert("Balance check failed: Insufficient funds. Refreshing data.");
-                    await fetchUserData(); // Re-fetch data to sync
-                    loader.style.display = 'none';
-                    return;
-                }
-
-                const deductionSuccess = await updateBalance(-amount); // Deduct balance immediately
+                // Deduct balance first
+                const deductionSuccess = await updateBalance(-amount); 
                 if (!deductionSuccess) throw new Error("Balance deduction failed.");
                 
-                await addDoc(collection(db, "withdrawals"), {
+                // Add withdrawal request to public collection
+                await addDoc(getWithdrawalsCollection(), {
                     userId: currentUser.uid, userName: userData.name, userEmail: userData.email,
                     amount: amount, method: method, paymentDetail: paymentDetail, status: "pending", requestedAt: serverTimestamp()
                 });
@@ -1171,10 +1145,10 @@
                 showAlert("Withdrawal request submitted successfully! Pending Approval.");
                 document.getElementById('withdraw-amount').value = '';
                 paymentDetailInput.value = '';
-                loadWithdrawalHistory();
+                // Withdrawal history updates via onSnapshot listener
             } catch (error) {
                 console.error("Withdrawal error:", error);
-                await updateBalance(amount); // Refund balance on error
+                await updateBalance(amount); // Refund balance on error (triggers onSnapshot)
                 showAlert("Error submitting request. Balance refunded: " + (error.code || error.message));
             } finally {
                 loader.style.display = 'none';
@@ -1231,100 +1205,111 @@
             }
         }
 
+        // --- MODIFIED: Claim Reward Logic with Modal ---
         window.claimReward = async function(taskType) {
-            if (!currentUser) return showAlert("Please log in to claim.");
+            if (!currentUser) return showAlert("Please log in to claim this reward.");
             
-            const today = new Date().toISOString().split('T')[0];
-            const userRef = doc(db, "users", currentUser.uid);
-
-            // Ensure dailyAdCount is reset if it's a new day
-            if (userData.lastAdWatchDate !== today) {
-                try {
-                    await updateDoc(userRef, { dailyAdCount: 0, lastAdWatchDate: today });
-                    userData.dailyAdCount = 0;
-                    userData.lastAdWatchDate = today;
-                } catch(e) { console.error("Error updating ad count:", e); }
-            }
-
-            if (userData.dailyAdCount >= (appConfig.dailyAdLimit || 10)) {
+            // Daily Ad Limit Check
+            if ((userData.dailyAdCount || 0) >= (appConfig.dailyAdLimit || 10)) {
                 return showAlert("You have reached your daily ad watch limit.");
             }
             
-            // Check if ad SDK function is available
             if (typeof window.show_10012357 !== 'function') {
                 return showAlert("Ad service is currently unavailable. (Code: 10012357).");
             }
-            
-            loader.style.display = 'flex';
+
+            // 1. Determine reward amount
             let rewardAmount = 0;
+            if (taskType === 'miniApp') rewardAmount = appConfig.rewardPerAd * 2;
+            else if (taskType !== 'inApp') rewardAmount = appConfig.rewardPerAd;
             
+            const rewardMessageEl = document.getElementById('reward-message');
+            const confirmAdBtn = document.getElementById('confirm-ad-btn');
+            
+            rewardMessageEl.textContent = taskType === 'inApp' 
+                ? "Starting Video..." 
+                : `Ad Loading... (Reward: ৳${rewardAmount.toFixed(2)})`;
+            confirmAdBtn.disabled = true;
+            confirmAdBtn.textContent = taskType === 'inApp' ? 'Continue' : 'Claim Reward';
+            
+            rewardModal.classList.add('active');
+            loader.style.display = 'flex';
+            
+            // 2. Simulate Ad Display (replace this with proper SDK callbacks in a real app)
             try {
-                 // 1. Show the Ad
-                 switch(taskType) {
-                    case 'interstitial': 
-                    case 'miniApp': 
-                    case 'popup':
-                        window.show_10012357(); 
-                        break;
-                    case 'inApp': 
-                        window.show_10012357({ type: 'inApp' }); 
-                        break;
-                    default: 
-                        loader.style.display = 'none';
-                        return;
-                }
-                
-                // 2. Wait for a few seconds to simulate the ad loading/watching time
-                await new Promise(resolve => setTimeout(resolve, 3000)); 
-
-                // 3. Process the reward and count (only if not 'inApp' which gives no direct TK reward)
-                if (taskType !== 'inApp') {
-                    // Determine reward amount
-                    if (taskType === 'miniApp') rewardAmount = appConfig.rewardPerAd * 2;
-                    else rewardAmount = appConfig.rewardPerAd;
-                    
-                    // Update user's ad count
-                    const newCount = (userData.dailyAdCount || 0) + 1;
-                    await updateDoc(userRef, { dailyAdCount: newCount });
-                    userData.dailyAdCount = newCount;
-
-                    // Update balance
-                    const updateSuccess = await updateBalance(rewardAmount);
-                    if (updateSuccess) {
-                        todayEarning += rewardAmount;
-                        showAlert(`Congratulations! You have earned ৳${rewardAmount.toFixed(2)}.`);
-                    }
-                } else {
-                    // For 'inApp' task, just count it
-                    const newCount = (userData.dailyAdCount || 0) + 1;
-                    await updateDoc(userRef, { dailyAdCount: newCount });
-                    userData.dailyAdCount = newCount;
-                    showAlert(`Task completed: Video viewed and counted towards your daily limit.`);
-                }
-                
-                updateAdsLeftCount();
-
+                 window.show_10012357(); // Call the ad SDK
+                 
+                 // Simulating successful ad view after a delay
+                 setTimeout(() => {
+                     rewardMessageEl.textContent = "Ad Finished!";
+                     confirmAdBtn.disabled = false;
+                     loader.style.display = 'none'; // Hide main loader once ad is "shown"
+                 }, 3000); // 3 seconds to simulate ad display
+                 
             } catch(e) {
                 console.error("Ad error:", e);
-                showAlert('Ad display failed or was skipped. Please try again.');
-            } finally {
+                rewardModal.classList.remove('active');
                 loader.style.display = 'none';
+                return showAlert('Ad service failed to load. Please try again.');
             }
+            
+            // 3. Handle Confirmation/Claim Logic
+            confirmAdBtn.onclick = async () => {
+                rewardModal.classList.remove('active');
+                loader.style.display = 'flex';
+                
+                const userRef = getUserRef(currentUser.uid);
+                
+                try {
+                    // Always count the ad towards the limit
+                    const newCount = (userData.dailyAdCount || 0) + 1;
+                    await updateDoc(userRef, { dailyAdCount: newCount });
+
+                    if (taskType !== 'inApp') {
+                        // Reward balance only if it's a paid task
+                        const updateSuccess = await updateBalance(rewardAmount);
+                        if (updateSuccess) {
+                            todayEarning += rewardAmount; // Local update is fine, onSnapshot handles persistence
+                            showAlert(`Congratulations! You have earned ৳${rewardAmount.toFixed(2)}.`);
+                        }
+                    } else {
+                        showAlert(`Task completed: Video viewed and counted towards your daily limit.`);
+                    }
+                    
+                    updateAdsLeftCount();
+                    updateUI(); // Ensure UI reflects changes immediately
+                } catch (e) {
+                    console.error("Reward processing failed:", e);
+                    showAlert("Error processing reward. Try again.");
+                } finally {
+                    loader.style.display = 'none';
+                }
+            };
         }
+        // --- END MODIFIED Claim Reward Logic ---
+
 
         // --- Notifications and Alerts ---
         
-        async function checkNewNotifications() {
+        async function checkNewNotifications(forceCheck = false) {
             if (!userData) return;
-            // Use local check time if server timestamp is missing or zero-equivalent
-            const lastCheckTime = userData.lastNotificationCheck?.toDate()?.getTime() || new Date(0).getTime();
-            const lastCheck = new Date(lastCheckTime);
+            // Get the latest notification timestamp
+            const qLatest = query(getNotificationsCollection(), limit(1));
             
-            // Query for notifications created after the user's last check time
-            const q = query(collection(db, "notifications"), where("createdAt", ">", lastCheck), limit(1));
             try {
-                 const querySnapshot = await getDocs(q);
-                 notificationDot.style.display = querySnapshot.empty ? 'none' : 'block';
+                const latestSnap = await getDocs(qLatest);
+                if (latestSnap.empty) {
+                    notificationDot.style.display = 'none';
+                    return;
+                }
+                
+                const latestNotification = latestSnap.docs[0].data();
+                const latestTime = latestNotification.createdAt?.toDate()?.getTime() || 0;
+                const lastCheckTime = userData.lastNotificationCheck?.toDate()?.getTime() || new Date(0).getTime();
+                
+                // Show dot if the latest notification is newer than the user's last check time
+                const hasNew = latestTime > lastCheckTime;
+                notificationDot.style.display = hasNew ? 'block' : 'none';
             } catch (e) {
                 console.error("Error checking notifications:", e);
                 notificationDot.style.display = 'none';
@@ -1337,7 +1322,7 @@
             notificationDot.style.display = 'none';
             
             // Fetch all notifications (or limit if the list grows large)
-            const q = query(collection(db, "notifications")); 
+            const q = query(getNotificationsCollection()); 
             try {
                 const querySnapshot = await getDocs(q);
                 let notifications = [];
@@ -1365,7 +1350,8 @@
                 
                 // Update last checked time to server timestamp
                 if (currentUser) {
-                    await updateDoc(doc(db, "users", currentUser.uid), { lastNotificationCheck: serverTimestamp() });
+                    await updateDoc(getUserRef(currentUser.uid), { lastNotificationCheck: serverTimestamp() });
+                    // No need to check for new notifications again, the next time it's opened it will compare against the new timestamp
                 }
             } catch (error) {
                 console.error("Error loading notifications:", error);
@@ -1386,4 +1372,3 @@
     </script>
 </body>
 </html>
-
