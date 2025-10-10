@@ -643,18 +643,13 @@
             profileNameEl.textContent = userData.name || 'User Profile';
             profileEmailEl.textContent = userData.email || 'No Email';
             
-            // --- UPDATED: Profile Avatar Logic (to simulate logo1.jpg) ---
-            const logoUrl = "https://placehold.co/80x80/10b981/ffffff?text=LOGO"; // Simulating logo1.jpg
-            const initial = userData.name?.charAt(0)?.toUpperCase() || userData.email?.charAt(0)?.toUpperCase() || 'U';
-            const initialFallbackUrl = `https://placehold.co/80x80/10b981/ffffff?text=${initial}`;
-
+            // --- FIX: Profile Avatar Logic (Always display the fixed logo placeholder) ---
+            const logoUrl = "https://placehold.co/80x80/10b981/ffffff?text=LOGO"; // Simulating logo1.jpg.png
             if (profileAvatarEl) {
-                 // Set the logo URL directly, simulating 'logo1.jpg'
                  profileAvatarEl.src = logoUrl; 
-                 // Fallback for image loading failure, using the user initial
-                 profileAvatarEl.onerror = () => { profileAvatarEl.src = initialFallbackUrl; }; 
+                 // We rely on the robustness of the placehold.co link, no complex fallback needed.
             }
-            // --- END UPDATED LOGIC ---
+            // --- END FIX ---
 
             // Referral link uses the updated Telegram bot structure
             const referralLink = `${appConfig.referralUrlBase}${userData.referralCode}`;
@@ -1324,3 +1319,4 @@
     </script>
 </body>
 </html>
+
