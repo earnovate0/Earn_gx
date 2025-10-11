@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Earn & Reward App</title>
+    <!-- Load Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <style>
+        :root {
+            /* Custom Colors for Light/Dark Theme Simulation */
+            --primary: #007AFF; /* Blue */
+            --primary-dark: #0A84FF;
+            --bg-light: #f4f4f9;
+            --surface-light: #ffffff;
+            --surface-dark: #1C1C1E;
+            --bg-dark: #121212;
+            --text-light: #1c1c1e;
+            --text-dark: #ffffff;
+            --subtle-light: #6d6d72;
+            --subtle-dark: #8e8e93;
+            --border-light: #e0e0e0;
+            --border-dark: #38383a;
+        }
+
+        /* Base Tailwind Customization */
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
+
+        /* Custom Dark/Light Theme Switching (for non-Tailwind elements like scrollbars if needed) */
+        .light-theme {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+        .dark-theme {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        /* Page Transitions & Animations */
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Button Loading State */
+        .btn-loader {
+            width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #fff; border-radius: 50%;
+            animation: spin 1s linear infinite; display: none;
+        }
+        .action-btn.loading .btn-text { visibility: hidden; }
+        .action-btn.loading .btn-loader { display: block; position: absolute; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Modal Styles */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0;
+            width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            padding: 2rem; border-radius: 1rem; text-align: center;
+            max-width: 90%;
+        }
+    </style>
+</head>
+<body class="light-theme">
+
+    <div id="app" class="max-w-md mx-auto min-h-screen relative pb-20">
+        
+        <!-- Profile Header -->
+        <header id="profile-header" class="p-4 flex items-center shadow-sm border-b"
+            style="background-color: var(--surface-light); border-color: var(--border-light);">
+            <div class="flex items-center gap-4">
+                <img id="user-photo" src="https://placehold.co/64x64/007aff/ffffff?text=U" alt="User Photo" 
+                    class="w-16 h-16 rounded-full object-cover border-2" 
+                    style="border-color: var(--primary);">
+                <div class="user-details">
+                    <h1 id="user-name" class="text-xl font-bold">Loading... <i class="fas fa-check-circle verified-icon text-blue-500"></i></h1>
+                    <p class="text-lg font-semibold" style="color: var(--subtle-light);">
+                        Balance: ৳<span id="user-points">0</span> TK
+                    </p>
+                    <p id="user-id-display" class="text-xs" style="color: var(--subtle-light);">ID: N/A</p>
+                </div>
+            </div>
+        </header>
+
+        <main id="main-content" class="p-4 overflow-y-auto">
+            
+            <!-- Home Page -->
+            <div id="home-page" class="page active">
+                <h2 class="text-2xl font-extrabold mb-5 pt-3">Dashboard</h2>
+                
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div id="stat-card-1" class="p-5 rounded-xl shadow-lg" 
+                        style="background-color: var(--surface-light); border: 1px solid var(--border-light);">
+                        <h3 class="text-sm font-medium mb-2" style="color: var(--subtle-light);">Daily Ads Watched</h3>
+                        <p class="text-2xl font-extrabold text-blue-500"><span id="daily-ads-watched">0</span> / 25</p>
+                    </div>
+                    <div id="stat-card-2" class="p-5 rounded-xl shadow-lg" 
+                        style="background-color: var(--surface-light); border: 1px solid var(--border-light);">
+                        <h3 class="text-sm font-medium mb-2" style="color: var(--subtle-light);">Total Referrals</h3>
+                        <p id="referral-count" class="text-2xl font-extrabold text-blue-500">0</p>
+                    </div>
+                </div>
+
+                <!-- Referral Section -->
+                <div id="referral-section" class="p-6 rounded-xl shadow-lg border-2 border-dashed border-blue-400" 
+                    style="background-color: var(--surface-light);">
+                    <h3 class="text-xl font-bold mb-3 text-center">Refer & Earn More!</h3>
+                    <p class="text-sm mb-4 text-center" style="color: var(--subtle-light);">Share your link to get bonus points.</p>
+                    <input type="text" id="referral-link" readonly 
+                        class="w-full p-3 text-center rounded-lg border-2 mb-4 font-mono text-sm" 
+                        style="border-color: var(--border-light); background-color: var(--bg-light); color: var(--text-light);">
+                    <button id="copy-ref-link-btn" class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition duration-200">
+                        Copy Referral Link
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tasks Page -->
+            <div id="tasks-page" class="page">
+                <h2 class="text-2xl font-extrabold mb-5 pt-3">Complete Tasks</h2>
+                
+                <!-- Watch Ad Task -->
+                <div id="task-ad" class="p-6 rounded-xl shadow-lg mb-5 text-center"
+                    style="background-color: var(--surface-light); border: 1px solid var(--border-light);">
+                    <i class="fas fa-video text-5xl mb-4 text-blue-500"></i>
+                    <h3 class="text-xl font-semibold mb-1">Watch a Rewarded Ad</h3>
+                    <p class="text-sm mb-5" style="color: var(--subtle-light);">Earn ৳3 for every ad watched (max 25/day).</p>
+                    <button id="watch-ad-btn" class="action-btn w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition duration-200 relative">
+                        <span class="btn-text">Watch Ad</span>
+                        <span class="btn-loader"></span>
+                    </button>
+                </div>
+
+                <!-- Join Channel Task -->
+                <div id="task-channel" class="p-6 rounded-xl shadow-lg mb-5 text-center"
+                    style="background-color: var(--surface-light); border: 1px solid var(--border-light);">
+                    <i class="fab fa-telegram text-5xl mb-4 text-blue-500"></i>
+                    <h3 class="text-xl font-semibold mb-1">Join Our Channel</h3>
+                    <p class="text-sm mb-5" style="color: var(--subtle-light);">Get ৳40 bonus (one-time).</p>
+                    <button id="join-channel-btn" class="action-btn w-full py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-xl transition duration-200 relative">
+                        <span class="btn-text">Join & Claim Bonus</span>
+                    </button>
+                </div>
+                
+                <!-- Join Group Task -->
+                <div id="task-group" class="p-6 rounded-xl shadow-lg mb-5 text-center"
+                    style="background-color: var(--surface-light); border: 1px solid var(--border-light);">
+                    <i class="fas fa-users text-5xl mb-4 text-blue-500"></i>
+                    <h3 class="text-xl font-semibold mb-1">Join Our Group</h3>
+                    <p class="text-sm mb-5" style="color: var(--subtle-light);">Get ৳10 bonus (one-time).</p>
+                    <button id="join-group-btn" class="action-btn w-full py-3 bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-xl transition duration-200 relative">
+                        <span class="btn-text">Join & Claim Bonus</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Withdraw Page -->
+            <div id="withdraw-page" class="page">
+                <h2 class="text-2xl font-extrabold mb-5 pt-3">Withdraw Funds</h2>
+                <p class="mb-5 p-3 rounded-lg text-sm font-medium bg-yellow-100 text-yellow-800 border border-yellow-300">
+                    Minimum ৳50 required to withdraw.
+                </p>
+                <form id="withdraw-form" class="p-6 rounded-xl shadow-lg" 
+                    style="background-color: var(--surface-light); border: 1px solid var(--border-light);">
+                    
+                    <div class="mb-4">
+                        <label for="withdraw-method" class="block mb-2 font-semibold text-sm">Method:</label>
+                        <select id="withdraw-method" required 
+                            class="w-full p-3 rounded-lg border-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="Bkash">Bkash</option>
+                            <option value="Nagad">Nagad</option>
+                            <option value="Rocket">Rocket</option>
+                            <option value="Binance">Binance (ID)</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="account-number" class="block mb-2 font-semibold text-sm">Account Number/ID:</label>
+                        <input type="text" id="account-number" placeholder="e.g., 012345..." required 
+                            class="w-full p-3 rounded-lg border-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label for="amount" class="block mb-2 font-semibold text-sm">Taka to Withdraw:</label>
+                        <input type="number" id="amount" placeholder="Minimum 50" required min="50"
+                            class="w-full p-3 rounded-lg border-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <button type="submit" id="withdraw-submit-btn" class="action-btn w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition duration-200 relative">
+                        <span class="btn-text">Submit Request</span>
+                        <span class="btn-loader"></span>
+                    </button>
+                </form>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav id="bottom-nav" class="bottom-nav fixed bottom-0 left-0 right-0 max-w-md mx-auto flex justify-around p-1 border-t shadow-2xl"
+            style="background-color: var(--surface-light); border-color: var(--border-light);">
+            <button class="nav-btn flex flex-col items-center p-2 text-xs font-semibold active" data-page="home-page" style="color: var(--primary);">
+                <i class="fas fa-home text-xl mb-1"></i><span>Home</span>
+            </button>
+            <button class="nav-btn flex flex-col items-center p-2 text-xs font-semibold" data-page="tasks-page" style="color: var(--subtle-light);">
+                <i class="fas fa-tasks text-xl mb-1"></i><span>Tasks</span>
+            </button>
+            <button class="nav-btn flex flex-col items-center p-2 text-xs font-semibold" data-page="withdraw-page" style="color: var(--subtle-light);">
+                <i class="fas fa-wallet text-xl mb-1"></i><span>Withdraw</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loading-modal" class="modal">
+        <div id="modal-content" class="modal-content" style="background-color: var(--surface-light);">
+            <div id="modal-loader" class="loader" style="border-top-color: var(--primary);"></div>
+            <p id="modal-text" style="color: var(--text-light);">Loading data...</p>
+        </div>
+    </div>
+    
+    <!-- Telegram Web App SDK & Ad SDK (kept from original) -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src='//libtl.com/sdk.js' data-zone='10012357' data-sdk='_10012357'></script>
+
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // Configuration Variables provided by the Canvas Environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Constants from the original app
+        const BOT_TOKEN = "8025165879:AAFBKnC6FDSm7P_zE-OviGwUe_iajZ_Lvw4";
+        const BOT_USERNAME = "@mango_cash_bot";
+        const ADMIN_CHAT_ID = "6703675335";
+        const CHANNEL_LINK = "https://t.me/goodgmail";
+        const GROUP_LINK = "https://t.me/OnlineEarnEleven";
+        const DAILY_AD_LIMIT = 25;
+        const POINTS_PER_AD = 3;
+        const CHANNEL_JOIN_BONUS = 40;
+        const GROUP_JOIN_BONUS = 10;
+        const MIN_WITHDRAW_POINTS = 50; // Changed from 500 in original code to match the UI text
+
+        // Firestore paths
+        const getProfileDocRef = (db, userId) => doc(db, 'artifacts', appId, 'users', userId, 'data', 'user_profile');
+
+        // Initializing App
+        if (Object.keys(firebaseConfig).length === 0) {
+            console.error("Firebase configuration is missing. Cannot initialize Firestore.");
+            // Fallback: use a simple local state if Firebase is unavailable
+            window.appState = { points: 0, dailyAdWatchCount: 0, lastAdWatchDate: null, referralCount: 0, hasJoinedChannel: false, hasJoinedGroup: false };
+            window.tgAppLoaded = true; // Pretend we are ready
+            return;
+        }
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        setLogLevel('debug'); // Enable Firestore logs for debugging
+
+        // Global state variable (holds user data and Firebase readiness)
+        let state = {
+            points: 0,
+            dailyAdWatchCount: 0,
+            referralCount: 0,
+            hasJoinedChannel: false,
+            hasJoinedGroup: false,
+            lastAdWatchDate: null,
+            referrals: [], // Storing this as an empty array since referral logic is complex and usually server-side
+            userId: null,
+            isAuthReady: false,
+            dbInstance: db,
+            authState: auth,
+            tg: window.Telegram.WebApp
+        };
+
+        const dom = {
+            userPhotoElem: document.getElementById('user-photo'),
+            userNameElem: document.getElementById('user-name'),
+            userIdDisplay: document.getElementById('user-id-display'),
+            userPointsElem: document.getElementById('user-points'),
+            dailyAdsWatchedElem: document.getElementById('daily-ads-watched'),
+            referralCountElem: document.getElementById('referral-count'),
+            watchAdBtn: document.getElementById('watch-ad-btn'),
+            joinChannelBtn: document.getElementById('join-channel-btn'),
+            joinGroupBtn: document.getElementById('join-group-btn'),
+            withdrawForm: document.getElementById('withdraw-form'),
+            withdrawSubmitBtn: document.getElementById('withdraw-submit-btn'),
+            referralLinkElem: document.getElementById('referral-link'),
+            copyRefLinkBtn: document.getElementById('copy-ref-link-btn'),
+            loadingModal: document.getElementById('loading-modal'),
+            modalText: document.getElementById('modal-text'),
+            navButtons: document.querySelectorAll('.nav-btn'),
+            pages: document.querySelectorAll('.page')
+        };
+        
+        const updateUI = () => {
+            const tgUser = state.tg.initDataUnsafe.user;
+            const primaryColor = state.tg.colorScheme === 'dark' ? 'var(--primary-dark)' : 'var(--primary)';
+            const subtleColor = state.tg.colorScheme === 'dark' ? 'var(--subtle-dark)' : 'var(--subtle-light)';
+            const surfaceColor = state.tg.colorScheme === 'dark' ? 'var(--surface-dark)' : 'var(--surface-light)';
+            const borderColor = state.tg.colorScheme === 'dark' ? 'var(--border-dark)' : 'var(--border-light)';
+            
+            // Apply Theme to dynamic styles
+            document.body.className = `${state.tg.colorScheme}-theme`;
+            document.getElementById('profile-header').style.backgroundColor = surfaceColor;
+            document.getElementById('profile-header').style.borderColor = borderColor;
+            dom.userPhotoElem.style.borderColor = primaryColor;
+            
+            document.querySelectorAll('[id^="stat-card"]').forEach(el => {
+                el.style.backgroundColor = surfaceColor;
+                el.style.borderColor = borderColor;
+            });
+            document.querySelectorAll('[id^="task-"]').forEach(el => {
+                el.style.backgroundColor = surfaceColor;
+                el.style.borderColor = borderColor;
+            });
+            dom.referralLinkElem.style.backgroundColor = state.tg.colorScheme === 'dark' ? 'var(--bg-dark)' : 'var(--bg-light)';
+            dom.withdrawForm.style.backgroundColor = surfaceColor;
+            dom.withdrawForm.style.borderColor = borderColor;
+            document.getElementById('bottom-nav').style.backgroundColor = surfaceColor;
+            document.getElementById('bottom-nav').style.borderColor = borderColor;
+            document.getElementById('modal-content').style.backgroundColor = surfaceColor;
+            document.getElementById('modal-loader').style.borderTopColor = primaryColor;
+            
+            // User Details
+            if (tgUser) {
+                dom.userPhotoElem.src = tgUser.photo_url || 'https://placehold.co/64x64/007aff/ffffff?text=U';
+                dom.userNameElem.innerHTML = `${tgUser.first_name || 'User'} ${tgUser.last_name || ''} <i class="fas fa-check-circle verified-icon text-blue-500"></i>`;
+                dom.userIdDisplay.textContent = `ID: ${state.userId.substring(0, 8)}...`;
+            }
+
+            // Points and Stats
+            dom.userPointsElem.textContent = state.points;
+            dom.dailyAdsWatchedElem.textContent = state.dailyAdWatchCount;
+            dom.referralCountElem.textContent = state.referralCount;
+
+            dom.referralLinkElem.value = `https://t.me/${BOT_USERNAME}?start=ref_${state.userId}`;
+
+            // Task Button States
+            if (state.dailyAdWatchCount >= DAILY_AD_LIMIT) {
+                dom.watchAdBtn.textContent = 'Daily Limit Reached';
+                dom.watchAdBtn.disabled = true;
+                dom.watchAdBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                dom.watchAdBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            } else {
+                dom.watchAdBtn.textContent = 'Watch Ad';
+                dom.watchAdBtn.disabled = false;
+                dom.watchAdBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+                dom.watchAdBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            }
+            
+            if (state.hasJoinedChannel) {
+                dom.joinChannelBtn.textContent = 'Bonus Claimed';
+                dom.joinChannelBtn.disabled = true;
+                dom.joinChannelBtn.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+                dom.joinChannelBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            } else {
+                dom.joinChannelBtn.textContent = 'Join & Claim Bonus';
+                dom.joinChannelBtn.disabled = false;
+                dom.joinChannelBtn.classList.add('bg-indigo-500', 'hover:bg-indigo-600');
+                dom.joinChannelBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            }
+
+            if (state.hasJoinedGroup) {
+                dom.joinGroupBtn.textContent = 'Bonus Claimed';
+                dom.joinGroupBtn.disabled = true;
+                dom.joinGroupBtn.classList.remove('bg-purple-500', 'hover:bg-purple-600');
+                dom.joinGroupBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            } else {
+                dom.joinGroupBtn.textContent = 'Join & Claim Bonus';
+                dom.joinGroupBtn.disabled = false;
+                dom.joinGroupBtn.classList.add('bg-purple-500', 'hover:bg-purple-600');
+                dom.joinGroupBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            }
+        };
+
+        const showModal = (text = "Loading...") => {
+            dom.modalText.textContent = text;
+            dom.loadingModal.style.display = 'flex';
+        };
+
+        const hideModal = () => {
+            dom.loadingModal.style.display = 'none';
+        };
+
+        // --- Data Handling ---
+
+        const fetchInitialState = async () => {
+            if (!state.isAuthReady || !state.userId) return;
+            showModal("Fetching user data...");
+            try {
+                const docRef = getProfileDocRef(state.dbInstance, state.userId);
+                const docSnap = await getDoc(docRef);
+                
+                const today = new Date().toISOString().slice(0, 10);
+                let initialData;
+                
+                if (docSnap.exists()) {
+                    initialData = docSnap.data();
+                    
+                    // Reset daily ad count if date is different
+                    if (initialData.lastAdWatchDate !== today) {
+                        initialData.dailyAdWatchCount = 0;
+                        initialData.lastAdWatchDate = today;
+                        // Update Firestore immediately to prevent cheating
+                        await setDoc(docRef, { 
+                            dailyAdWatchCount: 0, 
+                            lastAdWatchDate: today 
+                        }, { merge: true });
+                    }
+                } else {
+                    // Initialize new user document
+                    initialData = {
+                        points: 0,
+                        dailyAdWatchCount: 0,
+                        referralCount: 0,
+                        hasJoinedChannel: false,
+                        hasJoinedGroup: false,
+                        lastAdWatchDate: today
+                    };
+                    await setDoc(docRef, initialData);
+                }
+                
+                Object.assign(state, initialData);
+                updateUI();
+                setupRealtimeListener();
+
+            } catch (error) {
+                console.error("Error fetching or initializing user state:", error);
+                state.tg.showAlert("Failed to load user data. Please try again.");
+            } finally {
+                hideModal();
+            }
+        };
+
+        const setupRealtimeListener = () => {
+            const docRef = getProfileDocRef(state.dbInstance, state.userId);
+            
+            onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    // Merge data into state, but be careful not to overwrite local temporary data if any
+                    Object.assign(state, data);
+                    updateUI();
+                } else {
+                    console.error("User document suddenly disappeared. Reinitializing...");
+                    fetchInitialState();
+                }
+            }, (error) => {
+                console.error("Firestore onSnapshot error:", error);
+                state.tg.showAlert("Real-time connection lost. Data updates may be delayed.");
+            });
+        };
+
+        // --- Handlers ---
+
+        const handleWatchAd = async () => {
+            if (state.dailyAdWatchCount >= DAILY_AD_LIMIT) {
+                state.tg.showAlert("You have reached your daily ad watch limit."); return;
+            }
+
+            const docRef = getProfileDocRef(state.dbInstance, state.userId);
+            
+            dom.watchAdBtn.classList.add('loading');
+            dom.watchAdBtn.disabled = true;
+            showModal("Loading Ad...");
+
+            try {
+                // Simulate ad loading from external script, which should resolve when ad is closed
+                await new Promise((resolve, reject) => {
+                    if (typeof show_10012357 === 'function') {
+                        show_10012357().then(resolve).catch(reject);
+                    } else {
+                        // Fallback for testing if SDK is blocked
+                        setTimeout(resolve, 3000); 
+                    }
+                });
+
+                // Update Firestore: atomically increase points and ad count
+                const newPoints = state.points + POINTS_PER_AD;
+                const newAdCount = state.dailyAdWatchCount + 1;
+                
+                await setDoc(docRef, {
+                    points: newPoints,
+                    dailyAdWatchCount: newAdCount,
+                }, { merge: true });
+
+                state.tg.HapticFeedback.notificationOccurred('success');
+                state.tg.showAlert(`Congratulations! You've earned ৳${POINTS_PER_AD}.`);
+                
+            } catch (error) {
+                console.error("Ad loading failed or transaction failed:", error);
+                state.tg.HapticFeedback.notificationOccurred('error');
+                state.tg.showAlert("Ad failed to load or points could not be awarded. Try again.");
+            } finally {
+                hideModal();
+                dom.watchAdBtn.classList.remove('loading');
+                // UI will be updated by onSnapshot listener
+            }
+        };
+        
+        const handleJoinTask = async (taskType) => {
+            const isChannel = taskType === 'channel';
+            const bonus = isChannel ? CHANNEL_JOIN_BONUS : GROUP_JOIN_BONUS;
+            const link = isChannel ? CHANNEL_LINK : GROUP_LINK;
+            const claimedState = isChannel ? state.hasJoinedChannel : state.hasJoinedGroup;
+            const btn = isChannel ? dom.joinChannelBtn : dom.joinGroupBtn;
+            
+            if(claimedState) {
+                state.tg.showAlert(`You have already claimed the ${isChannel ? 'channel' : 'group'} bonus.`);
+                return;
+            }
+            
+            state.tg.openTelegramLink(link);
+            
+            // Wait a few seconds for the user to join (in a real app, this check would happen server-side/bot-side)
+            btn.classList.add('loading');
+            btn.disabled = true;
+            showModal("Waiting for confirmation...");
+
+            setTimeout(async () => {
+                try {
+                    const docRef = getProfileDocRef(state.dbInstance, state.userId);
+                    
+                    // Update Firestore
+                    const updateData = { points: state.points + bonus };
+                    if (isChannel) {
+                        updateData.hasJoinedChannel = true;
+                    } else {
+                        updateData.hasJoinedGroup = true;
+                    }
+                    
+                    await setDoc(docRef, updateData, { merge: true });
+
+                    state.tg.HapticFeedback.notificationOccurred('success');
+                    state.tg.showAlert(`Thank you! You received ৳${bonus} bonus.`);
+                } catch (error) {
+                    console.error("Failed to update task status:", error);
+                    state.tg.HapticFeedback.notificationOccurred('error');
+                    state.tg.showAlert("Bonus claim failed. Please try again.");
+                } finally {
+                    hideModal();
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                }
+            }, 3000); // 3 second simulation wait
+        };
+        
+        const handleWithdraw = async (e) => {
+            e.preventDefault();
+            const method = document.getElementById('withdraw-method').value;
+            const accountNumber = document.getElementById('account-number').value;
+            const amount = parseInt(document.getElementById('amount').value, 10);
+            
+            if (!state.isAuthReady) { state.tg.showAlert("App is still initializing. Please wait."); return; }
+            if (isNaN(amount) || amount <= 0) { state.tg.showAlert("Please enter a valid amount."); return; }
+            if (amount < MIN_WITHDRAW_POINTS) { state.tg.showAlert(`Minimum withdrawal is ৳${MIN_WITHDRAW_POINTS}.`); return; }
+            if (amount > state.points) { state.tg.showAlert("You don't have enough balance."); return; }
+
+            const docRef = getProfileDocRef(state.dbInstance, state.userId);
+            dom.withdrawSubmitBtn.classList.add('loading');
+            dom.withdrawSubmitBtn.disabled = true;
+
+            // Optimistically update local state and Firestore (will revert if bot message fails)
+            const oldPoints = state.points;
+            const newPoints = state.points - amount;
+
+            try {
+                // 1. Update points in Firestore
+                await setDoc(docRef, { points: newPoints }, { merge: true });
+                
+                // 2. Send request to the Telegram Bot/Admin
+                const tgUser = state.tg.initDataUnsafe.user;
+                const message = `<b>New Withdraw Request!</b>\n-----------------------------------\n<b>User:</b> ${tgUser.first_name || 'User'} ${tgUser.last_name || ''} (@${tgUser.username || 'N/A'})\n<b>User ID:</b> <code>${state.userId}</code>\n-----------------------------------\n<b>Method:</b> ${method}\n<b>Account:</b> <code>${accountNumber}</code>\n<b>Amount:</b> ৳${amount}\n-----------------------------------\n<b>Date:</b> ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}`;
+                
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: message, parse_mode: 'HTML'})
+                });
+                const result = await response.json();
+                
+                if (result.ok) {
+                    state.tg.HapticFeedback.notificationOccurred('success');
+                    state.tg.showAlert("Withdrawal request submitted successfully! Your balance has been updated.");
+                    dom.withdrawForm.reset();
+                } else {
+                    throw new Error(result.description || "Bot API failed.");
+                }
+
+            } catch (error) {
+                console.error("Withdrawal error:", error);
+                state.tg.HapticFeedback.notificationOccurred('error');
+                state.tg.showAlert("Failed to submit request. Your points have been returned. Check console for details.");
+                
+                // Revert points in Firestore
+                await setDoc(docRef, { points: oldPoints }, { merge: true });
+            } finally {
+                dom.withdrawSubmitBtn.classList.remove('loading');
+                dom.withdrawSubmitBtn.disabled = false;
+            }
+        };
+        
+        const copyReferralLink = () => {
+            navigator.clipboard.writeText(dom.referralLinkElem.value).then(() => {
+                state.tg.HapticFeedback.notificationOccurred('success');
+                state.tg.showAlert("Referral link copied!");
+            });
+        };
+
+        // --- Initialization ---
+
+        const setupNavigation = () => {
+            dom.navButtons.forEach(button => {
+                const defaultColor = state.tg.colorScheme === 'dark' ? 'var(--subtle-dark)' : 'var(--subtle-light)';
+                const activeColor = state.tg.colorScheme === 'dark' ? 'var(--primary-dark)' : 'var(--primary)';
+
+                // Set initial colors based on current theme/state
+                if (button.classList.contains('active')) {
+                    button.style.color = activeColor;
+                } else {
+                    button.style.color = defaultColor;
+                }
+
+                button.addEventListener('click', () => {
+                    const pageId = button.dataset.page;
+                    dom.pages.forEach(page => page.classList.remove('active'));
+                    document.getElementById(pageId).classList.add('active');
+                    
+                    dom.navButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.style.color = defaultColor;
+                    });
+                    
+                    button.classList.add('active');
+                    button.style.color = activeColor;
+                });
+            });
+        };
+
+        const setupEventListeners = () => {
+            dom.watchAdBtn.addEventListener('click', handleWatchAd);
+            dom.joinChannelBtn.addEventListener('click', () => handleJoinTask('channel'));
+            dom.joinGroupBtn.addEventListener('click', () => handleJoinTask('group'));
+            dom.withdrawForm.addEventListener('submit', handleWithdraw);
+            dom.copyRefLinkBtn.addEventListener('click', copyReferralLink);
+        };
+
+        const initApp = () => {
+            const tg = state.tg;
+            tg.ready();
+            tg.expand();
+            
+            // 1. Initial Auth Check (Custom Token preferred, fallback to Anonymous)
+            onAuthStateChanged(state.authState, async (user) => {
+                if (user) {
+                    state.userId = user.uid;
+                } else {
+                    // Sign in with custom token or anonymously
+                    try {
+                        let authResult;
+                        if (initialAuthToken) {
+                            authResult = await signInWithCustomToken(state.authState, initialAuthToken);
+                        } else {
+                            authResult = await signInAnonymously(state.authState);
+                        }
+                        state.userId = authResult.user.uid;
+                    } catch (error) {
+                        console.error("Auth failed:", error);
+                        tg.showAlert("Authentication failed. Please restart the app.");
+                        return;
+                    }
+                }
+                
+                state.isAuthReady = true;
+                await fetchInitialState();
+            });
+            
+            setupNavigation();
+            setupEventListeners();
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for Telegram WebApp environment
+            if (typeof window.Telegram === 'undefined' || typeof window.Telegram.WebApp === 'undefined') {
+                console.error("Telegram WebApp script not loaded.");
+                // Provide a basic UI update even if TG is missing
+                dom.userNameElem.textContent = "Test User (No TG)";
+                dom.userIdDisplay.textContent = "ID: LocalMode";
+                setupNavigation();
+                setupEventListeners();
+                return;
+            }
+            initApp();
+        });
+    </script>
+</body>
+</html>
+
