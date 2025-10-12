@@ -199,7 +199,7 @@
                 </div>
                 <div class="referral-section">
                     <h3>Refer & Earn More!</h3>
-                    <p>Share your link to get bonus points. (Local Tracking Added)</p>
+                    <p>Share your link to get bonus points. (Local Tracking Active)</p>
                     <input type="text" id="referral-link" value="Loading..." readonly>
                     <button id="copy-ref-link-btn">Copy Referral Link</button>
                 </div>
@@ -285,17 +285,26 @@
             const GROUP_LINK = "https://t.me/OnlineEarnEleven";
             const DAILY_AD_LIMIT = 25;
             const POINTS_PER_AD = 3;
+            const CHANNEL_JOIN_BONUS = 40;
+            const GROUP_JOIN_BONUS = 10;
             const REFERRAL_BONUS = 5; 
             const MIN_WITHDRAW_POINTS = 50; 
 
             // --- DOM Elements ---
             const appContainer = document.getElementById('app');
             const loadingScreen = document.getElementById('loading-screen');
+            const userPhotoElem = document.getElementById('user-photo');
+            const userNameElem = document.getElementById('user-name');
             const userPointsElem = document.getElementById('user-points');
             const dailyAdsWatchedElem = document.getElementById('daily-ads-watched');
+            const referralCountElem = document.getElementById('referral-count');
             const watchAdBtn = document.getElementById('watch-ad-btn');
+            const joinChannelBtn = document.getElementById('join-channel-btn');
+            const joinGroupBtn = document.getElementById('join-group-btn');
+            const withdrawForm = document.getElementById('withdraw-form');
+            const withdrawSubmitBtn = document.getElementById('withdraw-submit-btn');
             const referralLinkElem = document.getElementById('referral-link');
-            // ... (other DOM elements)
+            const copyRefLinkBtn = document.getElementById('copy-ref-link-btn');
 
             // --- State Management ---
             let userState = {
@@ -308,6 +317,7 @@
                 userId: null
             };
 
+            // --- Storage Functions ---
             const saveState = () => {
                 if(userState.userId) {
                     localStorage.setItem(`userState_${userState.userId}`, JSON.stringify(userState));
@@ -318,19 +328,20 @@
                 const savedState = localStorage.getItem(`userState_${userId}`);
                 if (savedState) {
                     userState = JSON.parse(savedState);
-                    // Ensure new state properties exist
+                    // Ensure state integrity for new properties
                     if (userState.hasJoinedGroup === undefined) userState.hasJoinedGroup = false;
                     if (userState.referrals === undefined) userState.referrals = 0; 
                 }
             };
 
+            // --- Referral Logic (Local/Insecure) ---
             const checkReferral = (userId) => {
                 const params = new URLSearchParams(window.location.search);
                 const startParam = params.get('startapp');
                 
                 if (startParam) {
                     const referrerId = startParam;
-                    const referralKey = `referred_by_${referrerId}`; 
+                    const referralKey = `referred_by_${referrerId}_${userId}`; // Use a unique key
                     
                     if (localStorage.getItem(referralKey) === null) {
                         if (referrerId !== String(userId)) {
@@ -351,8 +362,54 @@
                 }
             };
             
-            // --- Core Functions ---
+            // --- UI Update & Navigation ---
+
+            const updateUI = () => {
+                const user = tg.initDataUnsafe.user;
+                if (user) {
+                    userPhotoElem.src = user.photo_url || 'https://i.imgur.com/8x8F04B.png'; 
+                    userNameElem.innerHTML = `${user.first_name || ''} ${user.last_name || ''} <i class="fas fa-check-circle verified-icon"></i>`;
+                }
+                
+                userPointsElem.textContent = userState.points;
+                dailyAdsWatchedElem.textContent = String(userState.dailyAdWatchCount).padStart(2, '0');
+                referralCountElem.textContent = String(userState.referrals).padStart(2, '0');
+
+                // Set Referral Link
+                referralLinkElem.value = `https://t.me/${BOT_USERNAME}/${APP_SHORTNAME}?startapp=${userState.userId}`;
+
+                // Update Task Button States
+                joinChannelBtn.textContent = userState.hasJoinedChannel ? 'বোনাস দাবি করা হয়েছে (Claimed)' : 'Join & Claim Bonus';
+                joinChannelBtn.disabled = userState.hasJoinedChannel;
+                
+                joinGroupBtn.textContent = userState.hasJoinedGroup ? 'বোনাস দাবি করা হয়েছে (Claimed)' : 'Join & Claim Bonus';
+                joinGroupBtn.disabled = userState.hasJoinedGroup;
+
+                if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
+                    watchAdBtn.textContent = `দৈনিক সীমা পূর্ণ হয়েছে (${DAILY_AD_LIMIT})`;
+                    watchAdBtn.disabled = true;
+                } else {
+                    watchAdBtn.textContent = 'Watch Ad';
+                    watchAdBtn.disabled = false;
+                }
+            };
             
+            const setupNavigation = () => {
+                const navButtons = document.querySelectorAll('.nav-btn');
+                const pages = document.querySelectorAll('.page');
+                navButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const pageId = button.dataset.page;
+                        pages.forEach(page => page.classList.remove('active'));
+                        document.getElementById(pageId).classList.add('active');
+                        navButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                    });
+                });
+            };
+
+            // --- Action Handlers ---
+
             const creditAdReward = () => {
                 userState.points += POINTS_PER_AD;
                 userState.dailyAdWatchCount++;
@@ -362,7 +419,6 @@
                 tg.showAlert(`অভিনন্দন! আপনি ${POINTS_PER_AD} টাকা আয় করেছেন।`);
             };
             
-            // 💡 NEW: Ad Handling Logic
             const handleWatchAd = () => {
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
                     tg.showAlert("আপনার দৈনিক বিজ্ঞাপন দেখার সীমা পূর্ণ হয়েছে।"); 
@@ -375,13 +431,11 @@
                     // Call the function provided by the external SDK
                     window.show_10012357({
                         onCompletion: () => {
-                            // This function should be called by the SDK after the user watches the full ad
                             creditAdReward();
                             watchAdBtn.disabled = false;
                         },
                         onClose: () => {
-                            // Called when the ad is closed (might or might not be complete)
-                            // We only credit on onCompletion, but we re-enable the button
+                            // Re-enable button if ad closes without completion (to allow retrying)
                             watchAdBtn.disabled = false; 
                         },
                         onError: (error) => {
@@ -401,8 +455,104 @@
                 }
             };
             
-            // --- Initialization Function (Rest of the functions are omitted for brevity, they remain the same) ---
+            const handleJoinChannel = () => {
+                if(userState.hasJoinedChannel) {
+                    tg.showAlert('আপনি ইতিমধ্যেই এই বোনাস দাবি করেছেন।'); return;
+                }
+                tg.openTelegramLink(CHANNEL_LINK);
+                
+                // Simulate checking after a delay
+                setTimeout(() => {
+                    userState.points += CHANNEL_JOIN_BONUS;
+                    userState.hasJoinedChannel = true;
+                    tg.showAlert(`ধন্যবাদ! আপনি ${CHANNEL_JOIN_BONUS} বোনাস টাকা পেয়েছেন।`);
+                    saveState();
+                    updateUI();
+                }, 3000);
+            };
+
+            const handleJoinGroup = () => {
+                if(userState.hasJoinedGroup) {
+                    tg.showAlert('আপনি ইতিমধ্যেই এই বোনাস দাবি করেছেন।'); return;
+                }
+                tg.openTelegramLink(GROUP_LINK);
+                
+                // Simulate checking after a delay
+                setTimeout(() => {
+                    userState.points += GROUP_JOIN_BONUS;
+                    userState.hasJoinedGroup = true;
+                    tg.showAlert(`ধন্যবাদ! আপনি ${GROUP_JOIN_BONUS} বোনাস টাকা পেয়েছেন।`);
+                    saveState();
+                    updateUI();
+                }, 3000);
+            };
+
+            const handleWithdraw = async (e) => {
+                e.preventDefault();
+                const method = document.getElementById('withdraw-method').value;
+                const accountNumber = document.getElementById('account-number').value;
+                const amount = parseInt(document.getElementById('amount').value, 10);
+
+                if (isNaN(amount) || amount <= 0) { tg.showAlert("অনুগ্রহ করে একটি বৈধ পরিমাণ দিন।"); return; }
+                if (amount < MIN_WITHDRAW_POINTS) { tg.showAlert(`ন্যূনতম উইথড্রয়াল হলো ${MIN_WITHDRAW_POINTS} টাকা।`); return; }
+                if (amount > userState.points) { tg.showAlert("আপনার পর্যাপ্ত ব্যালেন্স নেই।"); return; }
+
+                withdrawSubmitBtn.classList.add('loading');
+                withdrawSubmitBtn.disabled = true;
+
+                userState.points -= amount;
+                saveState();
+                updateUI();
+                
+                const user = tg.initDataUnsafe.user;
+                const message = `<b>New Withdraw Request!</b>\n-----------------------------------\n<b>User:</b> ${user.first_name || ''} ${user.last_name || ''} (@${user.username || 'N/A'})\n<b>User ID:</b> <code>${user.id}</code>\n-----------------------------------\n<b>Method:</b> ${method}\n<b>Account:</b> <code>${accountNumber}</code>\n<b>Amount:</b> ${amount} TK\n-----------------------------------\n<b>Date:</b> ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}`;
+                
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: message, parse_mode: 'HTML'})
+                    });
+                    const result = await response.json();
+                    
+                    if (result.ok) {
+                        tg.HapticFeedback.notificationOccurred('success');
+                        tg.showAlert("উইথড্রয়াল অনুরোধ সফলভাবে জমা দেওয়া হয়েছে!");
+                        withdrawForm.reset();
+                    } else { 
+                        throw new Error(result.description); 
+                    }
+                } catch (error) {
+                    tg.HapticFeedback.notificationOccurred('error');
+                    tg.showAlert("অনুরোধ জমা দিতে ব্যর্থ হয়েছে। আপনার পয়েন্ট ফেরত দেওয়া হয়েছে।");
+                    userState.points += amount;
+                    saveState();
+                    updateUI();
+                } finally {
+                    withdrawSubmitBtn.classList.remove('loading');
+                    withdrawSubmitBtn.disabled = false;
+                }
+            };
             
+            const copyReferralLink = () => {
+                navigator.clipboard.writeText(referralLinkElem.value).then(() => {
+                    tg.HapticFeedback.notificationOccurred('success');
+                    tg.showAlert("রেফারেল লিঙ্ক কপি করা হয়েছে!");
+                });
+            };
+
+            // 💡 FIX: Centralized Event Listeners Setup
+            const setupEventListeners = () => {
+                watchAdBtn.addEventListener('click', handleWatchAd);
+                joinChannelBtn.addEventListener('click', handleJoinChannel);
+                joinGroupBtn.addEventListener('click', handleJoinGroup); 
+                withdrawForm.addEventListener('submit', handleWithdraw); // Form submission handles the withdraw button
+                copyRefLinkBtn.addEventListener('click', copyReferralLink);
+            };
+
+            // --- Initialization ---
+
             const initApp = () => {
                 tg.ready();
                 tg.expand();
@@ -426,7 +576,7 @@
                 
                 updateUI();
                 setupNavigation();
-                setupEventListeners();
+                setupEventListeners(); // 💡 FIX: Ensure listeners are set up after all DOM elements are accessed
                 saveState();
 
                 setTimeout(() => {
@@ -437,44 +587,6 @@
                     }, 300);
                 }, 1000); 
             };
-            
-            const updateUI = () => {
-                // ... (UI Update Logic - Remains the same)
-                const user = tg.initDataUnsafe.user;
-                if (user) {
-                    document.getElementById('user-photo').src = user.photo_url || 'https://i.imgur.com/8x8F04B.png'; 
-                    document.getElementById('user-name').innerHTML = `${user.first_name || ''} ${user.last_name || ''} <i class="fas fa-check-circle verified-icon"></i>`;
-                }
-                
-                userPointsElem.textContent = userState.points;
-                dailyAdsWatchedElem.textContent = String(userState.dailyAdWatchCount).padStart(2, '0');
-                document.getElementById('referral-count').textContent = String(userState.referrals).padStart(2, '0'); 
-
-                referralLinkElem.value = `https://t.me/${BOT_USERNAME}/${APP_SHORTNAME}?startapp=${userState.userId}`;
-
-                if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
-                    watchAdBtn.textContent = `দৈনিক সীমা পূর্ণ হয়েছে (${DAILY_AD_LIMIT})`;
-                    watchAdBtn.disabled = true;
-                } else {
-                    watchAdBtn.textContent = 'Watch Ad';
-                    watchAdBtn.disabled = false;
-                }
-                 // ... (Other UI updates)
-            };
-            
-            const setupEventListeners = () => {
-                document.getElementById('watch-ad-btn').addEventListener('click', handleWatchAd);
-                document.getElementById('join-channel-btn').addEventListener('click', handleJoinChannel);
-                document.getElementById('join-group-btn').addEventListener('click', handleJoinGroup); 
-                document.getElementById('withdraw-form').addEventListener('submit', handleWithdraw);
-                document.getElementById('copy-ref-link-btn').addEventListener('click', copyReferralLink);
-            };
-
-            const handleJoinChannel = () => { /* ... (Same Logic) ... */ };
-            const handleJoinGroup = () => { /* ... (Same Logic) ... */ };
-            const handleWithdraw = async (e) => { /* ... (Same Logic) ... */ };
-            const copyReferralLink = () => { /* ... (Same Logic) ... */ };
-            const setupNavigation = () => { /* ... (Same Logic) ... */ };
 
             initApp();
         });
