@@ -46,7 +46,7 @@
         body.dark-theme { background-color: var(--bg-color-dark); color: var(--text-color-dark); }
         #app { max-width: 500px; margin: 0 auto; padding-bottom: 70px; display: none; } 
 
-        /* --- Loading Screen Styles (Simplified & Improved) --- */
+        /* --- Loading Screen Styles (Advanced) --- */
         #loading-screen {
             position: fixed;
             top: 0;
@@ -63,21 +63,42 @@
         .light-theme #loading-screen { background-color: var(--secondary-bg-light); }
         .dark-theme #loading-screen { background-color: var(--secondary-bg-dark); }
 
-        /* Improved Loader Spinner (Larger and using Primary Blue Color) */
+        /* Advanced Loader Spinner (Pulse Effect) */
         .loader-spinner {
             width: 50px; 
             height: 50px;
-            border: 5px solid; 
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            position: relative;
         }
-        .light-theme .loader-spinner { 
-            border-color: var(--border-color-light); 
-            border-top-color: var(--primary-color-light); /* Blue */
+
+        .loader-spinner:before,
+        .loader-spinner:after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 4px solid var(--primary-color-light); /* Blue */
+            opacity: 0;
+            animation: pulse 2s infinite ease-out;
         }
-        .dark-theme .loader-spinner { 
-            border-color: var(--border-color-dark); 
-            border-top-color: var(--primary-color-dark); /* Blue */
+
+        .dark-theme .loader-spinner:before,
+        .dark-theme .loader-spinner:after {
+            border: 4px solid var(--primary-color-dark); /* Blue */
+        }
+        
+        .loader-spinner:after {
+            animation-delay: 1s;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.1); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+        
+        .loading-text {
+            margin-top: 70px; /* Space from the pulsing rings */
+            font-weight: 600;
         }
         /* --- End Loading Screen Styles --- */
 
@@ -87,19 +108,19 @@
         .dark-theme .profile-header { border-bottom-color: var(--border-color-dark); }
         .profile-info { display: flex; align-items: center; gap: 15px; }
         
-        /* 💡 UPDATE: Profile Logo Frame Blue */
+        /* UPDATE: Profile Logo Frame Blue */
         #user-photo { 
             width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid; 
         }
-        .light-theme #user-photo { border-color: var(--primary-color-light); } /* Blue */
-        .dark-theme #user-photo { border-color: var(--primary-color-dark); } /* Blue */
+        .light-theme #user-photo { border-color: var(--primary-color-light); } 
+        .dark-theme #user-photo { border-color: var(--primary-color-dark); } 
 
         .user-details h1 { font-size: 1.2rem; font-weight: 700; }
 
-        /* 💡 UPDATE: Verified Badge Blue */
+        /* UPDATE: Verified Badge Blue */
         .verified-icon { font-size: 1rem; margin-left: 5px; }
-        .light-theme .verified-icon { color: var(--primary-color-light); } /* Blue */
-        .dark-theme .verified-icon { color: var(--primary-color-dark); } /* Blue */
+        .light-theme .verified-icon { color: var(--primary-color-light); } 
+        .dark-theme .verified-icon { color: var(--primary-color-dark); } 
         
         .user-details p { font-size: 0.9rem; font-weight: 600; }
         .light-theme .user-details p { color: var(--subtle-text-light); }
@@ -165,22 +186,22 @@
         .dark-theme .nav-btn { color: var(--subtle-text-dark); }
         .nav-btn i { font-size: 1.4rem; margin-bottom: 3px; }
         .nav-btn.active { font-weight: 700; }
-        .light-theme .nav-btn.active { color: var(--primary-color-light); } /* Blue */ 
-        .dark-theme .nav-btn.active { color: var(--primary-color-dark); } /* Blue */
+        .light-theme .nav-btn.active { color: var(--primary-color-light); } 
+        .dark-theme .nav-btn.active { color: var(--primary-color-dark); } 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; }
         .modal-content { padding: 30px; border-radius: 15px; text-align: center; }
         .light-theme .modal-content { background-color: var(--secondary-bg-light); }
         .dark-theme .modal-content { background-color: var(--secondary-bg-dark); }
         .loader { border: 5px solid #f3f3f3; border-radius: 50%; border-top: 5px solid; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
-        /* 💡 UPDATE: Modal Loader Blue */
-        .light-theme .loader { border-top-color: var(--primary-color-light); } /* Blue */
-        .dark-theme .loader { border-top-color: var(--primary-color-dark); } /* Blue */
+        .light-theme .loader { border-top-color: var(--primary-color-light); } 
+        .dark-theme .loader { border-top-color: var(--primary-color-dark); } 
     </style>
 </head>
 <body class="light-theme">
 
     <div id="loading-screen">
         <div class="loader-spinner"></div>
+        <p class="loading-text">Loading...</p>
     </div>
 
     <div id="app">
@@ -285,7 +306,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const tg = window.Telegram.WebApp;
 
-            // --- Configuration (UPDATED) ---
+            // --- Configuration ---
             const BOT_TOKEN = "8025165879:AAFquOGuGR6IDVmeW4-IYjzAv9fuZHnd9UI"; 
             const BOT_USERNAME = "mango_cash_bot"; 
             const APP_SHORTNAME = "app"; 
@@ -297,8 +318,6 @@
             const POINTS_PER_AD = 3;
             const CHANNEL_JOIN_BONUS = 40;
             const GROUP_JOIN_BONUS = 10;
-            
-            // 💡 UPDATE: New Configuration Values
             const REFERRAL_BONUS = 60; 
             const MIN_WITHDRAW_POINTS = 500; 
             const MIN_REFERRALS_FOR_WITHDRAW = 15;
@@ -306,6 +325,7 @@
             // --- DOM Elements ---
             const appContainer = document.getElementById('app');
             const loadingScreen = document.getElementById('loading-screen');
+            const loadingModal = document.getElementById('loading-modal'); // Added Modal Reference
             const userPointsElem = document.getElementById('user-points');
             const dailyAdsWatchedElem = document.getElementById('daily-ads-watched');
             const referralCountElem = document.getElementById('referral-count');
@@ -314,7 +334,6 @@
             const withdrawSubmitBtn = document.getElementById('withdraw-submit-btn');
             const referralLinkElem = document.getElementById('referral-link');
             const copyRefLinkBtn = document.getElementById('copy-ref-link-btn');
-            // ... (other DOM elements remain the same)
 
             // --- State Management (Local) ---
             let userState = {
@@ -358,7 +377,7 @@
                             if (referrerStateString) {
                                 let referrerState = JSON.parse(referrerStateString);
                                 referrerState.referrals = (referrerState.referrals || 0) + 1;
-                                referrerState.points = (referrerState.points || 0) + REFERRAL_BONUS; // UPDATED BONUS
+                                referrerState.points = (referrerState.points || 0) + REFERRAL_BONUS; 
                                 
                                 localStorage.setItem(referrerKey, JSON.stringify(referrerState));
                                 tg.showAlert(`অভিনন্দন! আপনার রেফারার (${referrerId}) ${REFERRAL_BONUS} টাকা বোনাস পেয়েছে।`);
@@ -371,12 +390,13 @@
             
             // --- Action Handlers ---
 
-            // 💡 FIX: Ad Bonus Credit & Button Re-enable Logic (Ensures subsequent ads can be played)
+            // 💡 FIX: Ad Bonus Credit & Button Re-enable Logic
             const creditAdReward = () => {
                 userState.points += POINTS_PER_AD;
                 userState.dailyAdWatchCount++;
                 saveState();
-                updateUI(); // This call re-enables the button if the limit is not reached
+                updateUI(); 
+                loadingModal.style.display = 'none'; // Ensure modal is closed
                 tg.HapticFeedback.notificationOccurred('success');
                 tg.showAlert(`অভিনন্দন! আপনি ${POINTS_PER_AD} টাকা আয় করেছেন।`);
             };
@@ -387,31 +407,30 @@
                     return;
                 }
                 
-                // Disable button to prevent double-click while ad is loading/playing
                 watchAdBtn.disabled = true;
+                loadingModal.style.display = 'flex'; // Show Ad Loading Modal
 
                 if (TL_SDK_AVAILABLE) {
-                    // Call the function provided by the external SDK
                     window.show_10012357({
                         onCompletion: () => {
-                            // This ensures points are credited and the button is re-enabled/updated
+                            // Points credited only on successful completion
                             creditAdReward(); 
                             watchAdBtn.disabled = false;
                         },
                         onClose: () => {
-                            // Ensures button is re-enabled if the user closes the ad manually
+                            // If user closes, re-enable button and hide modal without credit
+                            loadingModal.style.display = 'none'; 
                             watchAdBtn.disabled = false; 
                         },
                         onError: (error) => {
+                            loadingModal.style.display = 'none';
                             tg.showAlert(`বিজ্ঞাপন লোড করতে ব্যর্থ: ${error}. আবার চেষ্টা করুন।`);
                             watchAdBtn.disabled = false;
                         }
                     });
 
                 } else {
-                    tg.showAlert("বিজ্ঞাপন SDK পাওয়া যায়নি। সিমুলেশন চলছে...");
-                    
-                    // Fallback: Simulate Ad completion after 3 seconds
+                    // Fallback: Simulate Ad completion after 3 seconds if SDK is unavailable
                     setTimeout(() => {
                         creditAdReward();
                         watchAdBtn.disabled = false;
@@ -427,10 +446,8 @@
 
                 if (isNaN(amount) || amount <= 0) { tg.showAlert("অনুগ্রহ করে একটি বৈধ পরিমাণ দিন।"); return; }
                 
-                // 💡 UPDATE: Minimum Withdraw Check
                 if (amount < MIN_WITHDRAW_POINTS) { tg.showAlert(`ন্যূনতম উইথড্রয়াল হলো ${MIN_WITHDRAW_POINTS} টাকা।`); return; }
                 
-                // 💡 UPDATE: Minimum Referral Check
                 if (userState.referrals < MIN_REFERRALS_FOR_WITHDRAW) {
                     tg.showAlert(`উইথড্র করার জন্য আপনার কমপক্ষে ${MIN_REFERRALS_FOR_WITHDRAW}টি রেফারেল প্রয়োজন। আপনার বর্তমান রেফারেল: ${userState.referrals}টি।`); 
                     return; 
@@ -441,7 +458,6 @@
                 withdrawSubmitBtn.classList.add('loading');
                 withdrawSubmitBtn.disabled = true;
 
-                // Simulate deduction and bot message sending...
                 userState.points -= amount;
                 saveState();
                 updateUI();
@@ -478,7 +494,6 @@
             };
             
             const copyReferralLink = () => {
-                // ... (Same logic for copying)
                 navigator.clipboard.writeText(referralLinkElem.value).then(() => {
                     tg.HapticFeedback.notificationOccurred('success');
                     tg.showAlert("রেফারেল লিঙ্ক কপি করা হয়েছে!");
@@ -491,7 +506,6 @@
             // --- UI Setup & Init ---
 
             const updateUI = () => {
-                // ... (UI Update Logic)
                 const user = tg.initDataUnsafe.user;
                 if (user) {
                     document.getElementById('user-photo').src = user.photo_url || 'https://i.imgur.com/8x8F04B.png'; 
@@ -504,7 +518,6 @@
 
                 referralLinkElem.value = `https://t.me/${BOT_USERNAME}/${APP_SHORTNAME}?startapp=${userState.userId}`;
 
-                // Update Task Button States
                 const joinChannelBtn = document.getElementById('join-channel-btn');
                 const joinGroupBtn = document.getElementById('join-group-btn');
 
@@ -514,7 +527,6 @@
                 joinGroupBtn.textContent = userState.hasJoinedGroup ? 'বোনাস দাবি করা হয়েছে (Claimed)' : 'Join & Claim Bonus';
                 joinGroupBtn.disabled = userState.hasJoinedGroup;
 
-                // Ad Button State
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
                     watchAdBtn.textContent = `দৈনিক সীমা পূর্ণ হয়েছে (${DAILY_AD_LIMIT})`;
                     watchAdBtn.disabled = true;
@@ -560,7 +572,6 @@
                 userState.userId = user.id;
                 loadState(user.id);
 
-                // Recheck daily limit status based on date
                 const today = new Date().toISOString().slice(0, 10);
                 if (userState.lastAdWatchDate !== today) {
                     userState.dailyAdWatchCount = 0;
