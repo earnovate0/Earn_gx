@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mango Cash</title>
+    <title>Mango Cash (Offline Simulation)</title>
     
     <script src='//libtl.com/sdk.js' data-zone='10012357' data-sdk='show_10012357'></script>
 
@@ -105,11 +105,11 @@
         <div class="text-center mb-12">
             <i data-lucide="dollar-sign" class="w-16 h-16 mx-auto mb-4 text-accent"></i>
             <h1 class="text-4xl font-extrabold mb-2 text-accent">Mango Cash</h1>
-            <p id="auth-message" class="text-gray-500 font-semibold text-lg">Connecting to database...</p>
+            <p id="auth-message" class="text-gray-500 font-semibold text-lg">Initializing app...</p>
         </div>
         <div class="card-bg p-6 rounded-2xl shadow-xl text-center">
-             <p class="text-sm text-gray-700">Please wait while we connect.</p>
-             <p class="text-xs text-red-500 mt-2">If this screen persists, please launch the app directly from Telegram.</p>
+             <p class="text-sm text-gray-700">Loading your profile data.</p>
+             <p class="text-xs text-red-500 mt-2">Running in Offline Simulation Mode (No external database).</p>
         </div>
     </div>
 
@@ -281,7 +281,7 @@
                         <p class="text-2xl font-extrabold text-accent">৳<span id="account-tk-balance">0.00</span></p>
                     </div>
                     <div class="card-bg p-3 rounded-xl text-center">
-                        <p class="text-xs text-gray-500 font-medium mb-1">Total Referrals</p>
+                        <p class="text-xs text-gray-500 font-medium mb-1">Total Referrals (Simulated)</p>
                         <p class="text-2xl font-extrabold text-blue-500" id="account-referral-count">0</p>
                     </div>
                 </div>
@@ -340,7 +340,7 @@
                  <div class="card-bg p-4 rounded-xl">
                     <h3 class="font-bold mb-3 text-lg text-center text-text-color">Apply Referral Code (Telegram User ID)</h3>
                     <input id="enter-referral-code" type="text" placeholder="Enter Telegram User ID here" class="w-full p-3 rounded-lg input-field mb-3 text-center font-mono uppercase">
-                    <button id="apply-referral-btn" class="w-full p-3 rounded-xl btn-outline-accent text-sm">Apply Code</button>
+                    <button id="apply-referral-btn" class="w-full p-3 rounded-xl btn-outline-accent text-sm">Apply Code (Simulated)</button>
                  </div>
                  </div>
             
@@ -396,52 +396,11 @@
     </div>
 
 
-    <script type="module">
-        // Global variables provided by the environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        // MODIFIED: Firebase Config updated for Mango Cash (Previous app's config)
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyAgLRhh96lsBipd01gPmCQ8gF-3Q5DnFq0",
-            authDomain: "earn-38176.firebaseapp.com",
-            databaseURL: "https://earn-38176-default-rtdb.firebaseio.com",
-            projectId: "earn-38176",
-            storageBucket: "earn-38176.appspot.com", // MODIFIED
-            messagingSenderId: "350056832143",
-            appId: "1:350056832143:web:9ffeba3301bd73dfc364fa", // MODIFIED
-            measurementId: "G-2LGXC91KT5"
-        };
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        // Firebase imports (using v9 compatibility syntax for CDN)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, serverTimestamp, query, where, onSnapshot, getDocs, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    <script>
+        // --- OFFLINE SIMULATION: Replaced Firebase with Local Storage and In-Memory Data ---
 
-        let currentUser = null;
-        let userData = null;
-        let unsubscribeUser = null;
-        let unsubscribeReferrals = null;
-        let unsubscribeWithdrawals = null;
-        let unsubscribeNotifications = null;
-        
-        // --- Fs Path Definitions (Security Fix) ---
-        const BASE_PATH_PUBLIC = `artifacts/${appId}/public/data`;
-        const getUserRef = (uid) => doc(db, BASE_PATH_PUBLIC, "users", uid);
-        const getUsersCollection = () => collection(db, BASE_PATH_PUBLIC, "users");
-        const getWithdrawalsCollection = () => collection(db, BASE_PATH_PUBLIC, "withdrawals");
-        const getNotificationsCollection = () => collection(db, BASE_PATH_PUBLIC, "notifications");
-        const getConfigRef = () => doc(db, BASE_PATH_PUBLIC, "config", "main");
-        // --- END Fs Path Definitions ---
-        
-        // Configuration for Telegram Bot Referral Link
-        // MODIFIED: Bot Username to 'mango_cash_bot'
-        const TELEGRAM_BOT_USERNAME = "mango_cash_bot"; 
-        
-        let appConfig = {
+        // Global Configuration (was appConfig, now directly here)
+        const appConfig = {
             minWithdrawal: 500,
             requiredReferralsForWithdrawal: 15,
             paymentMethods: ["bKash", "Nagad"],
@@ -450,297 +409,176 @@
             rewardPerReferral: 30,
             dailyCheckBonus: 5,
             rewardPerSocialTask: 7, 
-            // MODIFIED: Telegram link base using the 'start' parameter. 'ref_' is the prefix.
-            referralUrlBase: `https://t.me/${TELEGRAM_BOT_USERNAME}?start=ref_` 
+            TELEGRAM_BOT_USERNAME: "mango_cash_bot", 
+            referralUrlBase: `https://t.me/mango_cash_bot?start=ref_` 
         };
-
-        let todayEarning = 0; 
         
-        // UI Elements
-        const loader = document.getElementById('loader');
-        const headerTitleEl = document.getElementById('header-title');
-        const headerTkBalanceEl = document.getElementById('header-tk-balance');
-        const tkBalanceEl = document.getElementById('tk-balance');
-        const accountTkBalanceEl = document.getElementById('account-tk-balance');
-        const profileNameEl = document.getElementById('profile-name');
-        const profileEmailEl = document.getElementById('profile-email');
-        const profileAvatarEl = document.getElementById('profile-avatar');
-        const referralLinkDisplayEl = document.getElementById('referral-link-display');
-        const userReferralCodeEl = document.getElementById('user-referral-code'); // User's own Telegram ID
-        const withdrawMethodSelect = document.getElementById('withdraw-method');
-        const notificationDot = document.getElementById('notification-dot');
-        const adsLeftCountEl = document.getElementById('ads-left-count');
-        const paymentDetailsContainer = document.getElementById('payment-details-container');
-        const welcomePopup = document.getElementById('welcome-popup');
-        const welcomeContinueBtn = document.getElementById('welcome-continue-btn');
-        const referralCountEl = document.getElementById('referral-count');
-        const accountReferralCountEl = document.getElementById('account-referral-count');
-        const todayEarningCountEl = document.getElementById('today-earning-count');
-        const taskProgressEl = document.getElementById('task-progress');
-        const taskLimitEl = document.getElementById('task-limit');
-        const dailyCheckBtn = document.getElementById('daily-check-btn');
-        const dailyCheckBtnTask = document.getElementById('daily-check-btn-task');
-        const rewardModal = document.getElementById('reward-modal'); 
-        const authMessageEl = document.getElementById('auth-message');
-
+        // In-Memory Data Structures (Simulating Database Tables)
+        let currentUser = null; // Simulating the authenticated user object
+        let userData = null;    // Simulating the user's document
+        let allUsersData = JSON.parse(localStorage.getItem('simulated_users') || '{}'); // All simulated user docs
+        let withdrawalHistory = JSON.parse(localStorage.getItem('simulated_withdrawals') || '[]');
+        let simulatedNotifications = [
+            { id: 1, title: "Welcome Bonus Update", message: "Initial bonus is now ৳5 on first login.", createdAt: new Date() },
+            { id: 2, title: "Withdrawal Minimum", message: "Minimum withdrawal remains ৳500 with 15 referrals.", createdAt: new Date() }
+        ];
 
         // Utility to check if running inside Telegram Mini App
         function isTelegramApp() {
+            // Check for the global Telegram object and necessary data
             return window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
         }
 
-        window.onload = () => {
-            lucide.createIcons();
-            setupEventListeners();
-            // Start listening for authentication state changes
-            onAuthStateChanged(auth, handleAuthStateChange);
-        };
-        
-        // --- Core App Logic ---
-
-        function showWelcomePopupOnHome() {
-             const welcomePopup = document.getElementById('welcome-popup');
-             if (document.getElementById('home-page').classList.contains('active')) {
-                // Only show popup if it hasn't been closed/accepted yet (simple check)
-                if (localStorage.getItem('welcomeSeen') !== 'true') {
-                    welcomePopup.classList.add('active');
-                    welcomeContinueBtn.onclick = () => {
-                        welcomePopup.classList.remove('active');
-                        localStorage.setItem('welcomeSeen', 'true');
-                    };
-                }
-            }
-        }
-        
-        // Function to unsubscribe from all listeners
-        function unsubscribeAll() {
-            if (unsubscribeUser) unsubscribeUser();
-            if (unsubscribeReferrals) unsubscribeReferrals();
-            if (unsubscribeWithdrawals) unsubscribeWithdrawals();
-            if (unsubscribeNotifications) unsubscribeNotifications();
-            unsubscribeUser = null;
-            unsubscribeReferrals = null;
-            unsubscribeWithdrawals = null;
-            unsubscribeNotifications = null;
-            userData = null;
+        // Simulates fetching/generating a unique ID
+        function generateUniqueId() {
+            return 'user_' + Date.now() + Math.floor(Math.random() * 10000);
         }
 
+        // Helper to save all user data to local storage
+        function saveAllUsersData() {
+            localStorage.setItem('simulated_users', JSON.stringify(allUsersData));
+        }
+        
+        // Helper to save withdrawal history to local storage
+        function saveWithdrawalHistory() {
+            localStorage.setItem('simulated_withdrawals', JSON.stringify(withdrawalHistory));
+        }
 
-        async function handleAuthStateChange(user) {
-            unsubscribeAll(); // Unsubscribe old listeners
-
-            if (user) {
-                currentUser = user;
-                
-                // 1. Attempt Custom Token Sign-In if in Canvas Environment and Anonymous
-                if (initialAuthToken && user.isAnonymous) {
-                     authMessageEl.textContent = "Authenticating with Telegram...";
-                     try {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                        return; // Wait for the listener to fire again with the new user
-                    } catch(e) {
-                        console.error("Custom token sign-in failed:", e);
-                        // Fallback sign in for non-TMA testing environment if token fails
-                        if (user.isAnonymous) {
-                             console.log("Falling back to anonymous sign-in...");
-                             await signInAnonymously(auth); 
-                             authMessageEl.textContent = "Authentication Failed. Proceeding as Anonymous (may have limited functionality).";
-                        }
-                    }
-                }
-                
-                // 2. Fetch config (one-off)
-                await fetchAppConfig();
-                
-                // 3. Set up REAL-TIME listeners
-                setupRealtimeListeners();
-                
-                // Show the main application view and hide loader
-                showMainView('app-container'); 
-                navigateTo('home-page'); 
-                loader.style.display = 'none';
+        // Get or Create Telegram User ID
+        function getOrCreateUserId() {
+            const tgUser = isTelegramApp() ? Telegram.WebApp.initDataUnsafe.user : null;
+            
+            let userId;
+            if (tgUser && tgUser.id) {
+                // Use Telegram User ID as the unique ID and referral code
+                userId = String(tgUser.id);
             } else {
-                currentUser = null;
-                // Only show auth section on logout or initial load failure
-                showMainView('auth-section'); 
-                authMessageEl.textContent = "Authentication failed. Please launch from Telegram.";
-                loader.style.display = 'none';
+                // Fallback for non-TMA users (e.g., in a browser)
+                userId = localStorage.getItem('sim_tg_user_id');
+                if (!userId) {
+                    userId = generateUniqueId();
+                    localStorage.setItem('sim_tg_user_id', userId);
+                }
             }
+            return userId;
         }
-        
-        // --- Real-Time Listener Setup ---
-        function setupRealtimeListeners() {
-            if (!currentUser) return;
-            
-            // 1. User Data Listener (Core)
-            const userRef = getUserRef(currentUser.uid);
-            unsubscribeUser = onSnapshot(userRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data?.isBlocked) {
-                         showAlert("Your account has been blocked.");
-                         auth.signOut(); 
-                         return;
-                    }
-                    userData = data;
-                    
-                    // Handle Daily Ad Count Reset
-                    const today = new Date().toISOString().split('T')[0];
-                    if (userData.lastAdWatchDate !== today) {
-                        todayEarning = 0;
-                        if (userData.dailyAdCount > 0) {
-                            updateDoc(userRef, { dailyAdCount: 0, lastAdWatchDate: today }).catch(e => console.error("Error resetting daily count:", e));
-                        }
-                        userData.dailyAdCount = 0;
-                        userData.lastAdWatchDate = today;
-                    } else {
-                        todayEarning = userData.dailyAdCount * appConfig.rewardPerAd; 
-                    }
-                    
-                    updateUI();
-                } else {
-                    // If user doc doesn't exist, create it (handles first sign-in scenario)
-                    initializeUserData(currentUser);
-                }
-            }, (error) => {
-                console.error("Error listening to user data:", error);
-                showAlert("Error loading user data in real-time.");
-            });
-            
-            // 2. Referral Count Listener 
-            // This is set up inside updateUI as the referralCode might change/load later
-            
-            // 3. Notifications Check Listener (Simplified check for new items)
-            const notificationQuery = query(getNotificationsCollection(), limit(1));
-            if (unsubscribeNotifications) unsubscribeNotifications(); // Unsubscribe old listener
-            unsubscribeNotifications = onSnapshot(notificationQuery, () => {
-                 checkNewNotifications(true); 
-            }, (error) => {
-                 console.error("Error listening to notifications:", error);
-            });
-        }
-        
-        // --- User Data Initialization ---
-        async function initializeUserData(user) {
-            const userRef = getUserRef(user.uid);
-            try {
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) return; // Already exists, just wait for onSnapshot to fire
+
+        // --- Core App Logic (Replacement for Firebase) ---
+
+        async function initializeAppSimulation() {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate loading time
+
+            const userId = getOrCreateUserId();
+            currentUser = { uid: userId, isAnonymous: false }; // Simulate an authenticated user
+
+            if (!allUsersData[userId]) {
+                // First time user: initialize data
+                userData = initializeUserData(userId);
+                allUsersData[userId] = userData;
+                saveAllUsersData();
                 
-                const tgUser = isTelegramApp() ? Telegram.WebApp.initDataUnsafe.user : null;
-                
-                // MODIFIED: Use Telegram user ID as the definitive referral code
-                let ownReferralCode = 'N/A'; // Fallback
-                if (tgUser && tgUser.id) {
-                    // Set the referralCode to the unique Telegram User ID (Numeric String)
-                    ownReferralCode = String(tgUser.id);
-                } else {
-                     // Fallback for non-TMA users or testing environments
-                     ownReferralCode = user.uid; 
-                }
-                
-                const defaultUserData = {
-                    uid: user.uid, 
-                    name: tgUser ? `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() : user.displayName || 'New User', 
-                    email: tgUser ? `@${tgUser.username || 'N/A'}` : 'N/A', 
-                    tkBalance: 5,
-                    referralCode: ownReferralCode, 
-                    referredBy: null, // Will store the referrer's Telegram User ID
-                    lastNotificationCheck: serverTimestamp(),
-                    createdAt: serverTimestamp(),
-                    dailyAdCount: 0, lastAdWatchDate: new Date().toISOString().split('T')[0], isBlocked: false,
-                    lastDailyCheckTime: 0, 
-                    socialClaims: { telegram: false, bot: false, facebook: false }
-                };
-                
-                // Check URL for initial referral code
+                // Handle initial referral on first-time load (Simulated)
                 const urlParams = new URLSearchParams(window.location.search);
-                // The 'start' parameter contains the full code: 'ref_TELEGRAM_ID'
                 let startParam = urlParams.get('start'); 
-                
-                // Check if the 'start' parameter exists and starts with our prefix
                 let referrerId = null;
                 if (startParam && startParam.startsWith('ref_')) {
-                    // Extract the Telegram ID after 'ref_'
                     referrerId = startParam.substring(4); 
                 } 
 
-                // CRITICAL CHECK: Ensure the referrer ID is NOT the current user's own ID
-                if (referrerId && referrerId !== ownReferralCode) {
-                    // Pass the referrer's Telegram ID (referrerId)
-                    defaultUserData.referredBy = referrerId;
-                    // Apply bonus logic will now look up the referrer by their Telegram ID (referredBy)
-                    await applyReferralBonus(referrerId, false, defaultUserData); 
-                } else {
-                    // If no valid referral, or user referred themselves, just create the user doc
-                    await setDoc(userRef, defaultUserData);
+                if (referrerId && referrerId !== userId && allUsersData[referrerId]) {
+                    applyReferralBonus(referrerId, false, userData); 
                 }
-                
-            } catch (error) {
-                console.error("Error initializing user data:", error);
-                showAlert("Error initializing user data. Please try launching the app again.");
+            } else {
+                userData = allUsersData[userId];
+                // Check and reset daily ad count if needed
+                const today = new Date().toISOString().split('T')[0];
+                if (userData.lastAdWatchDate !== today) {
+                    userData.dailyAdCount = 0;
+                    userData.lastAdWatchDate = today;
+                    saveAllUsersData();
+                }
             }
+            
+            // Show the main application view
+            showMainView('app-container'); 
+            navigateTo('home-page'); 
+            document.getElementById('loader').style.display = 'none';
+
+            // Start the periodic UI refresh (Simulating Realtime)
+            setInterval(updateUI, 1000);
+        }
+
+        function initializeUserData(userId) {
+            const tgUser = isTelegramApp() ? Telegram.WebApp.initDataUnsafe.user : null;
+            
+            const defaultUserData = {
+                uid: userId, 
+                name: tgUser ? `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() : 'New User (Simulated)', 
+                email: tgUser ? `@${tgUser.username || 'N/A'}` : 'N/A', 
+                tkBalance: 5,
+                referralCode: userId, // User ID is the referral code
+                referredBy: null, 
+                lastNotificationCheck: Date.now(),
+                createdAt: Date.now(),
+                dailyAdCount: 0, 
+                lastAdWatchDate: new Date().toISOString().split('T')[0], 
+                isBlocked: false,
+                lastDailyCheckTime: 0, 
+                socialClaims: { telegram: false, bot: false, facebook: false }
+            };
+            return defaultUserData;
         }
         
-        async function fetchAppConfig() {
-            const configRef = getConfigRef();
-            try {
-                const configSnap = await getDoc(configRef);
-                if (configSnap.exists()) {
-                    const serverConfig = configSnap.data();
-                    appConfig = { ...appConfig, ...serverConfig };
-                }
-            } catch (error) {
-                console.error("Error fetching app config:", error);
-            }
-        }
+        // --- UI Update & Logic ---
 
         function updateUI() {
             if (!userData) return;
             const balance = userData.tkBalance || 0;
             
+            // UI Balance Update
             headerTkBalanceEl.textContent = balance.toFixed(2);
             tkBalanceEl.textContent = balance.toFixed(2);
             accountTkBalanceEl.textContent = balance.toFixed(2);
-            // MODIFIED: Show user's Telegram ID (the referralCode)
             userReferralCodeEl.textContent = userData.referralCode || 'N/A'; 
             
-            // --- UPDATED: Telegram TMA Integration for Profile Name/Picture ---
+            // Calculate Today's Earning
+            const todayEarning = (userData.dailyAdCount || 0) * appConfig.rewardPerAd;
+            todayEarningCountEl.textContent = `৳${todayEarning.toFixed(2)}`;
+
+            // UI Profile Update
             const tgUser = isTelegramApp() ? Telegram.WebApp.initDataUnsafe.user : null;
-            
             if (tgUser) {
                 profileNameEl.textContent = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || 'Telegram User';
+                profileEmailEl.textContent = `@${tgUser.username || 'N/A'} (Telegram)`;
                 if (tgUser.photo_url) {
                     profileAvatarEl.src = tgUser.photo_url;
                 } else {
-                    // Changed: placehold color to #ff9900 (Mango Cash)
                     profileAvatarEl.src = "https://placehold.co/80x80/ff9900/ffffff?text=LOGO"; 
                 }
-                profileEmailEl.textContent = `@${tgUser.username || 'N/A'} (Telegram)`;
             } else {
-                // Fallback to Firebase/DB data
-                profileNameEl.textContent = userData.name || 'User Profile';
-                profileEmailEl.textContent = userData.email || 'No Email';
-                // Changed: placehold color to #ff9900 (Mango Cash)
-                const logoUrl = "https://placehold.co/80x80/ff9900/ffffff?text=LOGO"; 
-                const initial = userData.name?.charAt(0)?.toUpperCase() || userData.email?.charAt(0)?.toUpperCase() || 'U';
-                const initialFallbackUrl = `https://placehold.co/80x80/ff9900/ffffff?text=${initial}`;
-                
-                profileAvatarEl.src = logoUrl; 
-                profileAvatarEl.onerror = () => { profileAvatarEl.src = initialFallbackUrl; }; 
+                 profileNameEl.textContent = userData.name;
+                 profileEmailEl.textContent = userData.email;
+                 profileAvatarEl.src = "https://placehold.co/80x80/ff9900/ffffff?text=U"; 
             }
-            // --- END UPDATED TMA LOGIC ---
 
-            // MODIFIED: Referral link uses the user's referralCode (Telegram User ID)
+            // UI Referral Link/Count Update (Simulated)
             const referralLink = `${appConfig.referralUrlBase}${userData.referralCode}`;
             referralLinkDisplayEl.textContent = referralLink;
             referralLinkDisplayEl.dataset.link = referralLink;
 
-            todayEarningCountEl.textContent = `৳${todayEarning.toFixed(2)}`;
+            // Simulated Referral Count: Count users whose 'referredBy' matches this user's 'referralCode'
+            const currentReferrals = Object.values(allUsersData).filter(user => user.referredBy === userData.referralCode).length;
+            referralCountEl.textContent = currentReferrals;
+            accountReferralCountEl.textContent = currentReferrals;
+
+
             updateAdsLeftCount();
             updateDailyCheckButtonState();
-            
-            // Update Social Task Buttons
+            updateSocialTaskButtonState();
+            updateWithdrawalMethods();
+        }
+        
+        function updateSocialTaskButtonState() {
             const socialTasks = ['telegram', 'bot', 'facebook'];
             socialTasks.forEach(key => {
                 const btn = document.getElementById(`claim-${key}-btn`);
@@ -748,45 +586,19 @@
                     if (userData.socialClaims?.[key]) {
                         btn.disabled = true;
                         btn.textContent = 'Claimed!';
-                        btn.classList.remove('bg-accent', 'hover:bg-orange-600');
+                        btn.classList.remove('bg-accent');
                         btn.classList.add('bg-gray-400', 'cursor-not-allowed');
                     } else {
                          btn.disabled = false;
                          btn.textContent = `Get ৳${appConfig.rewardPerSocialTask || 7}`;
-                         btn.classList.add('bg-accent', 'hover:bg-orange-600');
+                         btn.classList.add('bg-accent');
                          btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
                     }
                 }
             });
-
-            // Update Withdrawal Methods
-            withdrawMethodSelect.innerHTML = '';
-            (appConfig.paymentMethods || []).forEach(method => {
-                const option = document.createElement('option');
-                option.value = method;
-                option.textContent = method;
-                withdrawMethodSelect.appendChild(option);
-            });
-            updateDynamicPaymentFields();
-            
-            // Re-setup the referral listener when user data is confirmed
-            if (!unsubscribeReferrals && userData.referralCode) {
-                // MODIFIED: Query by referredBy which now stores the referrer's Telegram ID (the referralCode)
-                 const q = query(getUsersCollection(), where("referredBy", "==", userData.referralCode));
-                 if (unsubscribeReferrals) unsubscribeReferrals(); // Unsubscribe old listener
-                 unsubscribeReferrals = onSnapshot(q, (querySnapshot) => {
-                    const count = querySnapshot.size;
-                    referralCountEl.textContent = count;
-                    accountReferralCountEl.textContent = count;
-                 }, (error) => {
-                     console.error("Error listening to referral count:", error);
-                 });
-            }
         }
-        
-        // Updates the state of the Daily Check button based on 24-hour cool down
+
         function updateDailyCheckButtonState() {
-            if (!userData) return;
             const now = Date.now();
             const lastCheckTime = userData.lastDailyCheckTime || 0;
             const coolDownDuration = 24 * 60 * 60 * 1000; // 24 hours in ms
@@ -798,7 +610,6 @@
                     btn.disabled = false;
                     btn.textContent = 'Claim';
                     btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
-                    btn.classList.add('bg-yellow-500');
                 } else {
                     btn.disabled = true;
                     const timeLeft = lastCheckTime + coolDownDuration - now;
@@ -806,30 +617,47 @@
                     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
                     btn.textContent = `Next: ${hours}h ${minutes}m`;
                     btn.classList.add('bg-gray-400', 'cursor-not-allowed');
-                    btn.classList.remove('bg-yellow-500');
                 }
             };
 
-            updateButton(dailyCheckBtn);
-            updateButton(dailyCheckBtnTask);
+            updateButton(document.getElementById('daily-check-btn'));
+            updateButton(document.getElementById('daily-check-btn-task'));
         }
 
         function updateAdsLeftCount() {
-            if (!userData) return;
             const adsLeft = Math.max(0, (appConfig.dailyAdLimit || 25) - (userData.dailyAdCount || 0));
             adsLeftCountEl.textContent = adsLeft;
             taskProgressEl.textContent = (appConfig.dailyAdLimit || 25) - adsLeft;
             taskLimitEl.textContent = appConfig.dailyAdLimit || 25;
         }
 
-        function updateDynamicPaymentFields() {
-            const selectedMethod = withdrawMethodSelect.value.toLowerCase();
-            let placeholder = "Enter Payment Number";
-            if (selectedMethod.includes('bkash')) placeholder = "Enter your bKash Number";
-            if (selectedMethod.includes('nagad')) placeholder = "Enter your Nagad Number";
-            paymentDetailsContainer.innerHTML = `<input id="payment-detail-input" type="text" placeholder="${placeholder}" class="w-full p-3 rounded-lg input-field">`;
+        function updateWithdrawalMethods() {
+            withdrawMethodSelect.innerHTML = '';
+            (appConfig.paymentMethods || []).forEach(method => {
+                const option = document.createElement('option');
+                option.value = method;
+                option.textContent = method;
+                withdrawMethodSelect.appendChild(option);
+            });
+            updateDynamicPaymentFields();
         }
-        
+
+
+        // --- Navigation and Setup ---
+
+        function showWelcomePopupOnHome() {
+             const welcomePopup = document.getElementById('welcome-popup');
+             if (document.getElementById('home-page').classList.contains('active')) {
+                if (localStorage.getItem('welcomeSeen') !== 'true') {
+                    welcomePopup.classList.add('active');
+                    welcomeContinueBtn.onclick = () => {
+                        welcomePopup.classList.remove('active');
+                        localStorage.setItem('welcomeSeen', 'true');
+                    };
+                }
+            }
+        }
+
         function showMainView(viewId) {
             document.querySelectorAll('.main-view').forEach(p => p.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
@@ -845,7 +673,7 @@
             });
             
             const titleMap = {'home-page': 'Home', 'tasks-page': 'Daily Tasks', 'support-page': 'Support', 'account-page': 'My Account', 'notifications-page': 'Notifications'};
-            headerTitleEl.textContent = titleMap[pageId] || 'Mango Cash'; // Changed: Green Income to Mango Cash
+            headerTitleEl.textContent = titleMap[pageId] || 'Mango Cash';
 
             if (pageId === 'home-page') {
                 showWelcomePopupOnHome(); 
@@ -853,13 +681,10 @@
                 loadWithdrawalHistory(); 
             } else if (pageId === 'notifications-page') {
                 loadNotifications();
-            } else if (pageId === 'tasks-page') {
-                updateDailyCheckButtonState(); 
-                updateUI(); 
             }
             lucide.createIcons();
         }
-        window.navigateTo = navigateTo;
+        window.navigateTo = navigateTo; // Make accessible from inline HTML
 
         function setupEventListeners() {
             document.querySelectorAll('.nav-link').forEach(link => {
@@ -874,166 +699,118 @@
             document.getElementById('share-btn').addEventListener('click', shareReferralLink);
             document.getElementById('withdraw-btn').addEventListener('click', handleWithdrawal);
             document.getElementById('apply-referral-btn').addEventListener('click', handleApplyReferralCode);
-            withdrawMethodSelect.addEventListener('change', updateDynamicPaymentFields);
+            document.getElementById('withdraw-method').addEventListener('change', updateDynamicPaymentFields);
         }
 
-        // --- Real-Time Withdrawal History ---
+        // --- Simulated Database Operations (Write-Through to Local Storage) ---
+
+        // Simulates an update transaction
+        function updateUserData(newFields) {
+            userData = { ...userData, ...newFields };
+            allUsersData[currentUser.uid] = userData;
+            saveAllUsersData();
+            updateUI();
+        }
+
+        // Simulates a single-user withdrawal history load (Now loads from local var)
         function loadWithdrawalHistory() {
             const historyList = document.getElementById('withdrawal-history-list');
             
-            if (!currentUser) {
-                 historyList.innerHTML = '<p class="text-gray-500 text-center">User not authenticated.</p>';
-                 return;
+            // Filter withdrawals for the current user
+            const requests = withdrawalHistory
+                .filter(req => req.userId === currentUser.uid)
+                .sort((a, b) => b.requestedAt - a.requestedAt); // Sort by time descending
+
+            if (requests.length === 0) {
+                historyList.innerHTML = '<p class="text-gray-500 text-center">You haven\'t made any withdrawals yet.</p>';
+                return;
             }
             
-            if (unsubscribeWithdrawals) unsubscribeWithdrawals(); 
-            
-            const q = query(getWithdrawalsCollection(), where("userId", "==", currentUser.uid));
-            
-            unsubscribeWithdrawals = onSnapshot(q, (querySnapshot) => {
-                let requests = [];
-                querySnapshot.forEach(doc => {
-                    requests.push({...doc.data(), id: doc.id});
-                });
-
-                requests.sort((a, b) => {
-                    const dateA = a.requestedAt?.toDate()?.getTime() || 0;
-                    const dateB = b.requestedAt?.toDate()?.getTime() || 0;
-                    return dateB - dateA;
-                });
-
-
-                if (requests.length === 0) {
-                    historyList.innerHTML = '<p class="text-gray-500 text-center">You haven\'t made any withdrawals yet.</p>';
-                    return;
-                }
+            historyList.innerHTML = '';
+            requests.forEach(request => {
+                const status = request.status;
+                let statusColor = 'text-yellow-600';
+                let statusIcon = 'hourglass';
+                if (status === 'approved') { statusColor = 'text-accent'; statusIcon = 'check-circle'; }
+                else if (status === 'rejected') { statusColor = 'text-red-600'; statusIcon = 'x-circle'; }
                 
-                historyList.innerHTML = '';
-                requests.forEach(request => {
-                    const status = request.status;
-                    let statusColor = 'text-yellow-600';
-                    let statusIcon = 'hourglass';
-                    if (status === 'approved') { statusColor = 'text-accent'; statusIcon = 'check-circle'; } // Changed to accent color
-                    else if (status === 'rejected') { statusColor = 'text-red-600'; statusIcon = 'x-circle'; }
-                    
-                    const date = request.requestedAt ? request.requestedAt.toDate().toLocaleDateString() : 'N/A';
-                    
-                    historyList.innerHTML += `<div class="card-bg p-3 rounded-xl flex items-center justify-between border-l-4 border-gray-100 hover:bg-gray-50 transition">
-                        <div class="flex items-center space-x-3">
-                            <i data-lucide="${statusIcon}" class="w-5 h-5 ${statusColor}"></i>
-                            <div>
-                                <p class="font-semibold text-text-color">৳${request.amount.toFixed(2)} (${request.method})</p>
-                                <p class="text-xs text-gray-500">${date}</p>
-                            </div>
+                const date = new Date(request.requestedAt).toLocaleDateString();
+                
+                historyList.innerHTML += `<div class="card-bg p-3 rounded-xl flex items-center justify-between border-l-4 border-gray-100 hover:bg-gray-50 transition">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="${statusIcon}" class="w-5 h-5 ${statusColor}"></i>
+                        <div>
+                            <p class="font-semibold text-text-color">৳${request.amount.toFixed(2)} (${request.method})</p>
+                            <p class="text-xs text-gray-500">${date}</p>
                         </div>
-                        <p class="font-bold ${statusColor} text-sm capitalize">${status}</p>
-                    </div>`;
-                });
-                lucide.createIcons();
-            }, (error) => {
-                console.error("Error listening to withdrawal history:", error);
-                historyList.innerHTML = `<p class="text-red-600 text-center">Error loading history. (Check console for details)</p>`;
+                    </div>
+                    <p class="font-bold ${statusColor} text-sm capitalize">${status}</p>
+                </div>`;
             });
+            lucide.createIcons();
         }
-        // --- END Real-Time Withdrawal History ---
         
+        // Simulates applying a referral code
         async function handleApplyReferralCode() {
             if (userData.referredBy) return showAlert("You have already used a referral code.");
             const codeInput = document.getElementById('enter-referral-code');
-            // MODIFIED: Telegram IDs are numeric strings
             const code = codeInput.value.trim(); 
             if (!code) return showAlert("Please enter a code (Telegram User ID).");
             if (code === userData.referralCode) return showAlert("You cannot use your own ID.");
-            loader.style.display = 'flex';
             
-            // MODIFIED: Pass the Telegram User ID (code)
+            document.getElementById('loader').style.display = 'flex';
             await applyReferralBonus(code, true, userData);
             codeInput.value = '';
-            loader.style.display = 'none';
+            document.getElementById('loader').style.display = 'none';
         }
 
-        // MODIFIED: Function signature and logic to use 'referrerId' (which is the Telegram User ID)
-        async function applyReferralBonus(referrerId, isManualApply = false, targetUserData) {
-            // MODIFIED: Query the database to find the referrer by their Telegram ID (stored in the referralCode field)
-            const q = query(getUsersCollection(), where("referralCode", "==", referrerId)); 
+        // Simulates the referral logic, updating local memory
+        function applyReferralBonus(referrerId, isManualApply = false, targetUserData) {
             const rewardAmount = appConfig.rewardPerReferral;
-            try {
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot.empty) {
-                    const referrerDoc = querySnapshot.docs[0];
-                    const referrerRef = getUserRef(referrerDoc.id); 
-                    const referrerData = referrerDoc.data();
-                    
-                    // 1. Give bonus to referrer (Atomically)
-                    await updateDoc(referrerRef, { tkBalance: (referrerData.tkBalance || 0) + rewardAmount });
-                    
-                    // 2. Update new user's status and balance (Atomically)
-                    const newUserRef = getUserRef(targetUserData.uid);
-                    await setDoc(newUserRef, { 
-                        ...targetUserData,
-                        tkBalance: (targetUserData.tkBalance || 0) + rewardAmount, 
-                        referredBy: referrerId // Store the Telegram ID of the referrer
-                    }, { merge: true });
-                    
-                    if(isManualApply) showAlert(`Code applied successfully! You and the referrer received ৳${rewardAmount.toFixed(2)}.`);
-                } else {
-                    if(isManualApply) showAlert("Invalid referral code (Telegram User ID).");
-                }
-            } catch(error) {
-                console.error("Error applying referral bonus: ", error);
-                if(isManualApply) showAlert("Error applying code. Try again.");
-            }
-        }
-
-        async function updateBalance(amount) {
-            if (!currentUser) return;
-            const userRef = getUserRef(currentUser.uid);
-            const newBalance = (userData.tkBalance || 0) + amount;
-            try {
-                await updateDoc(userRef, { tkBalance: newBalance });
-                return true;
-            } catch (error) {
-                console.error("Error updating balance:", error);
-                showAlert("Error updating balance in database.");
-                return false;
-            }
-        }
-
-        // --- Social Reward Claim Logic ---
-        window.claimSocialReward = async function(taskKey) {
-            if (!currentUser) return showAlert("Please log in to claim this reward.");
             
+            // Find the referrer by their code (which is their ID)
+            const referrerData = allUsersData[referrerId];
+            
+            if (referrerData) {
+                // 1. Give bonus to referrer
+                referrerData.tkBalance = (referrerData.tkBalance || 0) + rewardAmount;
+                allUsersData[referrerId] = referrerData;
+
+                // 2. Update new user's status and balance
+                targetUserData.tkBalance = (targetUserData.tkBalance || 0) + rewardAmount;
+                targetUserData.referredBy = referrerId;
+                
+                // Save and update
+                updateUserData(targetUserData); // Automatically saves and updates UI for the current user
+                saveAllUsersData(); // Ensure the referrer's data is also saved
+
+                if(isManualApply) showAlert(`Code applied successfully! You and the referrer received ৳${rewardAmount.toFixed(2)}.`);
+            } else {
+                if(isManualApply) showAlert("Invalid referral code (Telegram User ID).");
+            }
+        }
+
+        // Simulates Social Reward Claim
+        window.claimSocialReward = function(taskKey) {
             if (userData.socialClaims?.[taskKey]) {
                 return showAlert("You have already claimed the reward for this task. This is a one-time bonus.");
             }
 
-            loader.style.display = 'flex';
+            document.getElementById('loader').style.display = 'flex';
             const rewardAmount = appConfig.rewardPerSocialTask || 7;
-            const userRef = getUserRef(currentUser.uid);
 
-            try {
-                const newClaims = { ...(userData.socialClaims || {}), [taskKey]: true };
-                const newBalance = (userData.tkBalance || 0) + rewardAmount;
-                
-                await updateDoc(userRef, { 
-                    tkBalance: newBalance,
-                    socialClaims: newClaims
-                });
-                
-                showAlert(`Social Reward Claimed! You earned ৳${rewardAmount.toFixed(2)}. This button is now disabled.`);
-            } catch(e) {
-                console.error("Social reward claim error:", e);
-                showAlert("Error claiming social reward. Please try again.");
-            } finally {
-                loader.style.display = 'none';
-            }
+            const newClaims = { ...(userData.socialClaims || {}), [taskKey]: true };
+            const newBalance = (userData.tkBalance || 0) + rewardAmount;
+            
+            // Update local state and save
+            updateUserData({ tkBalance: newBalance, socialClaims: newClaims });
+            
+            showAlert(`Social Reward Claimed! You earned ৳${rewardAmount.toFixed(2)}. This button is now disabled.`);
+            document.getElementById('loader').style.display = 'none';
         };
 
-
-        // --- DAILY CHECK BONUS LOGIC ---
-        window.claimDailyCheckBonus = async function() {
-            if (!currentUser) return showAlert("Please log in to claim your bonus.");
-
+        // Simulates Daily Check Bonus
+        window.claimDailyCheckBonus = function() {
             const now = Date.now();
             const lastCheckTime = userData.lastDailyCheckTime || 0;
             const coolDownDuration = 24 * 60 * 60 * 1000; 
@@ -1045,27 +822,20 @@
                 return showAlert(`Daily check already claimed. You can claim again in ${hours} hours and ${minutes} minutes.`);
             }
             
-            loader.style.display = 'flex';
+            document.getElementById('loader').style.display = 'flex';
             const rewardAmount = appConfig.dailyCheckBonus || 5;
 
-            try {
-                const userRef = getUserRef(currentUser.uid);
-                await updateDoc(userRef, { 
-                    tkBalance: (userData.tkBalance || 0) + rewardAmount,
-                    lastDailyCheckTime: now 
-                });
-                
-                showAlert(`Daily Check Bonus claimed! You earned ৳${rewardAmount.toFixed(2)}.`);
-            } catch(e) {
-                console.error("Daily check bonus error:", e);
-                showAlert("Error claiming daily bonus. Please try again.");
-            } finally {
-                loader.style.display = 'none';
-            }
+            // Update local state and save
+            updateUserData({ 
+                tkBalance: (userData.tkBalance || 0) + rewardAmount,
+                lastDailyCheckTime: now 
+            });
+            
+            showAlert(`Daily Check Bonus claimed! You earned ৳${rewardAmount.toFixed(2)}.`);
+            document.getElementById('loader').style.display = 'none';
         }
-        // --- END DAILY CHECK BONUS LOGIC ---
 
-        // --- WITHDRAWAL LOGIC ---
+        // Simulates Withdrawal Request
         async function handleWithdrawal() {
             const amount = parseFloat(document.getElementById('withdraw-amount').value);
             const method = document.getElementById('withdraw-method').value;
@@ -1084,36 +854,149 @@
                 return showAlert(`Withdrawal failed. You need at least ${requiredReferrals} referrals. You currently have ${currentReferrals}.`);
             }
 
-            loader.style.display = 'flex';
-            try {
-                const deductionSuccess = await updateBalance(-amount); 
-                if (!deductionSuccess) throw new Error("Balance deduction failed.");
-                
-                await addDoc(getWithdrawalsCollection(), {
-                    userId: currentUser.uid, userName: userData.name, userEmail: userData.email,
-                    amount: amount, method: method, paymentDetail: paymentDetail, status: "pending", requestedAt: serverTimestamp()
-                });
-                
-                showAlert("Withdrawal request submitted successfully! Pending Approval.");
-                document.getElementById('withdraw-amount').value = '';
-                paymentDetailInput.value = '';
-            } catch (error) {
-                console.error("Withdrawal error:", error);
-                await updateBalance(amount); // Refund balance on error
-                showAlert("Error submitting request. Balance refunded: " + (error.code || error.message));
-            } finally {
-                loader.style.display = 'none';
-            }
-        }
-        // --- END WITHDRAWAL LOGIC ---
+            document.getElementById('loader').style.display = 'flex';
+            
+            // Deduct balance
+            const newBalance = (userData.tkBalance || 0) - amount;
+            updateUserData({ tkBalance: newBalance });
+            
+            // Add to simulated history
+            const withdrawalId = generateUniqueId();
+            withdrawalHistory.push({
+                id: withdrawalId, userId: currentUser.uid, userName: userData.name, 
+                amount: amount, method: method, paymentDetail: paymentDetail, 
+                status: "pending", requestedAt: Date.now()
+            });
+            saveWithdrawalHistory();
+            
+            showAlert("Withdrawal request submitted successfully! Pending Approval (Simulated).");
+            document.getElementById('withdraw-amount').value = '';
+            paymentDetailInput.value = '';
 
+            document.getElementById('loader').style.display = 'none';
+        }
+        
+        // Simulates Ad Reward Claim
+        window.claimReward = async function(taskType) {
+            if ((userData.dailyAdCount || 0) >= (appConfig.dailyAdLimit || 25)) {
+                return showAlert(`You have reached your daily ad watch limit of ${appConfig.dailyAdLimit || 25}.`);
+            }
+            
+            if (typeof window.show_10012357 !== 'function') {
+                return showAlert("Ad service is currently unavailable.");
+            }
+
+            let rewardAmount = 0;
+            if (taskType === 'miniApp') rewardAmount = appConfig.rewardPerAd * 2;
+            else if (taskType !== 'inApp') rewardAmount = appConfig.rewardPerAd;
+            
+            const rewardMessageEl = document.getElementById('reward-message');
+            const confirmAdBtn = document.getElementById('confirm-ad-btn');
+            
+            rewardMessageEl.textContent = taskType === 'inApp' 
+                ? "Starting Video..." 
+                : `Ad Loading... (Reward: ৳${rewardAmount.toFixed(2)})`;
+            confirmAdBtn.disabled = true;
+            confirmAdBtn.textContent = taskType === 'inApp' ? 'Continue' : 'Claim Reward';
+            
+            rewardModal.classList.add('active');
+            document.getElementById('loader').style.display = 'flex';
+            
+            window.show_10012357(); // Call the ad SDK function
+            
+            setTimeout(() => {
+                rewardMessageEl.textContent = "Ad Finished!";
+                confirmAdBtn.disabled = false;
+                document.getElementById('loader').style.display = 'none'; 
+            }, 3000); 
+            
+            confirmAdBtn.onclick = () => {
+                rewardModal.classList.remove('active');
+                document.getElementById('loader').style.display = 'flex';
+                
+                try {
+                    const newCount = (userData.dailyAdCount || 0) + 1;
+                    
+                    const updates = { dailyAdCount: newCount };
+
+                    if (taskType !== 'inApp') {
+                        const newBalance = (userData.tkBalance || 0) + rewardAmount;
+                        updates.tkBalance = newBalance;
+                        showAlert(`Congratulations! You have earned ৳${rewardAmount.toFixed(2)}.`);
+                    } else {
+                        showAlert(`Task completed: Video viewed and counted towards your daily limit.`);
+                    }
+                    
+                    updateUserData(updates); // Update state and UI
+                    
+                } catch (e) {
+                    console.error("Reward processing failed:", e);
+                    showAlert("Error processing reward. Try again.");
+                } finally {
+                    document.getElementById('loader').style.display = 'none';
+                }
+            };
+        }
+
+
+        // --- Notifications and Alerts (Simulated) ---
+        
+        function loadNotifications() {
+            const listEl = document.getElementById('notifications-list');
+            listEl.innerHTML = '';
+            
+            if (simulatedNotifications.length === 0) {
+                 listEl.innerHTML = '<p class="text-gray-500 text-center">No notifications available.</p>';
+                 return;
+            }
+            
+            // Mark notifications as read
+            updateUserData({ lastNotificationCheck: Date.now() });
+
+            simulatedNotifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+            simulatedNotifications.forEach(msg => {
+                const date = new Date(msg.createdAt).toLocaleDateString();
+                listEl.innerHTML += `<div class="card-bg p-4 rounded-xl border-l-4 border-accent hover:shadow-md transition"><div class="flex justify-between items-center mb-1"><h3 class="font-bold text-text-color">${msg.title}</h3><p class="text-xs text-gray-400">${date}</p></div><p class="text-sm text-gray-600">${msg.message}</p></div>`;
+            });
+            lucide.createIcons();
+            
+            // Check new notifications state after loading
+            checkNewNotifications();
+        }
+        
+        function checkNewNotifications() {
+            const latestTime = simulatedNotifications.length > 0 ? simulatedNotifications[0].createdAt.getTime() : 0;
+            const lastCheckTime = userData.lastNotificationCheck || new Date(0).getTime();
+            
+            const hasNew = latestTime > lastCheckTime;
+            document.getElementById('notification-dot').style.display = hasNew ? 'block' : 'none';
+        }
+        
+        function showAlert(message) {
+            const alertEl = document.getElementById('custom-alert');
+            document.getElementById('alert-message').textContent = message;
+            alertEl.classList.add('active');
+            document.getElementById('alert-ok-btn').onclick = () => {
+                alertEl.classList.remove('active');
+            };
+        }
+        window.showAlert = showAlert; // Make accessible from inline HTML
+        
+        function updateDynamicPaymentFields() {
+            const selectedMethod = document.getElementById('withdraw-method').value.toLowerCase();
+            let placeholder = "Enter Payment Number";
+            if (selectedMethod.includes('bkash')) placeholder = "Enter your bKash Number";
+            if (selectedMethod.includes('nagad')) placeholder = "Enter your Nagad Number";
+            document.getElementById('payment-details-container').innerHTML = `<input id="payment-detail-input" type="text" placeholder="${placeholder}" class="w-full p-3 rounded-lg input-field">`;
+        }
+
+        // --- Clipboard/Share Utilities ---
+        
         function copyToClipboardFallback(text) {
              const textArea = document.createElement("textarea");
              textArea.value = text;
-             textArea.style.position = 'fixed'; 
-             textArea.style.top = '0';
-             textArea.style.left = '0';
-             textArea.style.opacity = '0';
+             textArea.style.position = 'fixed'; textArea.style.top = '0'; textArea.style.left = '0'; textArea.style.opacity = '0';
              document.body.appendChild(textArea);
              textArea.focus();
              textArea.select();
@@ -1132,7 +1015,6 @@
                 navigator.clipboard.writeText(textToCopy).then(() => {
                     showAlert("Referral link copied!");
                 }).catch(err => {
-                    console.error("Modern clipboard failed, using fallback:", err);
                     copyToClipboardFallback(textToCopy);
                 });
             } else {
@@ -1145,8 +1027,7 @@
             const text = `Join Mango Cash and earn money daily! Sign up using my referral link: ${linkToShare} (You get ৳${appConfig.rewardPerReferral.toFixed(2)} on signup!)`;
             if (navigator.share) {
                 navigator.share({ title: 'Join Mango Cash!', text: text, url: linkToShare })
-                    .catch((error) => {
-                        console.error("Share failed:", error);
+                    .catch(() => {
                         copyReferralLink();
                         showAlert("Share feature failed. Link copied instead!");
                     });
@@ -1155,160 +1036,13 @@
                 showAlert("Share feature is not available. Referral link has been copied instead!");
             }
         }
-
-        // --- MODIFIED: Claim Reward Logic with Modal ---
-        window.claimReward = async function(taskType) {
-            if (!currentUser) return showAlert("Please log in to claim this reward.");
-            
-            if ((userData.dailyAdCount || 0) >= (appConfig.dailyAdLimit || 25)) {
-                return showAlert(`You have reached your daily ad watch limit of ${appConfig.dailyAdLimit || 25}.`);
-            }
-            
-            if (typeof window.show_10012357 !== 'function') {
-                return showAlert("Ad service is currently unavailable. (Code: 10012357).");
-            }
-
-            let rewardAmount = 0;
-            if (taskType === 'miniApp') rewardAmount = appConfig.rewardPerAd * 2;
-            else if (taskType !== 'inApp') rewardAmount = appConfig.rewardPerAd;
-            
-            const rewardMessageEl = document.getElementById('reward-message');
-            const confirmAdBtn = document.getElementById('confirm-ad-btn');
-            
-            rewardMessageEl.textContent = taskType === 'inApp' 
-                ? "Starting Video..." 
-                : `Ad Loading... (Reward: ৳${rewardAmount.toFixed(2)})`;
-            confirmAdBtn.disabled = true;
-            confirmAdBtn.textContent = taskType === 'inApp' ? 'Continue' : 'Claim Reward';
-            
-            rewardModal.classList.add('active');
-            loader.style.display = 'flex';
-            
-            try {
-                 // Simulate Ad Display using the SDK function
-                 window.show_10012357(); 
-                 
-                 setTimeout(() => {
-                     rewardMessageEl.textContent = "Ad Finished!";
-                     confirmAdBtn.disabled = false;
-                     loader.style.display = 'none'; 
-                 }, 3000); 
-                 
-            } catch(e) {
-                console.error("Ad error:", e);
-                rewardModal.classList.remove('active');
-                loader.style.display = 'none';
-                return showAlert('Ad service failed to load. Please try again.');
-            }
-            
-            confirmAdBtn.onclick = async () => {
-                rewardModal.classList.remove('active');
-                loader.style.display = 'flex';
-                
-                const userRef = getUserRef(currentUser.uid);
-                
-                try {
-                    const newCount = (userData.dailyAdCount || 0) + 1;
-                    // Start transaction for count update
-                    await updateDoc(userRef, { dailyAdCount: newCount });
-
-                    if (taskType !== 'inApp') {
-                        const updateSuccess = await updateBalance(rewardAmount);
-                        if (updateSuccess) {
-                            todayEarning += rewardAmount; 
-                            showAlert(`Congratulations! You have earned ৳${rewardAmount.toFixed(2)}.`);
-                        }
-                    } else {
-                        showAlert(`Task completed: Video viewed and counted towards your daily limit.`);
-                    }
-                    
-                    updateAdsLeftCount();
-                    updateUI(); 
-                } catch (e) {
-                    console.error("Reward processing failed:", e);
-                    showAlert("Error processing reward. Try again.");
-                } finally {
-                    loader.style.display = 'none';
-                }
-            };
-        }
-        // --- END MODIFIED Claim Reward Logic ---
-
-
-        // --- Notifications and Alerts ---
         
-        async function checkNewNotifications(forceCheck = false) {
-            if (!userData) return;
-            const qLatest = query(getNotificationsCollection(), limit(1));
-            
-            try {
-                const latestSnap = await getDocs(qLatest);
-                if (latestSnap.empty) {
-                    notificationDot.style.display = 'none';
-                    return;
-                }
-                
-                const latestNotification = latestSnap.docs[0].data();
-                const latestTime = latestNotification.createdAt?.toDate()?.getTime() || 0;
-                const lastCheckTime = userData.lastNotificationCheck?.toDate()?.getTime() || new Date(0).getTime();
-                
-                const hasNew = latestTime > lastCheckTime;
-                notificationDot.style.display = hasNew ? 'block' : 'none';
-            } catch (e) {
-                console.error("Error checking notifications:", e);
-                notificationDot.style.display = 'none';
-            }
-        }
-
-        async function loadNotifications() {
-            const listEl = document.getElementById('notifications-list');
-            listEl.innerHTML = '<p class="text-gray-500 text-center">Loading...</p>';
-            notificationDot.style.display = 'none';
-            
-            const q = query(getNotificationsCollection()); 
-            try {
-                const querySnapshot = await getDocs(q);
-                let notifications = [];
-                querySnapshot.forEach(doc => {
-                    notifications.push({...doc.data(), id: doc.id});
-                });
-
-                notifications.sort((a, b) => {
-                    const dateA = a.createdAt?.toDate()?.getTime() || 0;
-                    const dateB = b.createdAt?.toDate()?.getTime() || 0;
-                    return dateB - dateA;
-                });
-
-
-                if (notifications.length === 0) {
-                    listEl.innerHTML = '<p class="text-gray-500 text-center">No notifications available.</p>';
-                    return;
-                }
-                listEl.innerHTML = '';
-                notifications.forEach(msg => {
-                    const date = msg.createdAt ? msg.createdAt.toDate().toLocaleDateString() : 'N/A';
-                    // Changed: border-l-4 border-accent
-                    listEl.innerHTML += `<div class="card-bg p-4 rounded-xl border-l-4 border-accent hover:shadow-md transition"><div class="flex justify-between items-center mb-1"><h3 class="font-bold text-text-color">${msg.title}</h3><p class="text-xs text-gray-400">${date}</p></div><p class="text-sm text-gray-600">${msg.message}</p></div>`;
-                });
-                
-                if (currentUser) {
-                    await updateDoc(getUserRef(currentUser.uid), { lastNotificationCheck: serverTimestamp() });
-                }
-            } catch (error) {
-                console.error("Error loading notifications:", error);
-                listEl.innerHTML = '<p class="text-red-600 text-center">Error loading notifications.</p>';
-            }
-        }
-        
-        function showAlert(message) {
-            const alertEl = document.getElementById('custom-alert');
-            document.getElementById('alert-message').textContent = message;
-            alertEl.classList.add('active');
-            document.getElementById('alert-ok-btn').onclick = () => {
-                alertEl.classList.remove('active');
-            };
-        }
-        window.showAlert = showAlert;
+        // --- Initialization on Load ---
+        window.onload = () => {
+            lucide.createIcons();
+            setupEventListeners();
+            initializeAppSimulation();
+        };
         
     </script>
 </body>
