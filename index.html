@@ -12,9 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
     <style>
-        /* Google Font Import */
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
-
         /* CSS Variables for Theming */
         :root {
             --font-family: 'Nunito', sans-serif;
@@ -45,9 +42,41 @@
         /* Theme Styles */
         body.light-theme { background-color: var(--bg-color-light); color: var(--text-color-light); }
         body.dark-theme { background-color: var(--bg-color-dark); color: var(--text-color-dark); }
-        #app { max-width: 500px; margin: 0 auto; padding-bottom: 70px; }
+        #app { max-width: 500px; margin: 0 auto; padding-bottom: 70px; display: none; } /* Initially hidden */
 
-        /* Profile Header */
+        /* --- Loading Screen Styles (NEW) --- */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease;
+            z-index: 5000;
+        }
+        .light-theme #loading-screen { background-color: var(--secondary-bg-light); }
+        .dark-theme #loading-screen { background-color: var(--secondary-bg-dark); }
+
+        .app-logo { font-size: 3rem; color: var(--mango-color); margin-bottom: 20px; animation: bounce 1s infinite alternate; }
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color-light);
+            border-top-color: var(--mango-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .dark-theme .loader-spinner { border-color: var(--border-color-dark); border-top-color: var(--mango-color); }
+        
+        @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
+        /* --- End Loading Screen Styles --- */
+
+        /* Existing styles below (omitted for brevity in this comment, but included in the full code block) */
+        
         .profile-header { padding: 20px 15px; display: flex; align-items: center; border-bottom: 1px solid; }
         .light-theme .profile-header { border-bottom-color: var(--border-color-light); }
         .dark-theme .profile-header { border-bottom-color: var(--border-color-dark); }
@@ -62,15 +91,11 @@
         .user-details p { font-size: 0.9rem; font-weight: 600; }
         .light-theme .user-details p { color: var(--subtle-text-light); }
         .dark-theme .user-details p { color: var(--subtle-text-dark); }
-
-        /* Main Content & Pages */
         main { padding: 15px; }
         .page { display: none; }
         .page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         h2 { font-size: 1.5rem; margin-bottom: 15px; }
-
-        /* Home Page Stats & Referral */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .stat-card { padding: 20px; border-radius: 12px; text-align: center; }
         .light-theme .stat-card { background-color: var(--secondary-bg-light); border: 1px solid var(--border-color-light); }
@@ -81,7 +106,6 @@
         .stat-card p { font-size: 1.5rem; font-weight: 700; }
         .light-theme .stat-card p { color: var(--primary-color-light); }
         .dark-theme .stat-card p { color: var(--primary-color-dark); }
-        
         .referral-section { margin-top: 30px; padding: 20px; border-radius: 12px; }
         .light-theme .referral-section { background-color: var(--secondary-bg-light); border: 1px solid var(--border-color-light); }
         .dark-theme .referral-section { background-color: var(--secondary-bg-dark); border: 1px solid var(--border-color-dark); }
@@ -92,8 +116,6 @@
         #copy-ref-link-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; color: #fff; cursor: pointer; font-weight: 600; }
         .light-theme #copy-ref-link-btn { background-color: var(--mango-color); }
         .dark-theme #copy-ref-link-btn { background-color: var(--mango-color); }
-        
-        /* Task/Bonus Container */
         .task-container { padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
         .task-container:last-child { margin-bottom: 0; }
         .light-theme .task-container { background-color: var(--secondary-bg-light); border: 1px solid var(--border-color-light); }
@@ -105,21 +127,16 @@
         .task-container p { font-size: 0.9rem; margin-bottom: 20px; }
         .light-theme .task-container p { color: var(--subtle-text-light); }
         .dark-theme .task-container p { color: var(--subtle-text-dark); }
-
-        /* Action Button */
         .action-btn { width: 100%; padding: 15px; font-size: 1rem; font-weight: 700; color: #fff; border: none; border-radius: 10px; cursor: pointer; transition: background-color 0.2s, opacity 0.2s; position: relative; display: flex; justify-content: center; align-items: center; }
         .light-theme .action-btn { background-color: var(--primary-color-light); }
         .dark-theme .action-btn { background-color: var(--primary-color-dark); }
         .light-theme #withdraw-submit-btn { background-color: var(--mango-color); }
         .dark-theme #withdraw-submit-btn { background-color: var(--mango-color); }
-        
         .action-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-loader { width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.4); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
         .action-btn.loading .btn-text { visibility: hidden; }
         .action-btn.loading .btn-loader { display: block; position: absolute; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Form Styles */
         #withdraw-form .form-group { margin-bottom: 15px; }
         #withdraw-form label { display: block; margin-bottom: 5px; font-weight: 600; }
         #withdraw-form input, #withdraw-form select { width: 100%; padding: 12px; border-radius: 8px; font-family: var(--font-family); font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
@@ -127,8 +144,6 @@
         .dark-theme #withdraw-form input, .dark-theme #withdraw-form select { background-color: var(--secondary-bg-dark); border: 1px solid var(--border-color-dark); color: var(--text-color-dark); }
         .light-theme input:focus, .light-theme select:focus { outline: none; border-color: var(--primary-color-light); box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15); }
         .dark-theme input:focus, .dark-theme select:focus { outline: none; border-color: var(--primary-color-dark); box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2); }
-        
-        /* Bottom Navigation */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; display: flex; justify-content: space-around; padding: 5px 0; border-top: 1px solid; z-index: 1000; }
         .light-theme .bottom-nav { background-color: var(--secondary-bg-light); border-top-color: var(--border-color-light); }
         .dark-theme .bottom-nav { background-color: var(--secondary-bg-dark); border-top-color: var(--border-color-dark); }
@@ -139,8 +154,6 @@
         .nav-btn.active { font-weight: 700; }
         .light-theme .nav-btn.active { color: var(--mango-color); } 
         .dark-theme .nav-btn.active { color: var(--mango-color); } 
-
-        /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; }
         .modal-content { padding: 30px; border-radius: 15px; text-align: center; }
         .light-theme .modal-content { background-color: var(--secondary-bg-light); }
@@ -150,7 +163,12 @@
         .dark-theme .loader { border-top-color: var(--mango-color); }
     </style>
 </head>
-<body>
+<body class="light-theme"> <div id="loading-screen">
+        <i class="fas fa-money-bill-wave app-logo"></i>
+        <h2>Mango Cash</h2>
+        <div class="loader-spinner"></div>
+        <p style="margin-top: 15px;">Loading Mini App...</p>
+    </div>
 
     <div id="app">
         <header class="profile-header">
@@ -178,7 +196,7 @@
                 </div>
                 <div class="referral-section">
                     <h3>Refer & Earn More!</h3>
-                    <p>Share your link to get bonus points. (Bonus handled by Bot)</p>
+                    <p>Share your link to get bonus points. (Local Tracking Added)</p>
                     <input type="text" id="referral-link" value="Loading..." readonly>
                     <button id="copy-ref-link-btn">Copy Referral Link</button>
                 </div>
@@ -255,8 +273,6 @@
             
             // --- Configuration ---
             const BOT_TOKEN = "8025165879:AAFquOGuGR6IDVmeW4-IYjzAv9fuZHnd9UI"; 
-            
-            // 💡 FIX: Updated config for the new referral link format
             const BOT_USERNAME = "mango_cash_bot"; // Your Bot's username (without @)
             const APP_SHORTNAME = "app"; // The shortname you set for your Mini App in BotFather
             
@@ -267,9 +283,12 @@
             const POINTS_PER_AD = 3;
             const CHANNEL_JOIN_BONUS = 40;
             const GROUP_JOIN_BONUS = 10;
+            const REFERRAL_BONUS = 5; // Local, dummy referral bonus
             const MIN_WITHDRAW_POINTS = 50; 
 
             // --- DOM Elements ---
+            const appContainer = document.getElementById('app');
+            const loadingScreen = document.getElementById('loading-screen');
             const userPhotoElem = document.getElementById('user-photo');
             const userNameElem = document.getElementById('user-name');
             const userPointsElem = document.getElementById('user-points');
@@ -289,7 +308,7 @@
                 points: 0,
                 dailyAdWatchCount: 0,
                 lastAdWatchDate: null,
-                referrals: [], 
+                referrals: 0, // Changed to a single count for simplicity
                 hasJoinedChannel: false,
                 hasJoinedGroup: false, 
                 userId: null
@@ -305,8 +324,44 @@
                 const savedState = localStorage.getItem(`userState_${userId}`);
                 if (savedState) {
                     userState = JSON.parse(savedState);
+                    // Ensure new state properties exist
                     if (userState.hasJoinedGroup === undefined) userState.hasJoinedGroup = false;
-                    if (userState.referrals === undefined) userState.referrals = [];
+                    if (userState.referrals === undefined) userState.referrals = 0; // Initialize as number
+                }
+            };
+
+            // 💡 FIX: Handles the referral parameter (Local Tracking - INSECURE)
+            const checkReferral = (userId) => {
+                const params = new URLSearchParams(window.location.search);
+                const startParam = params.get('startapp');
+                
+                // 1. Check if there's a referral parameter present
+                if (startParam) {
+                    const referrerId = startParam;
+                    const referralKey = `referred_by_${referrerId}`; // Key to track if current user was referred
+                    
+                    // 2. Check if the current user has already been credited for this referral
+                    if (localStorage.getItem(referralKey) === null) {
+                        // 3. Credit the referrer (must be a different user/ID)
+                        if (referrerId !== String(userId)) {
+                            // Load referrer's state
+                            const referrerKey = `userState_${referrerId}`;
+                            const referrerStateString = localStorage.getItem(referrerKey);
+                            
+                            if (referrerStateString) {
+                                let referrerState = JSON.parse(referrerStateString);
+                                referrerState.referrals = (referrerState.referrals || 0) + 1;
+                                referrerState.points = (referrerState.points || 0) + REFERRAL_BONUS;
+                                
+                                // Save updated referrer state
+                                localStorage.setItem(referrerKey, JSON.stringify(referrerState));
+                                tg.showAlert(`অভিনন্দন! আপনার রেফারার (${referrerId}) ${REFERRAL_BONUS} টাকা বোনাস পেয়েছে।`);
+                            }
+                            
+                            // 4. Mark the current user as having been referred
+                            localStorage.setItem(referralKey, 'true'); 
+                        }
+                    }
                 }
             };
             
@@ -325,6 +380,9 @@
                 userState.userId = user.id;
                 loadState(user.id);
                 
+                // 💡 FIX: Check and handle referral logic (INSECURE)
+                checkReferral(user.id);
+
                 // Reset daily count if date is new
                 const today = new Date().toISOString().slice(0, 10);
                 if (userState.lastAdWatchDate !== today) {
@@ -336,6 +394,15 @@
                 setupNavigation();
                 setupEventListeners();
                 saveState();
+
+                // 💡 NEW: Hide loading screen and show app content after a small delay
+                setTimeout(() => {
+                    loadingScreen.style.opacity = '0';
+                    appContainer.style.display = 'block';
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 300);
+                }, 1000); // 1 second delay for loading effect
             };
             
             const updateUI = () => {
@@ -347,9 +414,9 @@
                 
                 userPointsElem.textContent = userState.points;
                 dailyAdsWatchedElem.textContent = String(userState.dailyAdWatchCount).padStart(2, '0');
-                referralCountElem.textContent = String(userState.referrals.length).padStart(2, '0');
+                referralCountElem.textContent = String(userState.referrals).padStart(2, '0'); // Use referral count directly
 
-                // 💡 FIX APPLIED: Using the new TMA deep-link format
+                // Using the requested TMA deep-link format
                 referralLinkElem.value = `https://t.me/${BOT_USERNAME}/${APP_SHORTNAME}?startapp=${userState.userId}`;
 
                 // Update task button states
@@ -379,7 +446,6 @@
                 copyRefLinkBtn.addEventListener('click', copyReferralLink);
             };
 
-            // NOTE: This simulates ad watch since the SDK was removed.
             const handleWatchAd = () => {
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
                     tg.showAlert("আপনার দৈনিক বিজ্ঞাপন দেখার সীমা পূর্ণ হয়েছে।"); return;
@@ -388,7 +454,6 @@
                 loadingModal.style.display = 'flex';
                 watchAdBtn.disabled = true;
 
-                // Simulate Ad completion after 3 seconds
                 setTimeout(() => {
                     loadingModal.style.display = 'none';
                     
@@ -443,11 +508,9 @@
                 if (amount < MIN_WITHDRAW_POINTS) { tg.showAlert(`ন্যূনতম উইথড্রয়াল হলো ${MIN_WITHDRAW_POINTS} টাকা।`); return; }
                 if (amount > userState.points) { tg.showAlert("আপনার পর্যাপ্ত ব্যালেন্স নেই।"); return; }
 
-                // Start loading state
                 withdrawSubmitBtn.classList.add('loading');
                 withdrawSubmitBtn.disabled = true;
 
-                // Deduct points locally BEFORE sending request (optimistic update)
                 userState.points -= amount;
                 saveState();
                 updateUI();
@@ -457,7 +520,6 @@
                 
                 const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
                 try {
-                    // Send message to Admin Chat ID via Telegram Bot API
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -475,12 +537,10 @@
                 } catch (error) {
                     tg.HapticFeedback.notificationOccurred('error');
                     tg.showAlert("অনুরোধ জমা দিতে ব্যর্থ হয়েছে। আপনার পয়েন্ট ফেরত দেওয়া হয়েছে।");
-                    // Revert points on failure
                     userState.points += amount;
                     saveState();
                     updateUI();
                 } finally {
-                    // End loading state
                     withdrawSubmitBtn.classList.remove('loading');
                     withdrawSubmitBtn.disabled = false;
                 }
@@ -507,6 +567,7 @@
                 });
             };
 
+            // Start initialization
             initApp();
         });
     </script>
