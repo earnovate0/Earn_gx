@@ -30,7 +30,7 @@
             --subtle-text-dark: #8e8e93;
             --primary-color-dark: #0a84ff;
             --border-color-dark: #38383a;
-            --mango-color: #ff9900; /* Added a mango color */
+            --mango-color: #ff9900; 
         }
 
         /* Base Styles */
@@ -137,8 +137,8 @@
         .dark-theme .nav-btn { color: var(--subtle-text-dark); }
         .nav-btn i { font-size: 1.4rem; margin-bottom: 3px; }
         .nav-btn.active { font-weight: 700; }
-        .light-theme .nav-btn.active { color: var(--mango-color); } /* Changed active color */
-        .dark-theme .nav-btn.active { color: var(--mango-color); } /* Changed active color */
+        .light-theme .nav-btn.active { color: var(--mango-color); } 
+        .dark-theme .nav-btn.active { color: var(--mango-color); } 
 
         /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; }
@@ -255,9 +255,11 @@
             
             // --- Configuration ---
             const BOT_TOKEN = "8025165879:AAFquOGuGR6IDVmeW4-IYjzAv9fuZHnd9UI"; 
-            // 💡 FIX: Added '@' to BOT_USERNAME for correct referral link format
-            const BOT_USERNAME_WITH_AT = "@mango_cash_bot"; 
-            const BOT_USERNAME_ONLY = "mango_cash_bot"; 
+            
+            // 💡 FIX: Updated config for the new referral link format
+            const BOT_USERNAME = "mango_cash_bot"; // Your Bot's username (without @)
+            const APP_SHORTNAME = "app"; // The shortname you set for your Mini App in BotFather
+            
             const ADMIN_CHAT_ID = "6703675335";
             const CHANNEL_LINK = "https://t.me/goodgmail";
             const GROUP_LINK = "https://t.me/OnlineEarnEleven";
@@ -347,8 +349,8 @@
                 dailyAdsWatchedElem.textContent = String(userState.dailyAdWatchCount).padStart(2, '0');
                 referralCountElem.textContent = String(userState.referrals.length).padStart(2, '0');
 
-                // 💡 FIX APPLIED: Added @ symbol to BOT_USERNAME_WITH_AT for correct Telegram link format
-                referralLinkElem.value = `https://t.me/${BOT_USERNAME_WITH_AT}?start=ref_${userState.userId}`;
+                // 💡 FIX APPLIED: Using the new TMA deep-link format
+                referralLinkElem.value = `https://t.me/${BOT_USERNAME}/${APP_SHORTNAME}?startapp=${userState.userId}`;
 
                 // Update task button states
                 if (userState.hasJoinedChannel) {
