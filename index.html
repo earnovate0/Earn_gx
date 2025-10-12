@@ -46,7 +46,7 @@
         body.dark-theme { background-color: var(--bg-color-dark); color: var(--text-color-dark); }
         #app { max-width: 500px; margin: 0 auto; padding-bottom: 70px; display: none; } 
 
-        /* --- Loading Screen Styles (Omitted for brevity, assuming they are fine) --- */
+        /* --- Loading Screen Styles --- */
         #loading-screen {
             position: fixed;
             top: 0;
@@ -298,7 +298,7 @@
             const dailyAdsWatchedElem = document.getElementById('daily-ads-watched');
             const watchAdBtn = document.getElementById('watch-ad-btn');
             const referralLinkElem = document.getElementById('referral-link');
-            const loadingModal = document.getElementById('loading-modal'); // Re-added for potential use
+            const loadingModal = document.getElementById('loading-modal'); 
 
             // --- State Management ---
             let userState = {
@@ -413,7 +413,7 @@
                 }
             };
             
-            // --- Initialization Function (Rest of the functions are omitted for brevity, they remain the same) ---
+            // --- Initialization Function ---
             
             const initApp = () => {
                 tg.ready();
@@ -473,6 +473,13 @@
                        watchAdBtn.disabled = false;
                     }
                 }
+                 // Handle Joined buttons state
+                document.getElementById('join-channel-btn').disabled = userState.hasJoinedChannel;
+                if (userState.hasJoinedChannel) document.getElementById('join-channel-btn').textContent = "Bonus Claimed";
+                
+                document.getElementById('join-group-btn').disabled = userState.hasJoinedGroup;
+                if (userState.hasJoinedGroup) document.getElementById('join-group-btn').textContent = "Bonus Claimed";
+
             };
             
             const setupEventListeners = () => {
@@ -499,8 +506,6 @@
                     saveState();
                     updateUI();
                     tg.showAlert("অভিনন্দন! চ্যানেলে যোগ দেওয়ার জন্য আপনি ৳40 বোনাস পেয়েছেন।");
-                    document.getElementById('join-channel-btn').disabled = true;
-                    document.getElementById('join-channel-btn').textContent = "Bonus Claimed";
                 }, 5000); 
             };
             
@@ -520,8 +525,6 @@
                     saveState();
                     updateUI();
                     tg.showAlert("অভিনন্দন! গ্রুপে যোগ দেওয়ার জন্য আপনি ৳10 বোনাস পেয়েছেন।");
-                    document.getElementById('join-group-btn').disabled = true;
-                    document.getElementById('join-group-btn').textContent = "Bonus Claimed";
                 }, 5000); 
             };
 
@@ -556,7 +559,6 @@
                 `;
 
                 // In a real-world scenario, you would send this to your bot's API here.
-                // Since this is a client-side app, we'll simulate the request to the Bot Admin via a simple alert
                 
                 try {
                      // Simulate sending to the bot/admin
@@ -571,7 +573,6 @@
                     tg.showAlert(`আপনার ৳${amount} উত্তোলনের অনুরোধ সফলভাবে জমা দেওয়া হয়েছে। ২৪ ঘণ্টার মধ্যে প্রক্রিয়া করা হবে। ধন্যবাদ!`);
 
                     // Send the request details to the admin chat (Simulated: in reality, the backend bot would do this)
-                    // We'll use a local alert to simulate the message content to the admin.
                     console.log("Admin Notification Content:", message); 
 
                 } catch (error) {
