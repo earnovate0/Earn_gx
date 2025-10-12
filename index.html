@@ -360,44 +360,49 @@
                 userState.points += POINTS_PER_AD;
                 userState.dailyAdWatchCount++;
                 saveState();
-                updateUI();
                 tg.HapticFeedback.notificationOccurred('success');
                 tg.showAlert(`অভিনন্দন! আপনি ${POINTS_PER_AD} টাকা আয় করেছেন।`);
             };
             
-            // 💡 FIX: Ad Handling Logic with better state management
+            // ✅ IMPROVED Ad Handling Logic for better state management
             const handleWatchAd = () => {
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
                     tg.showAlert("আপনার দৈনিক বিজ্ঞাপন দেখার সীমা পূর্ণ হয়েছে।"); 
                     return;
                 }
                 
-                // Set Loading State
+                // Save original text for restoring later
+                const originalBtnText = watchAdBtn.querySelector('.btn-text').textContent;
+                
+                // **1. Set Loading State**
                 watchAdBtn.disabled = true;
                 watchAdBtn.classList.add('loading');
+                watchAdBtn.querySelector('.btn-text').textContent = 'Loading Ad...'; // Show loading text
                 
                 const resetBtnState = () => {
+                    // **3. Reset the button state and text**
                     watchAdBtn.disabled = false;
                     watchAdBtn.classList.remove('loading');
+                    watchAdBtn.querySelector('.btn-text').textContent = originalBtnText; // Restore original text
+                    updateUI(); // Ensure UI reflects latest state and ad count/limit
                 };
 
                 if (TL_SDK_AVAILABLE) {
                     // Call the function provided by the external SDK
                     window.show_10012357({
                         onCompletion: () => {
-                            // 1. Credit the reward
+                            // **2. Credit the reward only upon successful completion**
                             creditAdReward();
-                            // 2. Reset the button state
                             resetBtnState(); 
                         },
                         onClose: () => {
                             // Called when the ad is closed (might or might not be complete)
-                            // We only credit on onCompletion, but we *must* re-enable the button
+                            // Crucial: Must re-enable the button to allow next ad to be requested
                             resetBtnState(); 
                         },
                         onError: (error) => {
                             // Handle Ad loading/showing error
-                            tg.showAlert(`বিজ্ঞাপন লোড করতে ব্যর্থ: ${error}`);
+                            tg.showAlert(`বিজ্ঞাপন লোড করতে ব্যর্থ: ${error || 'Unknown Error'}`);
                             resetBtnState();
                         }
                     });
@@ -464,11 +469,15 @@
                 referralLinkElem.value = `https://t.me/${BOT_USERNAME}/${APP_SHORTNAME}?startapp=${userState.userId}`;
 
                 // Ensure the button state reflects the current count
+                const watchAdBtnTextSpan = watchAdBtn.querySelector('.btn-text');
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
-                    watchAdBtn.querySelector('.btn-text').textContent = `দৈনিক সীমা পূর্ণ হয়েছে (${DAILY_AD_LIMIT})`;
+                    watchAdBtnTextSpan.textContent = `দৈনিক সীমা পূর্ণ হয়েছে (${DAILY_AD_LIMIT})`;
                     watchAdBtn.disabled = true;
                 } else {
-                    watchAdBtn.querySelector('.btn-text').textContent = 'Watch Ad';
+                    // Only change text if it's not currently 'Loading Ad...' (to avoid overriding live loading state)
+                    if (watchAdBtnTextSpan.textContent !== 'Loading Ad...') { 
+                        watchAdBtnTextSpan.textContent = 'Watch Ad';
+                    }
                     if (!watchAdBtn.classList.contains('loading')) {
                        watchAdBtn.disabled = false;
                     }
@@ -558,7 +567,6 @@
 *বর্তমান ব্যালেন্স:* ৳${userState.points - amount}
                 `;
 
-                // In a real-world scenario, you would send this to your bot's API here.
                 
                 try {
                      // Simulate sending to the bot/admin
