@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mango Cash (Offline Simulation)</title>
     
+    <!-- Ad SDK Simulation Link -->
     <script src='//libtl.com/sdk.js' data-zone='10012357' data-sdk='show_10012357'></script>
 
+    <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
@@ -399,6 +403,12 @@
     <script>
         // --- OFFLINE SIMULATION: Replaced Firebase with Local Storage and In-Memory Data ---
 
+        // Global DOM element references (CRITICAL: Declared here to avoid ReferenceError)
+        let headerTkBalanceEl, tkBalanceEl, accountTkBalanceEl, todayEarningCountEl, referralCountEl, 
+            adsLeftCountEl, profileNameEl, profileEmailEl, profileAvatarEl, userReferralCodeEl, 
+            referralLinkDisplayEl, accountReferralCountEl, taskProgressEl, taskLimitEl, 
+            withdrawMethodSelect, rewardModal, welcomeContinueBtn; 
+            
         // Global Configuration (was appConfig, now directly here)
         const appConfig = {
             minWithdrawal: 500,
@@ -462,11 +472,40 @@
             }
             return userId;
         }
+        
+        // Function to cache all necessary DOM elements
+        function cacheDOMElements() {
+            headerTkBalanceEl = document.getElementById('header-tk-balance');
+            tkBalanceEl = document.getElementById('tk-balance');
+            accountTkBalanceEl = document.getElementById('account-tk-balance');
+            todayEarningCountEl = document.getElementById('today-earning-count');
+            referralCountEl = document.getElementById('referral-count');
+            adsLeftCountEl = document.getElementById('ads-left-count');
+            
+            profileNameEl = document.getElementById('profile-name');
+            profileEmailEl = document.getElementById('profile-email');
+            profileAvatarEl = document.getElementById('profile-avatar');
+            
+            userReferralCodeEl = document.getElementById('user-referral-code');
+            referralLinkDisplayEl = document.getElementById('referral-link-display');
+            accountReferralCountEl = document.getElementById('account-referral-count');
+            
+            taskProgressEl = document.getElementById('task-progress');
+            taskLimitEl = document.getElementById('task-limit');
+            
+            withdrawMethodSelect = document.getElementById('withdraw-method');
+            rewardModal = document.getElementById('reward-modal');
+            welcomeContinueBtn = document.getElementById('welcome-continue-btn');
+        }
+
 
         // --- Core App Logic (Replacement for Firebase) ---
 
         async function initializeAppSimulation() {
             await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate loading time
+
+            // CRITICAL FIX: Cache DOM elements before trying to use them in updateUI
+            cacheDOMElements(); 
 
             const userId = getOrCreateUserId();
             currentUser = { uid: userId, isAnonymous: false }; // Simulate an authenticated user
@@ -506,6 +545,7 @@
 
             // Start the periodic UI refresh (Simulating Realtime)
             setInterval(updateUI, 1000);
+            updateUI(); // Initial immediate UI update
         }
 
         function initializeUserData(userId) {
@@ -532,7 +572,9 @@
         // --- UI Update & Logic ---
 
         function updateUI() {
-            if (!userData) return;
+            // Check if userData is loaded and elements are cached
+            if (!userData || !headerTkBalanceEl) return;
+            
             const balance = userData.tkBalance || 0;
             
             // UI Balance Update
@@ -571,11 +613,11 @@
             referralCountEl.textContent = currentReferrals;
             accountReferralCountEl.textContent = currentReferrals;
 
-
             updateAdsLeftCount();
             updateDailyCheckButtonState();
             updateSocialTaskButtonState();
             updateWithdrawalMethods();
+            checkNewNotifications();
         }
         
         function updateSocialTaskButtonState() {
@@ -613,6 +655,14 @@
                 } else {
                     btn.disabled = true;
                     const timeLeft = lastCheckTime + coolDownDuration - now;
+                    // Prevent showing negative time if clock skew occurs
+                    if (timeLeft < 0) {
+                        btn.textContent = 'Claim Ready';
+                        btn.disabled = false;
+                        btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                        return;
+                    }
+
                     const hours = Math.floor(timeLeft / (1000 * 60 * 60));
                     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
                     btn.textContent = `Next: ${hours}h ${minutes}m`;
@@ -682,7 +732,8 @@
             } else if (pageId === 'notifications-page') {
                 loadNotifications();
             }
-            lucide.createIcons();
+            // Re-create icons on page change
+            lucide.createIcons(); 
         }
         window.navigateTo = navigateTo; // Make accessible from inline HTML
 
@@ -883,7 +934,10 @@
             }
             
             if (typeof window.show_10012357 !== 'function') {
-                return showAlert("Ad service is currently unavailable.");
+                // This is the simulated ad call that only works if the SDK loads
+                // In a true environment, this would call an ad. We simulate it with a short delay.
+                // return showAlert("Ad service is currently unavailable."); 
+                console.log("Simulating ad load...");
             }
 
             let rewardAmount = 0;
@@ -902,8 +956,12 @@
             rewardModal.classList.add('active');
             document.getElementById('loader').style.display = 'flex';
             
-            window.show_10012357(); // Call the ad SDK function
+            // Call the ad SDK function (if available) - otherwise, it's just a delay
+            if (typeof window.show_10012357 === 'function') {
+                 window.show_10012357();
+            }
             
+            // Simulate Ad viewing time
             setTimeout(() => {
                 rewardMessageEl.textContent = "Ad Finished!";
                 confirmAdBtn.disabled = false;
@@ -967,10 +1025,11 @@
         
         function checkNewNotifications() {
             const latestTime = simulatedNotifications.length > 0 ? simulatedNotifications[0].createdAt.getTime() : 0;
-            const lastCheckTime = userData.lastNotificationCheck || new Date(0).getTime();
+            const lastCheckTime = userData ? (userData.lastNotificationCheck || new Date(0).getTime()) : 0;
             
             const hasNew = latestTime > lastCheckTime;
-            document.getElementById('notification-dot').style.display = hasNew ? 'block' : 'none';
+            const notificationDot = document.getElementById('notification-dot');
+            if(notificationDot) notificationDot.style.display = hasNew ? 'block' : 'none';
         }
         
         function showAlert(message) {
@@ -1047,3 +1106,4 @@
     </script>
 </body>
 </html>
+
