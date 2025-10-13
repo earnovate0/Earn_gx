@@ -88,7 +88,7 @@
         
         .user-details h1 { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center;}
         
-        /* 🔥 UPDATED: Verified Badge Design (Full Blue with Clean White Outline) */
+        /* Unique Verified Badge Design - Blue */
         .verified-icon { 
             font-size: 1.0rem; 
             margin-left: 6px; 
@@ -96,8 +96,7 @@
             background-color: var(--verified-badge-color); 
             border-radius: 50%;
             padding: 3px; 
-            /* Simplified box-shadow for a cleaner, Meta Verified-like look */
-            box-shadow: 0 0 0 2px #ffffff; 
+            box-shadow: 0 0 0 1px #ffffff, 0 1px 4px rgba(0, 122, 255, 0.6); 
             position: relative;
             top: -1px;
         }
@@ -774,7 +773,7 @@
                 // The new link structure for Mini Apps that also passes a parameter
                 referralLinkElem.value = `https://t.me/${BOT_USERNAME}/app?startapp=${encodedRefId}`;
 
-                // 🔥 UPDATED: Update task button states (Joined/Bonus Claimed)
+                // Update task button states
                 if (userState.hasJoinedChannel) {
                     joinChannelBtn.innerHTML = '<i class="fas fa-check"></i> Bonus Claimed';
                     joinChannelBtn.disabled = true;
@@ -838,9 +837,9 @@
             };
             
             const handleJoinChannel = async () => {
-                // 🔥 UPDATED: Removed tg.showAlert on already claimed
-                if(userState.hasJoinedChannel) { return; } 
-                
+                if(userState.hasJoinedChannel) {
+                    tg.showAlert('You have already claimed this bonus.'); return;
+                }
                 tg.openTelegramLink(CHANNEL_LINK);
                 
                 // Give user time to join, then grant bonus and save to Firebase
@@ -858,9 +857,9 @@
             };
 
             const handleJoinGroup = async () => {
-                 // 🔥 UPDATED: Removed tg.showAlert on already claimed
-                if(userState.hasJoinedGroup) { return; }
-                
+                if(userState.hasJoinedGroup) {
+                    tg.showAlert('You have already claimed this bonus.'); return;
+                }
                 tg.openTelegramLink(GROUP_LINK);
                 
                 // Grant bonus and save to Firebase
@@ -954,3 +953,4 @@
     </script>
 </body>
 </html>
+
