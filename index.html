@@ -15,33 +15,31 @@
         /* Google Font Import */
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
-        /* CSS Variables for Theming (Reduced Mango usage) */
+        /* CSS Variables for Theming (Professional Base with Mango Accent) */
         :root {
             --font-family: 'Nunito', sans-serif;
             
-            /* Mango/Orange-Gold Palette (For Buttons & Referral Section BG) */
-            --mango-main: #ff9900; 
-            --mango-dark: #cc7a00; 
-            --mango-light: #fff2e6;
+            /* Mango/Orange-Gold Palette (Used ONLY for buttons and primary accent) */
+            --mango-main: #ff9900; /* Primary Mango Orange */
+            --mango-dark: #cc7a00; /* Darker for hover/active */
+            --mango-light: #fff2e6; /* Very light mango for subtle backgrounds (Invite/Earn) */
             
-            /* Blue for Verified Badge */
-            --verified-blue: #007bff;
-            
-            /* Light Theme - Default Professional Colors */
-            --bg-color-light: #f7f7fa; 
+            /* Professional Light Theme */
+            --bg-color-light: #f7f7fa; /* Near white background */
             --secondary-bg-light: #ffffff;
-            --text-color-light: #1c1c1e;
-            --subtle-text-light: #6d6d72;
-            --primary-color-light: var(--mango-main); /* Primary accent is still mango for buttons */
-            --border-color-light: #ebebf0;
+            --text-color-light: #333333; /* Darker but softer text */
+            --subtle-text-light: #777777; /* Neutral gray for secondary text */
+            --primary-color-light: var(--mango-main); /* Mango for highlights/buttons */
+            --border-color-light: #dddddd; /* Softer border */
+            --verified-badge-color: #007aff; /* Blue for verified badge */
             
-            /* Dark Theme - Default Professional Colors */
-            --bg-color-dark: #0d0d0d;
-            --secondary-bg-dark: #1f1f1f;
-            --text-color-dark: #ffffff;
-            --subtle-text-dark: #a9a9b0;
-            --primary-color-dark: var(--mango-main); 
-            --border-color-dark: #3a3a3c;
+            /* Professional Dark Theme */
+            --bg-color-dark: #121212; /* Darker background */
+            --secondary-bg-dark: #1e1e1e;
+            --text-color-dark: #f0f0f0;
+            --subtle-text-dark: #b0b0b0;
+            --primary-color-dark: var(--mango-main);
+            --border-color-dark: #333333;
         }
 
         /* Base Styles */
@@ -69,60 +67,53 @@
             padding: 20px 15px; 
             display: flex; 
             align-items: center; 
-            border-bottom: 1px solid var(--border-color-light); /* Added subtle border */
             background-color: var(--secondary-bg-light); 
+            border-bottom: 1px solid var(--border-color-light);
         }
         .dark-theme .profile-header {
-             border-bottom-color: var(--border-color-dark);
              background-color: var(--secondary-bg-dark); 
+             border-bottom-color: var(--border-color-dark);
         }
         .profile-info { display: flex; align-items: center; gap: 15px; }
         #user-photo { 
             width: 55px; height: 55px; 
             border-radius: 50%; 
             object-fit: cover; 
-            border: 1px solid var(--border-color-light); /* Unbolded frame */
+            /* Profile logo frame color unbold - Soft border */
+            border: 2px solid var(--border-color-light); 
         }
         .dark-theme #user-photo { border-color: var(--border-color-dark); }
         
         .user-details h1 { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center;}
         
-        /* Updated Verified Badge Design (Blue) */
+        /* Verified Badge Design - Unique Blue Design */
         .verified-icon { 
-            font-size: 1rem; 
+            font-size: 1.1rem;
             margin-left: 5px; 
-            color: #ffffff;
-            background-color: var(--verified-blue); /* Blue Color */
+            color: #ffffff; 
+            background-color: var(--verified-badge-color); /* Blue color */
             border-radius: 50%;
-            padding: 3px;
-            box-shadow: 0 1px 4px rgba(0, 123, 255, 0.3);
-            border: 2px solid #ffffff; /* White border for unique look */
-        }
-        .dark-theme .verified-icon {
-             border: 2px solid var(--secondary-bg-dark);
+            padding: 2px;
+            box-shadow: 0 1px 4px rgba(0, 122, 255, 0.4); /* Blue glow */
         }
         
         .user-details p { font-size: 1rem; font-weight: 700; }
         .light-theme .user-details p { color: var(--subtle-text-light); }
         .dark-theme .user-details p { color: var(--subtle-text-dark); }
+        /* Balance kept Mango for accent */
         .user-balance { 
             font-size: 1.1rem !important; 
-            color: var(--text-color-light) !important; /* Reverting balance text color to default */
+            color: var(--primary-color-light) !important;
             font-weight: 800 !important;
         }
-        .dark-theme .user-balance {
-            color: var(--text-color-dark) !important;
-        }
-        /* Highlight only the number with mango/primary color */
-        .user-balance #user-points { color: var(--primary-color-light) !important; }
-        .dark-theme .user-balance #user-points { color: var(--primary-color-dark) !important; }
 
-        /* Main Content & Pages */
+        /* Main Content & Pages (Rest is clean and professional) */
         main { padding: 15px; }
         .page { display: none; }
         .page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        h2 { font-size: 1.6rem; margin-bottom: 20px; font-weight: 800;}
+        h2 { font-size: 1.6rem; margin-bottom: 20px; font-weight: 800; color: var(--text-color-light);}
+        .dark-theme h2 { color: var(--text-color-dark);}
 
         /* Home Page Stats & Referral */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
@@ -130,7 +121,7 @@
             padding: 20px; 
             border-radius: 15px; 
             text-align: center; 
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03); /* Lighter shadow */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         .light-theme .stat-card { 
             background-color: var(--secondary-bg-light); 
@@ -139,15 +130,16 @@
         .dark-theme .stat-card { 
             background-color: var(--secondary-bg-dark); 
             border: 1px solid var(--border-color-dark); 
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         .stat-card h3 { font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;}
         .light-theme .stat-card h3 { color: var(--subtle-text-light); }
         .dark-theme .stat-card h3 { color: var(--subtle-text-dark); }
         .stat-card p { font-size: 1.6rem; font-weight: 800; }
-        /* Keeping stats numbers mango color for distinction */
+        /* Primary text (stats) kept Mango for accent */
         .stat-card p, .stat-card .primary-text { color: var(--primary-color-light); } 
         
+        /* Referral Section (Kept Mango-Light as requested) */
         .referral-section { 
             margin-top: 30px; 
             padding: 25px; 
@@ -155,9 +147,8 @@
             text-align: center; 
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
-        /* Keep referral background mango light as requested */
         .light-theme .referral-section { 
-            background-color: var(--mango-light); 
+            background-color: var(--mango-light); /* Mango Light */
             border: 1px solid var(--primary-color-light); 
         }
         .dark-theme .referral-section { 
@@ -185,7 +176,53 @@
             color: var(--text-color-dark); 
         }
         
-        /* Action Button - Keep Mango color */
+        /* Action Button (Kept Mango as requested) */
+        #copy-ref-link-btn { 
+            width: 100%; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 10px; 
+            color: #fff; 
+            cursor: pointer; 
+            font-weight: 700; 
+            background-color: var(--primary-color-light);
+            transition: background-color 0.2s;
+        }
+        #copy-ref-link-btn:active { background-color: var(--mango-dark); }
+        
+        /* Task/Bonus Container */
+        .task-container { 
+            padding: 25px; 
+            border-radius: 15px; 
+            text-align: center; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .task-container:last-child { margin-bottom: 0; }
+        .light-theme .task-container { 
+            background-color: var(--secondary-bg-light); 
+            border: 1px solid var(--border-color-light); 
+        }
+        .dark-theme .task-container { 
+            background-color: var(--secondary-bg-dark); 
+            border: 1px solid var(--border-color-dark); 
+        }
+        /* Task Icons (Kept Mango for accent) */
+        .task-icon { 
+            font-size: 2.8rem; 
+            margin-bottom: 15px; 
+            color: var(--primary-color-light); 
+        }
+        .task-container h3 { font-size: 1.3rem; margin-bottom: 5px; font-weight: 700;}
+        .task-container p { font-size: 0.95rem; margin-bottom: 20px; font-weight: 600;}
+        .light-theme .task-container p { color: var(--subtle-text-light); }
+        .dark-theme .task-container p { color: var(--subtle-text-dark); }
+        .task-container .action-btn { max-width: 250px; }
+
+        /* Action Button (Kept Mango as requested) */
         .action-btn { 
             width: 100%; 
             padding: 15px; 
@@ -204,64 +241,112 @@
         }
         .action-btn:active:not(:disabled) { background-color: var(--mango-dark); }
         .action-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        /* Task/Bonus Container - Revert to professional colors */
-        .task-container { 
-            padding: 25px; 
-            border-radius: 15px; 
-            text-align: center; 
-            margin-bottom: 20px; 
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .btn-loader { 
+            width: 20px; height: 20px; 
+            border: 3px solid rgba(255, 255, 255, 0.4); 
+            border-top-color: #fff; 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            display: none; 
         }
-        .light-theme .task-container { 
-            background-color: var(--secondary-bg-light); 
-            border: 1px solid var(--border-color-light); 
-        }
-        .dark-theme .task-container { 
-            background-color: var(--secondary-bg-dark); 
-            border: 1px solid var(--border-color-dark); 
-        }
-        .task-icon { 
-            font-size: 2.8rem; 
-            margin-bottom: 15px; 
-            color: var(--primary-color-light); /* Keep icon mango color */
-        }
+        .action-btn.loading .btn-text { visibility: hidden; }
+        .action-btn.loading .btn-loader { display: block; position: absolute; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Form Styles */
         #withdraw-page p { margin-bottom: 20px; font-weight: 600;}
+        #withdraw-form .form-group { margin-bottom: 18px; }
+        #withdraw-form label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.95rem;}
         #withdraw-form input, #withdraw-form select { 
-            /* Same as before */
+            width: 100%; 
             padding: 14px; 
             border-radius: 10px; 
+            font-family: var(--font-family); 
+            font-size: 1rem; 
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
+        .light-theme #withdraw-form input, .light-theme #withdraw-form select { 
+            background-color: var(--secondary-bg-light); 
+            border: 1px solid var(--border-color-light); 
+            color: var(--text-color-light); 
+        }
+        .dark-theme #withdraw-form input, .dark-theme #withdraw-form select { 
+            background-color: var(--secondary-bg-dark); 
+            border: 1px solid var(--border-color-dark); 
+            color: var(--text-color-dark); 
+        }
+        /* Focus kept Mango for accent */
         .light-theme input:focus, .light-theme select:focus { 
-            /* Focus remains Mango themed */
             outline: none; 
             border-color: var(--primary-color-light); 
             box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.2); 
         }
-        
-        /* Bottom Navigation */
-        .bottom-nav { 
-            /* Same as before */
+        .dark-theme input:focus, .dark-theme select:focus { 
+            outline: none; 
+            border-color: var(--primary-color-dark); 
+            box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.3); 
         }
+        
+        /* Bottom Navigation (Nav kept professional and subtle) */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; left: 0; right: 0; 
+            max-width: 500px; margin: 0 auto; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 5px 0; 
+            border-top: 1px solid; 
+            z-index: 1000; 
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); 
+        }
+        .light-theme .bottom-nav { 
+            background-color: var(--secondary-bg-light); 
+            border-top-color: var(--border-color-light); 
+        }
+        .dark-theme .bottom-nav { 
+            background-color: var(--secondary-bg-dark); 
+            border-top-color: var(--border-color-dark); 
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .nav-btn { 
+            background: none; border: none; cursor: pointer; 
+            display: flex; flex-direction: column; align-items: center; 
+            padding: 8px 10px; font-family: var(--font-family); 
+            font-size: 0.75rem; transition: color 0.2s, transform 0.1s; 
+            flex-grow: 1;
+        }
+        .light-theme .nav-btn { color: var(--subtle-text-light); }
+        .dark-theme .nav-btn { color: var(--subtle-text-dark); }
+        .nav-btn i { font-size: 1.5rem; margin-bottom: 3px; }
         .nav-btn.active { font-weight: 700; transform: translateY(-2px);}
-        .light-theme .nav-btn.active { color: var(--primary-color-light); }
-        .dark-theme .nav-btn.active { color: var(--primary-color-dark); }
+        /* Active Nav kept Mango for accent */
+        .light-theme .nav-btn.active { color: var(--primary-color-light); } 
+        .dark-theme .nav-btn.active { color: var(--primary-color-dark); } 
 
-        /* Custom Professional Loading Modal */
+        /* Custom Professional Loading Modal (No Text) */
         .modal { 
-            /* Same as before */
+            position: fixed; z-index: 2000; 
+            left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(0, 0, 0, 0.6); 
+            justify-content: center; align-items: center; 
+            display: none; 
+        }
+        .modal-content { 
+            padding: 0;
+            border-radius: 15px; 
+            text-align: center; 
+            background-color: transparent;
         }
         .app-loader { 
-            /* Same as before */
+            border: 4px solid rgba(255, 255, 255, 0.3); 
+            border-radius: 50%; 
             border-top: 4px solid var(--mango-main);
+            width: 50px; 
+            height: 50px; 
+            animation: spin 1s linear infinite; 
         }
         
-        /* Leaderboard Styles */
+        /* Leaderboard Styles (Clean and professional) */
         .leaderboard-list {
             list-style: none;
             padding: 0;
@@ -272,7 +357,6 @@
             padding: 15px;
             margin-bottom: 10px;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
         .light-theme .leaderboard-item { background-color: var(--secondary-bg-light); border: 1px solid var(--border-color-light); }
         .dark-theme .leaderboard-item { background-color: var(--secondary-bg-dark); border: 1px solid var(--border-color-dark); }
@@ -281,21 +365,18 @@
             font-size: 1.5rem;
             font-weight: 800;
             width: 40px;
-            text-align: left;
-            color: var(--subtle-text-light); /* Default professional gray for rank */
+            text-align: center;
+            color: var(--primary-color-light);
             margin-right: 15px;
         }
-        .dark-theme .rank { color: var(--subtle-text-dark); }
-        
         .rank-top-3 {
             font-size: 1.6rem;
         }
-        /* Top 3 colors remain for prestige */
-        .rank-1 { color: gold; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
-        .rank-2 { color: silver; text-shadow: 0 0 5px rgba(192, 192, 192, 0.5); }
-        .rank-3 { color: #cd7f32; text-shadow: 0 0 5px rgba(205, 127, 50, 0.5); }
+        .rank-1 { color: gold; text-shadow: none; } /* Removed shadow for clean look */
+        .rank-2 { color: silver; text-shadow: none; }
+        .rank-3 { color: #cd7f32; text-shadow: none; }
         
-        /* Removed .user-avatar styles */
+        /* .user-avatar CSS removed as per request */
         
         .leader-info {
             flex-grow: 1;
@@ -310,12 +391,10 @@
             color: var(--subtle-text-light);
             margin: 0;
         }
-        .dark-theme .leader-info p { color: var(--subtle-text-dark); }
-
         .points {
             font-size: 1.1rem;
             font-weight: 800;
-            color: var(--primary-color-light); /* Points remain Mango color */
+            color: var(--primary-color-light);
         }
     </style>
 </head>
@@ -327,7 +406,7 @@
                 <img id="user-photo" src="" alt="User Photo">
                 <div class="user-details">
                     <h1 id="user-name">Loading... <i class="fas fa-check-circle verified-icon"></i></h1>
-                    <p> Balance: ৳<span class="user-balance"><span id="user-points">0</span> TK</span></p>
+                    <p> Balance: <span class="user-balance">৳<span id="user-points">0</span> TK</span></p>
                 </div>
             </div>
         </header>
@@ -470,7 +549,7 @@
                 userId: null
             };
             
-            let leaderboardUsers = [];
+            let leaderboardUsers = []; // State for leaderboard
 
             const saveState = () => {
                 if(userState.userId) {
@@ -498,18 +577,21 @@
             const generateDefaultLeaderboard = () => {
                 const names = ['A. Karim', 'J. Hossain', 'M. Rahman', 'S. Ahmed', 'R. Khan', 'N. Islam', 'F. Akter', 'T. Hassan', 'Z. Mia', 'K. Begum'];
                 const basePoints = [15500, 12200, 9800, 8500, 7200, 6100, 5000, 4300, 3100, 2500];
+                const baseIds = [9123456, 8276543, 7389012, 6412345, 5578901, 4634567, 3790123, 2856789, 1923456, 1089012];
                 return names.map((name, index) => ({
-                    id: 90000 + index, // Shorter, more realistic IDs
+                    // More realistic 7-8 digit IDs
+                    id: baseIds[index] + Math.floor(Math.random() * 500), 
                     name: name,
-                    points: basePoints[index] + Math.floor(Math.random() * 50)
-                })).sort((a, b) => b.points - a.points);
+                    points: basePoints[index] + Math.floor(Math.random() * 50) // Add small random variance
+                })).sort((a, b) => b.points - a.points); // Sort initially
             };
 
             const updateLeaderboardRanks = () => {
                 // Apply a small random change to points to simulate activity
                 leaderboardUsers.forEach(user => {
+                    // Change points by -10 to +10
                     user.points += Math.floor(Math.random() * 21) - 10;
-                    user.points = Math.max(user.points, 1000);
+                    user.points = Math.max(user.points, 1000); // Prevent points from becoming too low
                 });
 
                 // Add current user to leaderboard if they are in the top 10
@@ -517,7 +599,7 @@
                 const currentUserId = userState.userId;
                 const userIndex = leaderboardUsers.findIndex(u => u.id === currentUserId);
 
-                if (userIndex === -1 && currentUserPoints > 2000) { 
+                if (userIndex === -1 && currentUserPoints > 2000) { // Example threshold to enter default leaderboard
                     leaderboardUsers.push({ id: currentUserId, name: tg.initDataUnsafe.user.first_name || 'You', points: currentUserPoints, isCurrentUser: true });
                 } else if (userIndex !== -1) {
                     leaderboardUsers[userIndex].points = currentUserPoints;
@@ -526,10 +608,13 @@
                 // Re-sort the leaderboard
                 leaderboardUsers.sort((a, b) => b.points - a.points);
                 
-                // Trim to top 10
+                // Trim to top 10 or 11 (if current user is included)
                 leaderboardUsers = leaderboardUsers.slice(0, 10);
                 
-                renderLeaderboard();
+                // Only render if on leaderboard page or after initial load
+                if (document.getElementById('leaderboard-page').classList.contains('active') || !document.getElementById('leaderboard-page').classList.contains('active')) {
+                     renderLeaderboard();
+                }
                 saveState();
             };
 
@@ -544,13 +629,17 @@
                     item.className = 'leaderboard-item';
                     if (isCurrentUser) {
                         item.style.border = `2px solid ${tg.colorScheme === 'dark' ? 'var(--primary-color-dark)' : 'var(--primary-color-light)'}`;
+                        item.style.order = -1; // Keep user visible, though list is sorted by rank
                     }
                     
+                    // User ID Shortening Logic: Displays only the last 4 digits
+                    const shortId = String(user.id).slice(-4).padStart(4, '0');
+
                     item.innerHTML = `
                         <span class="rank ${rankClass}">${rank}</span>
                         <div class="leader-info">
                             <h4>${user.name} ${isCurrentUser ? '(You)' : ''}</h4>
-                            <p>ID: ${user.id}</p>
+                            <p>ID: ****${shortId}</p> 
                         </div>
                         <span class="points">৳${user.points}</span>
                     `;
@@ -756,6 +845,7 @@
                         navButtons.forEach(btn => btn.classList.remove('active'));
                         button.classList.add('active');
                         
+                        // Special check for leaderboard to re-render when clicked
                         if (pageId === 'leaderboard-page') {
                              renderLeaderboard();
                         }
