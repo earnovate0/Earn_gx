@@ -3,38 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Mango Cash - Earning App</title>
+    <title>Mango Cash</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
     <style>
         /* Google Font Import */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 
-        /* CSS Variables for Theming - Slightly more refined colors */
+        /* CSS Variables for Theming (Mango Theme) */
         :root {
-            --font-family: 'Inter', sans-serif;
-            --bg-color-light: #f7f7fa; /* Lighter background */
+            --font-family: 'Nunito', sans-serif;
+            
+            /* Mango/Orange-Gold Palette */
+            --mango-main: #ff9900; /* Primary Mango Orange */
+            --mango-dark: #cc7a00; /* Darker for hover/active */
+            --mango-light: #fff2e6; /* Very light mango for subtle backgrounds */
+            
+            /* Light Theme */
+            --bg-color-light: #f7f7fa; /* Near white background */
             --secondary-bg-light: #ffffff;
-            --text-color-light: #17171a;
-            --subtle-text-light: #6b7280;
-            --primary-color-light: #10b981; /* Tailwind Green 500 for a fresh, positive feel */
-            --primary-color-hover-light: #059669;
-            --border-color-light: #e5e7eb;
-            --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-
-            --bg-color-dark: #1f2937; /* Darker background */
-            --secondary-bg-dark: #374151;
-            --text-color-dark: #f9fafb;
-            --subtle-text-dark: #9ca3af;
-            --primary-color-dark: #34d399; /* Lighter green for dark mode contrast */
-            --primary-color-hover-dark: #10b981;
-            --border-color-dark: #4b5563;
-            --shadow-dark: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --text-color-light: #1c1c1e;
+            --subtle-text-light: #6d6d72;
+            --primary-color-light: var(--mango-main);
+            --border-color-light: #ebebf0;
+            
+            /* Dark Theme */
+            --bg-color-dark: #0d0d0d;
+            --secondary-bg-dark: #1f1f1f;
+            --text-color-dark: #ffffff;
+            --subtle-text-dark: #a9a9b0;
+            --primary-color-dark: var(--mango-main);
+            --border-color-dark: #3a3a3c;
         }
 
         /* Base Styles */
@@ -44,146 +48,285 @@
             transition: background-color 0.3s, color 0.3s;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            line-height: 1.5;
         }
 
         /* Theme Styles */
-        body.light-theme { background-color: var(--bg-color-light); color: var(--text-color-light); }
-        body.dark-theme { background-color: var(--bg-color-dark); color: var(--text-color-dark); }
-        #app { max-width: 500px; margin: 0 auto; padding-bottom: 80px; }
+        body.light-theme { 
+            background-color: var(--bg-color-light); 
+            color: var(--text-color-light); 
+        }
+        body.dark-theme { 
+            background-color: var(--bg-color-dark); 
+            color: var(--text-color-dark); 
+        }
+        #app { max-width: 500px; margin: 0 auto; padding-bottom: 70px; }
 
         /* Profile Header */
-        .profile-header { padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid; }
-        .light-theme .profile-header { border-bottom-color: var(--border-color-light); }
-        .dark-theme .profile-header { border-bottom-color: var(--border-color-dark); }
-        .profile-info { display: flex; align-items: center; gap: 12px; }
-        #user-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color-light); }
+        .profile-header { 
+            padding: 20px 15px; 
+            display: flex; 
+            align-items: center; 
+            border-bottom: none; /* Removed border for cleaner look */
+            background-color: var(--secondary-bg-light); /* Added background for light theme */
+        }
+        .dark-theme .profile-header {
+             background-color: var(--secondary-bg-dark); /* Added background for dark theme */
+        }
+        .profile-info { display: flex; align-items: center; gap: 15px; }
+        #user-photo { 
+            width: 55px; height: 55px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 3px solid var(--primary-color-light); /* Mango ring */
+            box-shadow: 0 0 8px rgba(255, 153, 0, 0.5); /* Subtle mango glow */
+        }
         .dark-theme #user-photo { border-color: var(--primary-color-dark); }
-        .user-details h1 { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; }
-        .verified-icon { font-size: 0.9rem; margin-left: 5px; }
-        .light-theme .verified-icon { color: var(--primary-color-light); }
-        .dark-theme .verified-icon { color: var(--primary-color-dark); }
-        .user-details p { font-size: 1.2rem; font-weight: 800; }
-        .light-theme .user-details p { color: var(--primary-color-light); }
-        .dark-theme .user-details p { color: var(--primary-color-dark); }
         
+        .user-details h1 { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center;}
+        .verified-icon { 
+            font-size: 1rem; 
+            margin-left: 5px; 
+            color: var(--primary-color-light); 
+        }
+        .user-details p { font-size: 1rem; font-weight: 700; }
+        .light-theme .user-details p { color: var(--subtle-text-light); }
+        .dark-theme .user-details p { color: var(--subtle-text-dark); }
+        .user-balance { 
+            font-size: 1.1rem !important; 
+            color: var(--primary-color-light) !important;
+            font-weight: 800 !important;
+        }
+
         /* Main Content & Pages */
         main { padding: 15px; }
         .page { display: none; }
         .page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-        h2 { font-size: 1.4rem; margin-bottom: 20px; font-weight: 700; }
-
-        /* Card Styles */
-        .card { padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: var(--shadow-light); transition: all 0.2s; }
-        .light-theme .card { background-color: var(--secondary-bg-light); border: 1px solid var(--border-color-light); }
-        .dark-theme .card { background-color: var(--secondary-bg-dark); border: 1px solid var(--border-color-dark); box-shadow: var(--shadow-dark); }
-        .card:hover { transform: translateY(-1px); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        h2 { font-size: 1.6rem; margin-bottom: 20px; font-weight: 800;}
 
         /* Home Page Stats & Referral */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .stat-card { text-align: center; } /* Inherits .card styles */
-        .stat-card h3 { font-size: 0.8rem; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-card { 
+            padding: 20px; 
+            border-radius: 15px; 
+            text-align: center; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Added subtle shadow */
+        }
+        .light-theme .stat-card { 
+            background-color: var(--secondary-bg-light); 
+            border: 1px solid var(--border-color-light); 
+        }
+        .dark-theme .stat-card { 
+            background-color: var(--secondary-bg-dark); 
+            border: 1px solid var(--border-color-dark); 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .stat-card h3 { font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;}
         .light-theme .stat-card h3 { color: var(--subtle-text-light); }
         .dark-theme .stat-card h3 { color: var(--subtle-text-dark); }
         .stat-card p { font-size: 1.6rem; font-weight: 800; }
-        .referral-section { margin-top: 20px; } /* Inherits .card styles */
-        .referral-section h3 { text-align: center; font-size: 1.1rem; margin-bottom: 8px; }
-        .referral-section > p { text-align: center; font-size: 0.9rem; margin-bottom: 15px; }
-        .light-theme .referral-section > p { color: var(--subtle-text-light); }
-        .dark-theme .referral-section > p { color: var(--subtle-text-dark); }
-        #referral-link { width: 100%; padding: 12px; text-align: center; border: 1px solid; border-radius: 8px; margin: 10px 0 15px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
-        .light-theme #referral-link { border-color: var(--border-color-light); background-color: var(--bg-color-light); color: var(--text-color-light); }
-        .dark-theme #referral-link { border-color: var(--border-color-dark); background-color: var(--bg-color-dark); color: var(--text-color-dark); }
-
+        .stat-card p, .stat-card .primary-text { color: var(--primary-color-light); }
+        
+        .referral-section { 
+            margin-top: 30px; 
+            padding: 25px; 
+            border-radius: 15px; 
+            text-align: center; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .light-theme .referral-section { 
+            background-color: var(--mango-light); /* Light mango background */
+            border: 1px solid var(--primary-color-light); 
+        }
+        .dark-theme .referral-section { 
+            background-color: var(--secondary-bg-dark); 
+            border: 1px solid var(--border-color-dark); 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .referral-section h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;}
+        .referral-section p { font-size: 0.9rem; margin-bottom: 15px; }
+        
+        #referral-link { 
+            width: 100%; 
+            padding: 12px; 
+            text-align: center; 
+            border: 2px solid var(--primary-color-light); 
+            border-radius: 10px; 
+            margin: 10px 0; 
+            font-size: 0.9rem; 
+            font-weight: 600;
+            background-color: transparent;
+        }
+        .dark-theme #referral-link { 
+            border-color: var(--primary-color-dark); 
+            background-color: var(--bg-color-dark); 
+            color: var(--text-color-dark); 
+        }
+        
+        #copy-ref-link-btn { 
+            width: 100%; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 10px; 
+            color: #fff; 
+            cursor: pointer; 
+            font-weight: 700; 
+            background-color: var(--primary-color-light);
+            transition: background-color 0.2s;
+        }
+        #copy-ref-link-btn:active { background-color: var(--mango-dark); }
+        
         /* Task/Bonus Container */
-        .task-container { display: flex; align-items: center; gap: 15px; } /* Inherits .card styles */
+        .task-container { 
+            padding: 25px; 
+            border-radius: 15px; 
+            text-align: center; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         .task-container:last-child { margin-bottom: 0; }
-        .task-icon-wrapper { min-width: 45px; height: 45px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; }
-        .light-theme .task-icon-wrapper { background-color: rgba(16, 185, 129, 0.1); color: var(--primary-color-light); }
-        .dark-theme .task-icon-wrapper { background-color: rgba(52, 211, 153, 0.1); color: var(--primary-color-dark); }
-        .task-details { flex-grow: 1; text-align: left; }
-        .task-details h3 { font-size: 1rem; margin-bottom: 2px; }
-        .task-details p { font-size: 0.85rem; }
-        .task-action { min-width: 80px; }
+        .light-theme .task-container { 
+            background-color: var(--secondary-bg-light); 
+            border: 1px solid var(--border-color-light); 
+        }
+        .dark-theme .task-container { 
+            background-color: var(--secondary-bg-dark); 
+            border: 1px solid var(--border-color-dark); 
+        }
+        .task-icon { 
+            font-size: 2.8rem; 
+            margin-bottom: 15px; 
+            color: var(--primary-color-light); 
+        }
+        .task-container h3 { font-size: 1.3rem; margin-bottom: 5px; font-weight: 700;}
+        .task-container p { font-size: 0.95rem; margin-bottom: 20px; font-weight: 600;}
+        .light-theme .task-container p { color: var(--subtle-text-light); }
+        .dark-theme .task-container p { color: var(--subtle-text-dark); }
+        .task-container .action-btn { max-width: 250px; } /* Constrain task button width */
 
         /* Action Button */
         .action-btn { 
-            padding: 10px 15px; 
-            font-size: 0.85rem; 
+            width: 100%; 
+            padding: 15px; 
+            font-size: 1.05rem; 
             font-weight: 700; 
             color: #fff; 
             border: none; 
-            border-radius: 8px; 
+            border-radius: 10px; 
             cursor: pointer; 
-            transition: background-color 0.2s, opacity 0.2s, transform 0.1s; 
+            transition: background-color 0.2s, opacity 0.2s; 
             position: relative; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            text-align: center;
+            background-color: var(--primary-color-light);
         }
-        .light-theme .action-btn { background-color: var(--primary-color-light); }
-        .light-theme .action-btn:hover:not(:disabled) { background-color: var(--primary-color-hover-light); }
-        .dark-theme .action-btn { background-color: var(--primary-color-dark); }
-        .dark-theme .action-btn:hover:not(:disabled) { background-color: var(--primary-color-hover-dark); }
+        .action-btn:active:not(:disabled) { background-color: var(--mango-dark); }
         .action-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .action-btn:active:not(:disabled) { transform: scale(0.98); }
+        .btn-loader { 
+            width: 20px; height: 20px; 
+            border: 3px solid rgba(255, 255, 255, 0.4); 
+            border-top-color: #fff; 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            display: none; 
+        }
+        .action-btn.loading .btn-text { visibility: hidden; }
+        .action-btn.loading .btn-loader { display: block; position: absolute; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Form Styles */
+        #withdraw-page p { margin-bottom: 20px; font-weight: 600;}
         #withdraw-form .form-group { margin-bottom: 18px; }
-        #withdraw-form label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; }
+        #withdraw-form label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.95rem;}
         #withdraw-form input, #withdraw-form select { 
             width: 100%; 
-            padding: 10px; 
-            border-radius: 8px; 
+            padding: 14px; 
+            border-radius: 10px; 
             font-family: var(--font-family); 
             font-size: 1rem; 
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .light-theme #withdraw-form input, .light-theme #withdraw-form select { background-color: var(--bg-color-light); border: 1px solid var(--border-color-light); color: var(--text-color-light); }
-        .dark-theme #withdraw-form input, .dark-theme #withdraw-form select { background-color: var(--secondary-bg-dark); border: 1px solid var(--border-color-dark); color: var(--text-color-dark); }
-        .light-theme input:focus, .light-theme select:focus { outline: none; border-color: var(--primary-color-light); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
-        .dark-theme input:focus, .dark-theme select:focus { outline: none; border-color: var(--primary-color-dark); box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2); }
-
+        .light-theme #withdraw-form input, .light-theme #withdraw-form select { 
+            background-color: var(--secondary-bg-light); 
+            border: 1px solid var(--border-color-light); 
+            color: var(--text-color-light); 
+        }
+        .dark-theme #withdraw-form input, .dark-theme #withdraw-form select { 
+            background-color: var(--secondary-bg-dark); 
+            border: 1px solid var(--border-color-dark); 
+            color: var(--text-color-dark); 
+        }
+        .light-theme input:focus, .light-theme select:focus { 
+            outline: none; 
+            border-color: var(--primary-color-light); 
+            box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.2); 
+        }
+        .dark-theme input:focus, .dark-theme select:focus { 
+            outline: none; 
+            border-color: var(--primary-color-dark); 
+            box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.3); 
+        }
+        
         /* Bottom Navigation */
         .bottom-nav { 
             position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            max-width: 500px; 
-            margin: 0 auto; 
+            bottom: 0; left: 0; right: 0; 
+            max-width: 500px; margin: 0 auto; 
             display: flex; 
             justify-content: space-around; 
-            padding: 8px 0; 
+            padding: 5px 0; 
             border-top: 1px solid; 
-            z-index: 1000;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            z-index: 1000; 
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); /* Subtle shadow for lift */
         }
-        .light-theme .bottom-nav { background-color: var(--secondary-bg-light); border-top-color: var(--border-color-light); }
-        .dark-theme .bottom-nav { background-color: var(--secondary-bg-dark); border-top-color: var(--border-color-dark); box-shadow: 0 -2px 5px rgba(0,0,0,0.3); }
-        .nav-btn { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; padding: 5px 10px; font-family: var(--font-family); font-size: 0.7rem; transition: color 0.2s, transform 0.1s; flex-grow: 1; }
+        .light-theme .bottom-nav { 
+            background-color: var(--secondary-bg-light); 
+            border-top-color: var(--border-color-light); 
+        }
+        .dark-theme .bottom-nav { 
+            background-color: var(--secondary-bg-dark); 
+            border-top-color: var(--border-color-dark); 
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+        .nav-btn { 
+            background: none; border: none; cursor: pointer; 
+            display: flex; flex-direction: column; align-items: center; 
+            padding: 8px 10px; font-family: var(--font-family); 
+            font-size: 0.75rem; transition: color 0.2s, transform 0.1s; 
+            flex-grow: 1;
+        }
         .light-theme .nav-btn { color: var(--subtle-text-light); }
         .dark-theme .nav-btn { color: var(--subtle-text-dark); }
-        .nav-btn i { font-size: 1.4rem; margin-bottom: 3px; }
-        .nav-btn.active { font-weight: 700; transform: translateY(-2px); }
+        .nav-btn i { font-size: 1.5rem; margin-bottom: 3px; }
+        .nav-btn.active { font-weight: 700; transform: translateY(-2px);} /* Added slight lift on active */
         .light-theme .nav-btn.active { color: var(--primary-color-light); }
         .dark-theme .nav-btn.active { color: var(--primary-color-dark); }
 
-        /* Utility/Loader Styles (Kept from original, but using new colors) */
-        .btn-loader { width: 18px; height: 18px; border: 3px solid rgba(255, 255, 255, 0.4); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
-        .action-btn.loading .btn-text { visibility: hidden; }
-        .action-btn.loading .btn-loader { display: block; position: absolute; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; }
-        .modal-content { padding: 30px; border-radius: 15px; text-align: center; }
-        .light-theme .modal-content { background-color: var(--secondary-bg-light); color: var(--text-color-light); }
-        .dark-theme .modal-content { background-color: var(--secondary-bg-dark); color: var(--text-color-dark); }
-        .loader { border: 5px solid; border-color: var(--border-color-light); border-radius: 50%; border-top: 5px solid; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
-        .light-theme .loader { border-top-color: var(--primary-color-light); }
-        .dark-theme .loader { border-top-color: var(--primary-color-dark); }
-        
+        /* Custom Professional Loading Modal (No Text) */
+        .modal { 
+            display: none; position: fixed; z-index: 2000; 
+            left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(0, 0, 0, 0.6); 
+            justify-content: center; align-items: center; 
+        }
+        .modal-content { 
+            padding: 0; /* No padding needed */
+            border-radius: 15px; 
+            text-align: center; 
+            background-color: transparent; /* Transparent background */
+        }
+        .app-loader { 
+            border: 4px solid rgba(255, 255, 255, 0.3); 
+            border-radius: 50%; 
+            border-top: 4px solid var(--mango-main); /* Mango color ring */
+            width: 50px; 
+            height: 50px; 
+            animation: spin 1s linear infinite; 
+        }
     </style>
 </head>
 <body>
@@ -194,115 +337,93 @@
                 <img id="user-photo" src="" alt="User Photo">
                 <div class="user-details">
                     <h1 id="user-name">Loading... <i class="fas fa-check-circle verified-icon"></i></h1>
-                    <p>৳<span id="user-points">0</span> TK</p>
+                    <p> Balance: <span class="user-balance">৳<span id="user-points">0</span> TK</span></p>
                 </div>
-            </div>
-            <div class="header-action">
-                 <i class="fas fa-bell light-theme-icon" style="font-size: 1.2rem; color: var(--subtle-text-light);"></i>
-                 <i class="fas fa-bell dark-theme-icon" style="font-size: 1.2rem; color: var(--subtle-text-dark);"></i>
             </div>
         </header>
 
         <main id="main-content">
             <div id="home-page" class="page active">
-                <h2>Overview</h2>
+                <h2>Dashboard</h2>
                 <div class="stats-grid">
-                    <div class="stat-card card">
-                        <h3><i class="fas fa-eye"></i> Daily Views</h3>
-                        <p><span id="daily-ads-watched">00</span> / 25</p>
+                    <div class="stat-card">
+                        <h3>Daily Ads Watched</h3>
+                        <p><span id="daily-ads-watched">00</span> / <span class="primary-text">25</span></p>
                     </div>
-                    <div class="stat-card card">
-                        <h3><i class="fas fa-users"></i> Referrals</h3>
+                    <div class="stat-card">
+                        <h3>Total Referrals</h3>
                         <p id="referral-count">00</p>
                     </div>
                 </div>
-                
-                <div class="referral-section card">
-                    <h3><i class="fas fa-share-alt"></i> Refer & Grow</h3>
-                    <p>Share your link and earn rewards for every successful referral.</p>
-                    <input type="text" id="referral-link" readonly value="Loading Referral Link...">
+                <div class="referral-section">
+                    <h3>Invite & Earn!</h3>
+                    <p>Share your link to get bonus points.</p>
+                    <input type="text" id="referral-link" readonly>
                     <button id="copy-ref-link-btn" class="action-btn">
-                        <i class="fas fa-copy"></i> Copy Link
+                        <i class="fas fa-copy"></i> Copy Referral Link
                     </button>
                 </div>
             </div>
 
             <div id="tasks-page" class="page">
-                <h2>Earn Rewards</h2>
-                
-                <div class="task-container card">
-                    <div class="task-icon-wrapper"><i class="fas fa-film"></i></div>
-                    <div class="task-details">
-                        <h3>Watch Rewarded Ad</h3>
-                        <p>Earn **3 TK** per ad (Max 25/Day).</p>
-                    </div>
-                    <div class="task-action">
-                        <button id="watch-ad-btn" class="action-btn">Watch</button>
-                    </div>
+                <h2>Complete Tasks</h2>
+                <div class="task-container">
+                    <i class="fas fa-play-circle task-icon"></i>
+                    <h3>Watch a Rewarded Ad</h3>
+                    <p>Earn <span class="primary-text">3 TK</span> for every ad.</p>
+                    <button id="watch-ad-btn" class="action-btn">Watch Ad</button>
                 </div>
-
-                <div class="task-container card">
-                    <div class="task-icon-wrapper"><i class="fab fa-telegram-plane"></i></div>
-                    <div class="task-details">
-                        <h3>Join Telegram Channel</h3>
-                        <p>Get **৳15** instant bonus.</p>
-                    </div>
-                    <div class="task-action">
-                        <button id="join-channel-btn" class="action-btn">Claim</button>
-                    </div>
+                <div class="task-container">
+                    <i class="fab fa-telegram-plane task-icon"></i>
+                    <h3>Join Telegram Channel</h3>
+                    <p>Get <span class="primary-text">৳15</span> bonus.</p>
+                    <button id="join-channel-btn" class="action-btn">Join & Claim Bonus</button>
                 </div>
-
-                <div class="task-container card">
-                    <div class="task-icon-wrapper"><i class="fas fa-user-friends"></i></div>
-                    <div class="task-details">
-                        <h3>Join Telegram Group</h3>
-                        <p>Get **৳10** instant bonus.</p>
-                    </div>
-                    <div class="task-action">
-                        <button id="join-group-btn" class="action-btn">Claim</button>
-                    </div>
+                <div class="task-container">
+                    <i class="fas fa-users task-icon"></i>
+                    <h3>Join Telegram Group</h3>
+                    <p>Get <span class="primary-text">৳10</span> bonus.</p>
+                    <button id="join-group-btn" class="action-btn">Join & Claim Bonus</button>
                 </div>
             </div>
             
             <div id="withdraw-page" class="page">
-                <h2>Withdraw Funds</h2>
-                <div class="card">
-                    <p style="margin-bottom: 15px; font-weight: 600;">Minimum: <span style="font-weight: 700;">500 TK</span> balance required.</p>
-                    <form id="withdraw-form">
-                        <div class="form-group">
-                            <label for="withdraw-method"><i class="fas fa-money-bill-wave"></i> Payment Method:</label>
-                            <select id="withdraw-method" required>
-                                <option value="Bkash">Bkash</option>
-                                <option value="Nagad">Nagad</option>
-                                <option value="Binance">Binance (USDT/ID)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="account-number"><i class="fas fa-credit-card"></i> Account Number/ID:</label>
-                            <input type="text" id="account-number" placeholder="Enter your mobile number or Binance ID" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="amount"><i class="fas fa-sack-dollar"></i> Amount (TK):</label>
-                            <input type="number" id="amount" placeholder="e.g., 500" required>
-                        </div>
-                        <button type="submit" id="withdraw-submit-btn" class="action-btn" style="margin-top: 10px;">
-                            <span class="btn-text">Submit Request</span>
-                            <span class="btn-loader"></span>
-                        </button>
-                    </form>
-                </div>
+                <h2>Withdraw</h2>
+                <p>Minimum <span class="primary-text">500 TK</span> required to withdraw.</p>
+                <form id="withdraw-form">
+                    <div class="form-group">
+                        <label for="withdraw-method">Method:</label>
+                        <select id="withdraw-method" required>
+                            <option value="Bkash">Bkash</option>
+                            <option value="Nagad">Nagad</option>
+                            <option value="Binance">Binance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="account-number">Account Number/ID:</label>
+                        <input type="text" id="account-number" placeholder="e.g., 012345..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Taka to Withdraw:</label>
+                        <input type="number" id="amount" placeholder="e.g., 500" required>
+                    </div>
+                    <button type="submit" id="withdraw-submit-btn" class="action-btn">
+                        <span class="btn-text">Submit Request</span>
+                        <span class="btn-loader"></span>
+                    </button>
+                </form>
             </div>
         </main>
 
         <nav class="bottom-nav">
-            <button class="nav-btn active" data-page="home-page"><i class="fas fa-tachometer-alt"></i><span>Home</span></button>
-            <button class="nav-btn" data-page="tasks-page"><i class="fas fa-list-check"></i><span>Tasks</span></button>
+            <button class="nav-btn active" data-page="home-page"><i class="fas fa-home"></i><span>Home</span></button>
+            <button class="nav-btn" data-page="tasks-page"><i class="fas fa-medal"></i><span>Tasks</span></button>
             <button class="nav-btn" data-page="withdraw-page"><i class="fas fa-wallet"></i><span>Withdraw</span></button>
         </nav>
     </div>
 
     <div id="loading-modal" class="modal">
-        <div class="modal-content"><div class="loader"></div><p style="font-weight: 600;">Loading Ad...</p></div>
+        <div class="modal-content"><div class="app-loader"></div></div>
     </div>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -320,7 +441,7 @@
             const GROUP_LINK = "https://t.me/goodgmail";
             const DAILY_AD_LIMIT = 25;
             const POINTS_PER_AD = 3;
-            const CHANNEL_JOIN_BONUS = 15; // Corrected bonus to match text
+            const CHANNEL_JOIN_BONUS = 30;
             const GROUP_JOIN_BONUS = 10;
             const MIN_WITHDRAW_POINTS = 500;
 
@@ -346,14 +467,12 @@
                 lastAdWatchDate: null,
                 referrals: [],
                 hasJoinedChannel: false,
-                hasJoinedGroup: false, 
+                hasJoinedGroup: false,
                 userId: null
             };
 
             const saveState = () => {
                 if(userState.userId) {
-                    // Use WebApp storage for better cross-device sync if possible,
-                    // but keeping localStorage for simplicity here.
                     localStorage.setItem(`userState_${userState.userId}`, JSON.stringify(userState));
                 }
             };
@@ -362,6 +481,7 @@
                 const savedState = localStorage.getItem(`userState_${userId}`);
                 if (savedState) {
                     userState = JSON.parse(savedState);
+                    // Ensure new state properties exist
                     if (userState.hasJoinedGroup === undefined) userState.hasJoinedGroup = false;
                 }
             };
@@ -370,13 +490,8 @@
             const initApp = () => {
                 tg.ready();
                 tg.expand();
+                // Use the new theme class logic
                 document.body.className = `${tg.colorScheme}-theme`;
-
-                // Handle theme specific icon visibility (minor fix for dark mode text)
-                const isDarkMode = tg.colorScheme === 'dark';
-                document.querySelectorAll('.light-theme-icon').forEach(el => el.style.display = isDarkMode ? 'none' : 'block');
-                document.querySelectorAll('.dark-theme-icon').forEach(el => el.style.display = isDarkMode ? 'block' : 'none');
-
 
                 const user = tg.initDataUnsafe.user;
                 if (!user || !user.id) {
@@ -403,30 +518,46 @@
                 const user = tg.initDataUnsafe.user;
                 if (user) {
                     userPhotoElem.src = user.photo_url || 'https://i.imgur.com/placeholder.png';
+                    // Use a more professional name format
                     userNameElem.innerHTML = `${user.first_name || ''} ${user.last_name || ''} <i class="fas fa-check-circle verified-icon"></i>`;
                 }
                 
                 userPointsElem.textContent = userState.points;
-                dailyAdsWatchedElem.textContent = String(userState.dailyAdWatchCount).padStart(2, '0');
-                referralCountElem.textContent = String(userState.referrals.length).padStart(2, '0');
+                dailyAdsWatchedElem.textContent = userState.dailyAdWatchCount;
+                referralCountElem.textContent = userState.referrals.length;
 
                 referralLinkElem.value = `https://t.me/${BOT_USERNAME}?start=ref_${userState.userId}`;
 
                 // Update task button states
                 if (userState.hasJoinedChannel) {
-                    joinChannelBtn.innerHTML = '<i class="fas fa-check"></i> Claimed';
+                    joinChannelBtn.innerHTML = '<i class="fas fa-check"></i> Bonus Claimed';
                     joinChannelBtn.disabled = true;
+                } else {
+                     joinChannelBtn.innerHTML = 'Join & Claim Bonus';
+                     joinChannelBtn.disabled = false;
                 }
                 if (userState.hasJoinedGroup) {
-                    joinGroupBtn.innerHTML = '<i class="fas fa-check"></i> Claimed';
+                    joinGroupBtn.innerHTML = '<i class="fas fa-check"></i> Bonus Claimed';
                     joinGroupBtn.disabled = true;
+                } else {
+                     joinGroupBtn.innerHTML = 'Join & Claim Bonus';
+                     joinGroupBtn.disabled = false;
+                }
+                
+                // Update Watch Ad button text based on daily limit
+                if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
+                    watchAdBtn.textContent = 'Daily Limit Reached';
+                    watchAdBtn.disabled = true;
+                } else {
+                    watchAdBtn.textContent = 'Watch Ad';
+                    watchAdBtn.disabled = false;
                 }
             };
             
             const setupEventListeners = () => {
                 watchAdBtn.addEventListener('click', handleWatchAd);
                 joinChannelBtn.addEventListener('click', handleJoinChannel);
-                joinGroupBtn.addEventListener('click', handleJoinGroup); 
+                joinGroupBtn.addEventListener('click', handleJoinGroup);
                 withdrawForm.addEventListener('submit', handleWithdraw);
                 copyRefLinkBtn.addEventListener('click', copyReferralLink);
             };
@@ -436,9 +567,9 @@
                     tg.showAlert("You have reached your daily ad watch limit."); return;
                 }
                 loadingModal.style.display = 'flex';
-                // Assuming show_10012357() is the ad network function that returns a Promise on completion
-                const adPromise = window.show_10012357 ? window.show_10012357() : Promise.resolve();
-
+                // The SDK function is expected to return a Promise that resolves when the ad is closed
+                const adPromise = window.show_10012357 ? show_10012357() : Promise.resolve(); // Fallback if SDK fails
+                
                 adPromise.then(() => {
                     userState.points += POINTS_PER_AD;
                     userState.dailyAdWatchCount++;
@@ -446,9 +577,8 @@
                     updateUI();
                     tg.HapticFeedback.notificationOccurred('success');
                     tg.showAlert(`Congratulations! You've earned ${POINTS_PER_AD} taka.`);
-                }).catch((error) => {
-                    console.error("Ad failed or was dismissed:", error);
-                    tg.showAlert("Ad could not be loaded or was interrupted. Please try again.");
+                }).catch(() => {
+                    tg.showAlert("Ad could not be loaded or was skipped. Please try again later.");
                 }).finally(() => {
                     loadingModal.style.display = 'none';
                 });
@@ -459,13 +589,11 @@
                     tg.showAlert('You have already claimed this bonus.'); return;
                 }
                 tg.openTelegramLink(CHANNEL_LINK);
-                // In a real app, membership check should happen via bot API.
-                // Using a timed delay as a simple placeholder for claiming the bonus.
-                tg.showAlert(`Please join the channel first. Claiming bonus in 3 seconds...`);
+                // Note: Actual Telegram membership verification requires a bot backend API call.
+                // For a frontend-only example, we'll use a timer as a placeholder for the user to join.
                 setTimeout(() => {
                     userState.points += CHANNEL_JOIN_BONUS;
                     userState.hasJoinedChannel = true;
-                    tg.HapticFeedback.notificationOccurred('success');
                     tg.showAlert(`Thank you! You received ${CHANNEL_JOIN_BONUS} bonus taka.`);
                     saveState();
                     updateUI();
@@ -477,12 +605,10 @@
                     tg.showAlert('You have already claimed this bonus.'); return;
                 }
                 tg.openTelegramLink(GROUP_LINK);
-                // Placeholder for bonus claim after an assumed join time.
-                tg.showAlert(`Please join the group first. Claiming bonus in 3 seconds...`);
+                // Placeholder timer for joining group
                 setTimeout(() => {
                     userState.points += GROUP_JOIN_BONUS;
                     userState.hasJoinedGroup = true;
-                    tg.HapticFeedback.notificationOccurred('success');
                     tg.showAlert(`Thank you! You received ${GROUP_JOIN_BONUS} bonus taka.`);
                     saveState();
                     updateUI();
@@ -502,12 +628,12 @@
                 withdrawSubmitBtn.classList.add('loading');
                 withdrawSubmitBtn.disabled = true;
 
-                userState.points -= amount; // Deduct points immediately
+                userState.points -= amount;
                 saveState();
                 updateUI();
                 
                 const user = tg.initDataUnsafe.user;
-                const message = `<b>New Withdraw Request!</b>\n-----------------------------------\n<b>User:</b> ${user.first_name || ''} ${user.last_name || ''} (@${user.username || 'N/A'})\n<b>User ID:</b> <code>${user.id}</code>\n-----------------------------------\n<b>Method:</b> ${method}\n<b>Account:</b> <code>${accountNumber}</code>\n<b>Amount:</b> ${amount} TK\n-----------------------------------\n<b>Date:</b> ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}`;
+                const message = `<b>New Withdraw Request!</b>\n-----------------------------------\n<b>User:</b> ${user.first_name || ''} ${user.last_name || ''} (@${user.username || 'N/A'})\n<b>User ID:</b> <code>${user.id}</code>\n-----------------------------------\n<b>Method:</b> ${method}\n<b>Account:</b> <code>${accountNumber}</code>\n<b>Amount:</b> ${amount} Points\n-----------------------------------\n<b>Date:</b> ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}`;
                 
                 const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
                 try {
@@ -519,13 +645,13 @@
                     const result = await response.json();
                     if (result.ok) {
                         tg.HapticFeedback.notificationOccurred('success');
-                        tg.showAlert("Withdrawal request submitted successfully! Payment will be processed shortly.");
+                        tg.showAlert("Withdrawal request submitted successfully!");
                         withdrawForm.reset();
                     } else { throw new Error(result.description); }
                 } catch (error) {
                     tg.HapticFeedback.notificationOccurred('error');
                     tg.showAlert("Failed to submit request. Your points have been returned.");
-                    userState.points += amount; // Refund points on failure
+                    userState.points += amount;
                     saveState();
                     updateUI();
                 } finally {
@@ -537,7 +663,7 @@
             const copyReferralLink = () => {
                 navigator.clipboard.writeText(referralLinkElem.value).then(() => {
                     tg.HapticFeedback.notificationOccurred('success');
-                    tg.showAlert("Referral link copied to clipboard!");
+                    tg.showAlert("Referral link copied!");
                 });
             };
 
