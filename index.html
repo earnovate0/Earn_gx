@@ -165,6 +165,15 @@
             text-align: center; 
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
+        /* Adjusted margin for rule box */
+        .rules-section {
+             margin-top: 20px; 
+             text-align: left; 
+             padding: 20px; 
+             border: 1px solid #007aff;
+             border-radius: 15px;
+        }
+        
         .light-theme .referral-section { 
             background-color: var(--mango-light); 
             border: 1px solid var(--primary-color-light); 
@@ -528,8 +537,18 @@
                         <p class="user-balance"><span id="referral-count">00</span></p>
                     </div>
                 </div>
-                <div class="referral-section" style="margin-top: 20px; text-align: left; padding: 20px; border-color: #007aff;">
-                    <h3 style="text-align: center; color: #007aff;">📢 Important Rules</h3>
+                
+                <div class="referral-section">
+                    <h3>Invite & Earn!</h3>
+                    <p>Share your link to get bonus points.</p>
+                    <input type="text" id="referral-link" readonly>
+                    <button id="copy-ref-link-btn" class="action-btn">
+                        <i class="fas fa-copy"></i> Copy Referral Link
+                    </button>
+                </div>
+                
+                <div class="rules-section">
+                    <h3 style="text-align: center; color: #007aff; margin-top: 0;">📢 Important Rules</h3>
                     <ul style="border-left: 3px solid #007aff; margin: 10px 0 15px 10px;">
                         <li><span class="highlight">💸 Per Ad:</span> ৳<span class="primary-text">3</span></li>
                         <li><span class="highlight">🎁 Join Bonus:</span> ৳<span class="primary-text">30</span></li>
@@ -539,15 +558,7 @@
                     </ul>
                     <p style="text-align: center; color: var(--subtle-text-light);">Work with honesty and follow the rules for 100% payment, Insha'Allah. No investment needed!</p>
                 </div>
-                <div class="referral-section">
-                    <h3>Invite & Earn!</h3>
-                    <p>Share your link to get bonus points.</p>
-                    <input type="text" id="referral-link" readonly>
-                    <button id="copy-ref-link-btn" class="action-btn">
-                        <i class="fas fa-copy"></i> Copy Referral Link
-                    </button>
                 </div>
-            </div>
 
             <div id="tasks-page" class="page">
                 <h2>Complete Tasks</h2>
@@ -1056,7 +1067,7 @@
                     userState.points += CHANNEL_JOIN_BONUS;
                     userState.hasJoinedChannel = true;
                     
-                    await saveStateFromFirebase();
+                    await saveStateToFirebase();
                     
                     tg.showAlert(`Thank you! You received ${CHANNEL_JOIN_BONUS} bonus taka.`);
                     updateLeaderboardRanks();
