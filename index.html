@@ -27,7 +27,7 @@
             /* Professional Light Theme */
             --bg-color-light: #f7f7fa; /* Near white background */
             --secondary-bg-light: #ffffff;
-            --text-color-light: #333333; /* Darker but softer text */
+            --text-color-light: #333333; /* Darker but softer text - Used for numbers/balance */
             --subtle-text-light: #777777; /* Neutral gray for secondary text */
             --primary-color-light: var(--mango-main); /* Mango for highlights/buttons */
             --border-color-light: #dddddd; /* Softer border */
@@ -36,7 +36,7 @@
             /* Professional Dark Theme */
             --bg-color-dark: #121212; /* Darker background */
             --secondary-bg-dark: #1e1e1e;
-            --text-color-dark: #f0f0f0;
+            --text-color-dark: #f0f0f0; /* Light text - Used for numbers/balance */
             --subtle-text-dark: #b0b0b0;
             --primary-color-dark: var(--mango-main);
             --border-color-dark: #333333;
@@ -86,28 +86,46 @@
         
         .user-details h1 { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center;}
         
-        /* Verified Badge Design - Unique Blue Design */
+        /* Unique Verified Badge Design - Blue */
         .verified-icon { 
-            font-size: 1.1rem;
-            margin-left: 5px; 
+            font-size: 1.0rem; /* Slightly smaller for uniqueness */
+            margin-left: 6px; 
             color: #ffffff; 
             background-color: var(--verified-badge-color); /* Blue color */
             border-radius: 50%;
-            padding: 2px;
-            box-shadow: 0 1px 4px rgba(0, 122, 255, 0.4); /* Blue glow */
+            padding: 3px; /* More padding to make it a distinct circle */
+            box-shadow: 0 0 0 1px #ffffff, 0 1px 4px rgba(0, 122, 255, 0.6); /* White ring + Blue glow */
+            position: relative;
+            top: -1px;
         }
         
         .user-details p { font-size: 1rem; font-weight: 700; }
         .light-theme .user-details p { color: var(--subtle-text-light); }
         .dark-theme .user-details p { color: var(--subtle-text-dark); }
-        /* Balance kept Mango for accent */
-        .user-balance { 
+        
+        /* All Taka amounts (৳) adjusted to professional black/white color */
+        .user-balance, .user-balance span, 
+        .stat-card p, .stat-card p span, 
+        .points { 
             font-size: 1.1rem !important; 
-            color: var(--primary-color-light) !important;
             font-weight: 800 !important;
+            color: var(--text-color-light) !important; 
+        }
+        .dark-theme .user-balance, .dark-theme .user-balance span,
+        .dark-theme .stat-card p, .dark-theme .stat-card p span,
+        .dark-theme .points {
+             color: var(--text-color-dark) !important;
+        }
+        
+        /* Primary Text for Rewards/Limit is still Mango */
+        .primary-text {
+            color: var(--primary-color-light) !important;
+        }
+        .dark-theme .primary-text {
+            color: var(--primary-color-dark) !important;
         }
 
-        /* Main Content & Pages (Rest is clean and professional) */
+        /* Main Content & Pages */
         main { padding: 15px; }
         .page { display: none; }
         .page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
@@ -136,8 +154,6 @@
         .light-theme .stat-card h3 { color: var(--subtle-text-light); }
         .dark-theme .stat-card h3 { color: var(--subtle-text-dark); }
         .stat-card p { font-size: 1.6rem; font-weight: 800; }
-        /* Primary text (stats) kept Mango for accent */
-        .stat-card p, .stat-card .primary-text { color: var(--primary-color-light); } 
         
         /* Referral Section (Kept Mango-Light as requested) */
         .referral-section { 
@@ -323,11 +339,11 @@
         .light-theme .nav-btn.active { color: var(--primary-color-light); } 
         .dark-theme .nav-btn.active { color: var(--primary-color-dark); } 
 
-        /* Custom Professional Loading Modal (No Text) */
+        /* Custom Professional Loading Modal (With Mango Icon) */
         .modal { 
             position: fixed; z-index: 2000; 
             left: 0; top: 0; width: 100%; height: 100%; 
-            background-color: rgba(0, 0, 0, 0.6); 
+            background-color: rgba(0, 0, 0, 0.7); 
             justify-content: center; align-items: center; 
             display: none; 
         }
@@ -336,6 +352,10 @@
             border-radius: 15px; 
             text-align: center; 
             background-color: transparent;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .app-loader { 
             border: 4px solid rgba(255, 255, 255, 0.3); 
@@ -344,6 +364,16 @@
             width: 50px; 
             height: 50px; 
             animation: spin 1s linear infinite; 
+        }
+        /* Professional Mango Icon overlay */
+        .mango-icon {
+            position: absolute;
+            font-size: 1.8rem;
+            color: var(--mango-main);
+            /* Slightly offset to look centered on the spinner */
+            transform: translate(-50%, -50%); 
+            left: 50%;
+            top: 50%;
         }
         
         /* Leaderboard Styles (Clean and professional) */
@@ -372,11 +402,9 @@
         .rank-top-3 {
             font-size: 1.6rem;
         }
-        .rank-1 { color: gold; text-shadow: none; } /* Removed shadow for clean look */
+        .rank-1 { color: gold; text-shadow: none; } 
         .rank-2 { color: silver; text-shadow: none; }
         .rank-3 { color: #cd7f32; text-shadow: none; }
-        
-        /* .user-avatar CSS removed as per request */
         
         .leader-info {
             flex-grow: 1;
@@ -391,11 +419,7 @@
             color: var(--subtle-text-light);
             margin: 0;
         }
-        .points {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--primary-color-light);
-        }
+        /* Points color is now professional black/white, NOT mango */
     </style>
 </head>
 <body>
@@ -406,7 +430,7 @@
                 <img id="user-photo" src="" alt="User Photo">
                 <div class="user-details">
                     <h1 id="user-name">Loading... <i class="fas fa-check-circle verified-icon"></i></h1>
-                    <p> Balance: <span class="user-balance">৳<span id="user-points">0</span> TK</span></p>
+                    <p> Balance: ৳<span class="user-balance"><span id="user-points">0</span> TK</span></p>
                 </div>
             </div>
         </header>
@@ -417,11 +441,11 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <h3>Daily Ads Watched</h3>
-                        <p><span id="daily-ads-watched">00</span> / <span class="primary-text">25</span></p>
+                        <p><span class="user-balance"><span id="daily-ads-watched">00</span></span> / <span class="primary-text">25</span></p>
                     </div>
                     <div class="stat-card">
                         <h3>Total Referrals</h3>
-                        <p id="referral-count">00</p>
+                        <p class="user-balance"><span id="referral-count">00</span></p>
                     </div>
                 </div>
                 <div class="referral-section">
@@ -499,7 +523,9 @@
     </div>
 
     <div id="loading-modal" class="modal" style="display: flex;">
-        <div class="modal-content"><div class="app-loader"></div></div>
+        <div class="modal-content">
+            <div class="app-loader"></div>
+            <i class="fas fa-seedling mango-icon"></i> </div>
     </div>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -632,14 +658,16 @@
                         item.style.order = -1; // Keep user visible, though list is sorted by rank
                     }
                     
-                    // User ID Shortening Logic: Displays only the last 4 digits
-                    const shortId = String(user.id).slice(-4).padStart(4, '0');
+                    // User ID masking Logic: 670367•••
+                    const idString = String(user.id);
+                    const prefix = idString.length >= 6 ? idString.substring(0, 6) : idString;
+                    const maskedId = `${prefix}•••`;
 
                     item.innerHTML = `
                         <span class="rank ${rankClass}">${rank}</span>
                         <div class="leader-info">
                             <h4>${user.name} ${isCurrentUser ? '(You)' : ''}</h4>
-                            <p>ID: ****${shortId}</p> 
+                            <p>ID: ${maskedId}</p> 
                         </div>
                         <span class="points">৳${user.points}</span>
                     `;
