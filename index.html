@@ -66,28 +66,35 @@
             padding: 20px 15px; 
             display: flex; 
             align-items: center; 
-            border-bottom: none; /* Removed border for cleaner look */
-            background-color: var(--secondary-bg-light); /* Added background for light theme */
+            border-bottom: none; 
+            background-color: var(--secondary-bg-light); 
         }
         .dark-theme .profile-header {
-             background-color: var(--secondary-bg-dark); /* Added background for dark theme */
+             background-color: var(--secondary-bg-dark); 
         }
         .profile-info { display: flex; align-items: center; gap: 15px; }
         #user-photo { 
             width: 55px; height: 55px; 
             border-radius: 50%; 
             object-fit: cover; 
-            border: 3px solid var(--primary-color-light); /* Mango ring */
-            box-shadow: 0 0 8px rgba(255, 153, 0, 0.5); /* Subtle mango glow */
+            border: 3px solid var(--primary-color-light);
+            /* Removed box-shadow here */
         }
         .dark-theme #user-photo { border-color: var(--primary-color-dark); }
         
         .user-details h1 { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center;}
+        
+        /* Updated Verified Badge Design */
         .verified-icon { 
-            font-size: 1rem; 
+            font-size: 1.1rem; /* Slightly larger */
             margin-left: 5px; 
-            color: var(--primary-color-light); 
+            color: #ffffff; /* White icon color */
+            background-color: var(--primary-color-light); /* Mango background color */
+            border-radius: 50%;
+            padding: 2px;
+            box-shadow: 0 1px 4px rgba(255, 153, 0, 0.4); /* Subtle glow added to the badge itself */
         }
+        
         .user-details p { font-size: 1rem; font-weight: 700; }
         .light-theme .user-details p { color: var(--subtle-text-light); }
         .dark-theme .user-details p { color: var(--subtle-text-dark); }
@@ -110,7 +117,7 @@
             padding: 20px; 
             border-radius: 15px; 
             text-align: center; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Added subtle shadow */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         .light-theme .stat-card { 
             background-color: var(--secondary-bg-light); 
@@ -135,7 +142,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         .light-theme .referral-section { 
-            background-color: var(--mango-light); /* Light mango background */
+            background-color: var(--mango-light); 
             border: 1px solid var(--primary-color-light); 
         }
         .dark-theme .referral-section { 
@@ -205,7 +212,7 @@
         .task-container p { font-size: 0.95rem; margin-bottom: 20px; font-weight: 600;}
         .light-theme .task-container p { color: var(--subtle-text-light); }
         .dark-theme .task-container p { color: var(--subtle-text-dark); }
-        .task-container .action-btn { max-width: 250px; } /* Constrain task button width */
+        .task-container .action-btn { max-width: 250px; }
 
         /* Action Button */
         .action-btn { 
@@ -281,7 +288,7 @@
             padding: 5px 0; 
             border-top: 1px solid; 
             z-index: 1000; 
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); /* Subtle shadow for lift */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); 
         }
         .light-theme .bottom-nav { 
             background-color: var(--secondary-bg-light); 
@@ -302,30 +309,87 @@
         .light-theme .nav-btn { color: var(--subtle-text-light); }
         .dark-theme .nav-btn { color: var(--subtle-text-dark); }
         .nav-btn i { font-size: 1.5rem; margin-bottom: 3px; }
-        .nav-btn.active { font-weight: 700; transform: translateY(-2px);} /* Added slight lift on active */
+        .nav-btn.active { font-weight: 700; transform: translateY(-2px);}
         .light-theme .nav-btn.active { color: var(--primary-color-light); }
         .dark-theme .nav-btn.active { color: var(--primary-color-dark); }
 
         /* Custom Professional Loading Modal (No Text) */
         .modal { 
-            display: none; position: fixed; z-index: 2000; 
+            position: fixed; z-index: 2000; 
             left: 0; top: 0; width: 100%; height: 100%; 
             background-color: rgba(0, 0, 0, 0.6); 
             justify-content: center; align-items: center; 
+            display: none; /* Will be set to flex by initial script for loading */
         }
         .modal-content { 
-            padding: 0; /* No padding needed */
+            padding: 0;
             border-radius: 15px; 
             text-align: center; 
-            background-color: transparent; /* Transparent background */
+            background-color: transparent;
         }
         .app-loader { 
             border: 4px solid rgba(255, 255, 255, 0.3); 
             border-radius: 50%; 
-            border-top: 4px solid var(--mango-main); /* Mango color ring */
+            border-top: 4px solid var(--mango-main);
             width: 50px; 
             height: 50px; 
             animation: spin 1s linear infinite; 
+        }
+        
+        /* Leaderboard Styles */
+        .leaderboard-list {
+            list-style: none;
+            padding: 0;
+        }
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+        }
+        .light-theme .leaderboard-item { background-color: var(--secondary-bg-light); border: 1px solid var(--border-color-light); }
+        .dark-theme .leaderboard-item { background-color: var(--secondary-bg-dark); border: 1px solid var(--border-color-dark); }
+
+        .rank {
+            font-size: 1.5rem;
+            font-weight: 800;
+            width: 40px;
+            text-align: center;
+            color: var(--primary-color-light);
+            margin-right: 15px;
+        }
+        .rank-top-3 {
+            font-size: 1.6rem;
+        }
+        .rank-1 { color: gold; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+        .rank-2 { color: silver; text-shadow: 0 0 5px rgba(192, 192, 192, 0.5); }
+        .rank-3 { color: #cd7f32; text-shadow: 0 0 5px rgba(205, 127, 50, 0.5); }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .leader-info {
+            flex-grow: 1;
+        }
+        .leader-info h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .leader-info p {
+            font-size: 0.85rem;
+            color: var(--subtle-text-light);
+            margin: 0;
+        }
+        .points {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--primary-color-light);
         }
     </style>
 </head>
@@ -401,11 +465,11 @@
                     </div>
                     <div class="form-group">
                         <label for="account-number">Account Number/ID:</label>
-                        <input type="text" id="account-number" placeholder="e.g., 012345..." required>
+                        <input type="text" id="account-number" placeholder="01xxxxxxxxx" required>
                     </div>
                     <div class="form-group">
                         <label for="amount">Taka to Withdraw:</label>
-                        <input type="number" id="amount" placeholder="e.g., 500" required>
+                        <input type="number" id="amount" placeholder="amount" required>
                     </div>
                     <button type="submit" id="withdraw-submit-btn" class="action-btn">
                         <span class="btn-text">Submit Request</span>
@@ -413,16 +477,23 @@
                     </button>
                 </form>
             </div>
+
+            <div id="leaderboard-page" class="page">
+                <h2>🏆 Leaderboard</h2>
+                <ul id="leaderboard-list" class="leaderboard-list">
+                    </ul>
+            </div>
         </main>
 
         <nav class="bottom-nav">
             <button class="nav-btn active" data-page="home-page"><i class="fas fa-home"></i><span>Home</span></button>
             <button class="nav-btn" data-page="tasks-page"><i class="fas fa-medal"></i><span>Tasks</span></button>
+            <button class="nav-btn" data-page="leaderboard-page"><i class="fas fa-trophy"></i><span>Leaderboard</span></button>
             <button class="nav-btn" data-page="withdraw-page"><i class="fas fa-wallet"></i><span>Withdraw</span></button>
         </nav>
     </div>
 
-    <div id="loading-modal" class="modal">
+    <div id="loading-modal" class="modal" style="display: flex;">
         <div class="modal-content"><div class="app-loader"></div></div>
     </div>
     
@@ -435,7 +506,7 @@
 
             // --- Configuration ---
             const BOT_TOKEN = "8253581338:AAGjghsJluvnnklV0TfQZVuvcK8w9Nxh2R0";
-            const BOT_USERNAME = "mango_cash_bot"; // Your bot's username
+            const BOT_USERNAME = "mango_cash_bot";
             const ADMIN_CHAT_ID = "6703675335";
             const CHANNEL_LINK = "https://t.me/OnlineEarnEleven";
             const GROUP_LINK = "https://t.me/goodgmail";
@@ -444,6 +515,7 @@
             const CHANNEL_JOIN_BONUS = 30;
             const GROUP_JOIN_BONUS = 10;
             const MIN_WITHDRAW_POINTS = 500;
+            const LEADERBOARD_UPDATE_INTERVAL = 86400000; // 24 hours in milliseconds
 
             // --- DOM Elements ---
             const userPhotoElem = document.getElementById('user-photo');
@@ -459,6 +531,7 @@
             const referralLinkElem = document.getElementById('referral-link');
             const copyRefLinkBtn = document.getElementById('copy-ref-link-btn');
             const loadingModal = document.getElementById('loading-modal');
+            const leaderboardListElem = document.getElementById('leaderboard-list');
 
             // --- State Management ---
             let userState = {
@@ -470,10 +543,13 @@
                 hasJoinedGroup: false,
                 userId: null
             };
+            
+            let leaderboardUsers = []; // State for leaderboard
 
             const saveState = () => {
                 if(userState.userId) {
                     localStorage.setItem(`userState_${userState.userId}`, JSON.stringify(userState));
+                    localStorage.setItem('leaderboardUsers', JSON.stringify(leaderboardUsers));
                 }
             };
 
@@ -481,17 +557,95 @@
                 const savedState = localStorage.getItem(`userState_${userId}`);
                 if (savedState) {
                     userState = JSON.parse(savedState);
-                    // Ensure new state properties exist
                     if (userState.hasJoinedGroup === undefined) userState.hasJoinedGroup = false;
                 }
+                
+                const savedLeaderboard = localStorage.getItem('leaderboardUsers');
+                if (savedLeaderboard) {
+                    leaderboardUsers = JSON.parse(savedLeaderboard);
+                } else {
+                    leaderboardUsers = generateDefaultLeaderboard();
+                }
             };
+            
+            // --- Leaderboard Functions ---
+            const generateDefaultLeaderboard = () => {
+                const names = ['A. Karim', 'J. Hossain', 'M. Rahman', 'S. Ahmed', 'R. Khan', 'N. Islam', 'F. Akter', 'T. Hassan', 'Z. Mia', 'K. Begum'];
+                const basePoints = [15500, 12200, 9800, 8500, 7200, 6100, 5000, 4300, 3100, 2500];
+                return names.map((name, index) => ({
+                    id: 90000 + index, // Dummy IDs
+                    name: name,
+                    points: basePoints[index] + Math.floor(Math.random() * 50) // Add small random variance
+                })).sort((a, b) => b.points - a.points); // Sort initially
+            };
+
+            const updateLeaderboardRanks = () => {
+                // Apply a small random change to points to simulate activity
+                leaderboardUsers.forEach(user => {
+                    // Change points by -10 to +10
+                    user.points += Math.floor(Math.random() * 21) - 10;
+                    user.points = Math.max(user.points, 1000); // Prevent points from becoming too low
+                });
+
+                // Add current user to leaderboard if they are in the top 10
+                const currentUserPoints = userState.points;
+                const currentUserId = userState.userId;
+                const userIndex = leaderboardUsers.findIndex(u => u.id === currentUserId);
+
+                if (userIndex === -1 && currentUserPoints > 2000) { // Example threshold to enter default leaderboard
+                    leaderboardUsers.push({ id: currentUserId, name: tg.initDataUnsafe.user.first_name || 'You', points: currentUserPoints, isCurrentUser: true });
+                } else if (userIndex !== -1) {
+                    leaderboardUsers[userIndex].points = currentUserPoints;
+                }
+
+                // Re-sort the leaderboard
+                leaderboardUsers.sort((a, b) => b.points - a.points);
+                
+                // Trim to top 10 or 11 (if current user is included)
+                leaderboardUsers = leaderboardUsers.slice(0, 10);
+                
+                renderLeaderboard();
+                saveState();
+            };
+
+            const renderLeaderboard = () => {
+                leaderboardListElem.innerHTML = '';
+                leaderboardUsers.forEach((user, index) => {
+                    const rank = index + 1;
+                    const rankClass = rank <= 3 ? `rank-top-3 rank-${rank}` : '';
+                    const isCurrentUser = user.id === userState.userId;
+                    
+                    const item = document.createElement('li');
+                    item.className = 'leaderboard-item';
+                    if (isCurrentUser) {
+                        item.style.border = `2px solid ${tg.colorScheme === 'dark' ? 'var(--primary-color-dark)' : 'var(--primary-color-light)'}`;
+                        item.style.order = -1; // Keep user visible, though list is sorted by rank
+                    }
+                    
+                    item.innerHTML = `
+                        <span class="rank ${rankClass}">${rank}</span>
+                        <img class="user-avatar" src="${user.isCurrentUser ? (tg.initDataUnsafe.user.photo_url || 'https://i.imgur.com/placeholder.png') : 'https://i.imgur.com/placeholder.png'}" alt="${user.name}">
+                        <div class="leader-info">
+                            <h4>${user.name} ${isCurrentUser ? '(You)' : ''}</h4>
+                            <p>ID: ${user.id}</p>
+                        </div>
+                        <span class="points">৳${user.points}</span>
+                    `;
+                    leaderboardListElem.appendChild(item);
+                });
+            };
+            
+            // Set up interval for dynamic rank updates
+            setInterval(updateLeaderboardRanks, LEADERBOARD_UPDATE_INTERVAL);
             
             // --- Core Functions ---
             const initApp = () => {
                 tg.ready();
                 tg.expand();
-                // Use the new theme class logic
                 document.body.className = `${tg.colorScheme}-theme`;
+                
+                // Hide loading UI once Telegram WebApp is ready and theme is set
+                loadingModal.style.display = 'none'; 
 
                 const user = tg.initDataUnsafe.user;
                 if (!user || !user.id) {
@@ -508,6 +662,7 @@
                     userState.lastAdWatchDate = today;
                 }
                 
+                updateLeaderboardRanks(); // Initial render and sort
                 updateUI();
                 setupNavigation();
                 setupEventListeners();
@@ -518,7 +673,6 @@
                 const user = tg.initDataUnsafe.user;
                 if (user) {
                     userPhotoElem.src = user.photo_url || 'https://i.imgur.com/placeholder.png';
-                    // Use a more professional name format
                     userNameElem.innerHTML = `${user.first_name || ''} ${user.last_name || ''} <i class="fas fa-check-circle verified-icon"></i>`;
                 }
                 
@@ -544,7 +698,6 @@
                      joinGroupBtn.disabled = false;
                 }
                 
-                // Update Watch Ad button text based on daily limit
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
                     watchAdBtn.textContent = 'Daily Limit Reached';
                     watchAdBtn.disabled = true;
@@ -567,13 +720,14 @@
                     tg.showAlert("You have reached your daily ad watch limit."); return;
                 }
                 loadingModal.style.display = 'flex';
-                // The SDK function is expected to return a Promise that resolves when the ad is closed
-                const adPromise = window.show_10012357 ? show_10012357() : Promise.resolve(); // Fallback if SDK fails
+                
+                const adPromise = window.show_10012357 ? show_10012357() : Promise.resolve();
                 
                 adPromise.then(() => {
                     userState.points += POINTS_PER_AD;
                     userState.dailyAdWatchCount++;
                     saveState();
+                    updateLeaderboardRanks();
                     updateUI();
                     tg.HapticFeedback.notificationOccurred('success');
                     tg.showAlert(`Congratulations! You've earned ${POINTS_PER_AD} taka.`);
@@ -589,13 +743,12 @@
                     tg.showAlert('You have already claimed this bonus.'); return;
                 }
                 tg.openTelegramLink(CHANNEL_LINK);
-                // Note: Actual Telegram membership verification requires a bot backend API call.
-                // For a frontend-only example, we'll use a timer as a placeholder for the user to join.
                 setTimeout(() => {
                     userState.points += CHANNEL_JOIN_BONUS;
                     userState.hasJoinedChannel = true;
                     tg.showAlert(`Thank you! You received ${CHANNEL_JOIN_BONUS} bonus taka.`);
                     saveState();
+                    updateLeaderboardRanks();
                     updateUI();
                 }, 3000);
             };
@@ -605,12 +758,12 @@
                     tg.showAlert('You have already claimed this bonus.'); return;
                 }
                 tg.openTelegramLink(GROUP_LINK);
-                // Placeholder timer for joining group
                 setTimeout(() => {
                     userState.points += GROUP_JOIN_BONUS;
                     userState.hasJoinedGroup = true;
                     tg.showAlert(`Thank you! You received ${GROUP_JOIN_BONUS} bonus taka.`);
                     saveState();
+                    updateLeaderboardRanks();
                     updateUI();
                 }, 3000);
             };
@@ -631,6 +784,7 @@
                 userState.points -= amount;
                 saveState();
                 updateUI();
+                updateLeaderboardRanks();
                 
                 const user = tg.initDataUnsafe.user;
                 const message = `<b>New Withdraw Request!</b>\n-----------------------------------\n<b>User:</b> ${user.first_name || ''} ${user.last_name || ''} (@${user.username || 'N/A'})\n<b>User ID:</b> <code>${user.id}</code>\n-----------------------------------\n<b>Method:</b> ${method}\n<b>Account:</b> <code>${accountNumber}</code>\n<b>Amount:</b> ${amount} Points\n-----------------------------------\n<b>Date:</b> ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}`;
@@ -654,6 +808,7 @@
                     userState.points += amount;
                     saveState();
                     updateUI();
+                    updateLeaderboardRanks();
                 } finally {
                     withdrawSubmitBtn.classList.remove('loading');
                     withdrawSubmitBtn.disabled = false;
@@ -677,6 +832,11 @@
                         document.getElementById(pageId).classList.add('active');
                         navButtons.forEach(btn => btn.classList.remove('active'));
                         button.classList.add('active');
+                        
+                        // Special check for leaderboard to re-render when clicked
+                        if (pageId === 'leaderboard-page') {
+                             renderLeaderboard();
+                        }
                     });
                 });
             };
