@@ -11,6 +11,9 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
         /* Google Font Import */
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
@@ -27,7 +30,7 @@
             /* Professional Light Theme */
             --bg-color-light: #f7f7fa; /* Near white background */
             --secondary-bg-light: #ffffff;
-            --text-color-light: #333333; /* Darker but softer text - Used for numbers/balance */
+            --text-color-light: #333333; /* Darker but softer text - Used for numbers/balance/stats */
             --subtle-text-light: #777777; /* Neutral gray for secondary text */
             --primary-color-light: var(--mango-main); /* Mango for highlights/buttons */
             --border-color-light: #dddddd; /* Softer border */
@@ -36,7 +39,7 @@
             /* Professional Dark Theme */
             --bg-color-dark: #121212; /* Darker background */
             --secondary-bg-dark: #1e1e1e;
-            --text-color-dark: #f0f0f0; /* Light text - Used for numbers/balance */
+            --text-color-dark: #f0f0f0; /* Light text - Used for numbers/balance/stats */
             --subtle-text-dark: #b0b0b0;
             --primary-color-dark: var(--mango-main);
             --border-color-dark: #333333;
@@ -79,7 +82,6 @@
             width: 55px; height: 55px; 
             border-radius: 50%; 
             object-fit: cover; 
-            /* Profile logo frame color unbold - Soft border */
             border: 2px solid var(--border-color-light); 
         }
         .dark-theme #user-photo { border-color: var(--border-color-dark); }
@@ -88,13 +90,13 @@
         
         /* Unique Verified Badge Design - Blue */
         .verified-icon { 
-            font-size: 1.0rem; /* Slightly smaller for uniqueness */
+            font-size: 1.0rem; 
             margin-left: 6px; 
             color: #ffffff; 
-            background-color: var(--verified-badge-color); /* Blue color */
+            background-color: var(--verified-badge-color); 
             border-radius: 50%;
-            padding: 3px; /* More padding to make it a distinct circle */
-            box-shadow: 0 0 0 1px #ffffff, 0 1px 4px rgba(0, 122, 255, 0.6); /* White ring + Blue glow */
+            padding: 3px; 
+            box-shadow: 0 0 0 1px #ffffff, 0 1px 4px rgba(0, 122, 255, 0.6); 
             position: relative;
             top: -1px;
         }
@@ -164,7 +166,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         .light-theme .referral-section { 
-            background-color: var(--mango-light); /* Mango Light */
+            background-color: var(--mango-light); 
             border: 1px solid var(--primary-color-light); 
         }
         .dark-theme .referral-section { 
@@ -370,7 +372,6 @@
             position: absolute;
             font-size: 1.8rem;
             color: var(--mango-main);
-            /* Slightly offset to look centered on the spinner */
             transform: translate(-50%, -50%); 
             left: 50%;
             top: 50%;
@@ -419,7 +420,6 @@
             color: var(--subtle-text-light);
             margin: 0;
         }
-        /* Points color is now professional black/white, NOT mango */
     </style>
 </head>
 <body>
@@ -455,6 +455,9 @@
                     <button id="copy-ref-link-btn" class="action-btn">
                         <i class="fas fa-copy"></i> Copy Referral Link
                     </button>
+                    <blockquote style="margin-top: 15px; text-align: left; font-size: 0.85rem; border-left: 4px solid var(--mango-dark); padding-left: 10px; color: var(--text-color-light);">
+                        ডেটা এখন Firebase-এ সেভ হচ্ছে। রেফারেল কাউন্ট সঠিকভাবে বাড়াতে, **আপনার বট ব্যাকএন্ডকেও Firebase-এ যুক্ত করে** নতুন ইউজার জয়েন হলে ডেটা আপডেট করতে হবে।
+                    </blockquote>
                 </div>
             </div>
 
@@ -525,13 +528,35 @@
     <div id="loading-modal" class="modal" style="display: flex;">
         <div class="modal-content">
             <div class="app-loader"></div>
-            <i class="fas fa-seedling mango-icon"></i> </div>
+            <i class="fas fa-seedling mango-icon"></i>
+        </div>
     </div>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src='//libtl.com/sdk.js' data-zone='10012357' data-sdk='show_10012357'></script>
     
     <script>
+        // --- FIREBASE CONFIGURATION (MUST BE REPLACED) ---
+        const firebaseConfig = {
+  apiKey: "AIzaSyAgLRhh96lsBipd01gPmCQ8gF-3Q5DnFq0",
+  authDomain: "earn-38176.firebaseapp.com",
+  databaseURL: "https://earn-38176-default-rtdb.firebaseio.com",
+  projectId: "earn-38176",
+  storageBucket: "earn-38176.firebasestorage.app",
+  messagingSenderId: "350056832143",
+  appId: "1:350056832143:web:9ffeba3301bd73dfc364fa",
+  measurementId: "G-2LGXC91KT5"
+};
+        
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
+        const USERS_REF = 'users'; // Root path for user data
+        const LEADERBOARD_REF = 'leaderboard'; // Root path for global leaderboard data
+        // ----------------------------------------------------
+
         document.addEventListener('DOMContentLoaded', () => {
             const tg = window.Telegram.WebApp;
 
@@ -548,7 +573,7 @@
             const MIN_WITHDRAW_POINTS = 500;
             const LEADERBOARD_UPDATE_INTERVAL = 86400000; // 24 hours in milliseconds
 
-            // --- DOM Elements ---
+            // --- DOM Elements (omitted for brevity) ---
             const userPhotoElem = document.getElementById('user-photo');
             const userNameElem = document.getElementById('user-name');
             const userPointsElem = document.getElementById('user-points');
@@ -564,86 +589,109 @@
             const loadingModal = document.getElementById('loading-modal');
             const leaderboardListElem = document.getElementById('leaderboard-list');
 
-            // --- State Management ---
+            // --- State Management: Now mirrored with Firebase ---
             let userState = {
                 points: 0,
                 dailyAdWatchCount: 0,
+                referralCount: 0, // Using a simple count, assuming bot updates this
                 lastAdWatchDate: null,
-                referrals: [],
                 hasJoinedChannel: false,
                 hasJoinedGroup: false,
-                userId: null
+                userId: null,
+                name: ''
             };
             
-            let leaderboardUsers = []; // State for leaderboard
+            let leaderboardUsers = [];
 
-            const saveState = () => {
-                if(userState.userId) {
-                    localStorage.setItem(`userState_${userState.userId}`, JSON.stringify(userState));
-                    localStorage.setItem('leaderboardUsers', JSON.stringify(leaderboardUsers));
+            // --- Database Functions ---
+
+            // Load data from Firebase
+            const loadStateFromFirebase = async (userId) => {
+                try {
+                    const snapshot = await database.ref(`${USERS_REF}/${userId}`).once('value');
+                    const dbData = snapshot.val();
+                    
+                    const today = new Date().toISOString().slice(0, 10);
+
+                    if (dbData) {
+                        userState = {
+                            ...dbData,
+                            userId: userId,
+                            // Reset daily ad count if date has changed
+                            dailyAdWatchCount: dbData.lastAdWatchDate === today ? dbData.dailyAdWatchCount : 0,
+                            lastAdWatchDate: today
+                        };
+                        console.log("State loaded from Firebase:", userState);
+                    } else {
+                        // Initialize new user data in Firebase
+                        userState.userId = userId;
+                        userState.name = tg.initDataUnsafe.user.first_name || 'New User';
+                        await saveStateToFirebase();
+                        console.log("New user initialized in Firebase.");
+                    }
+                } catch (error) {
+                    console.error("Error loading user state from Firebase:", error);
+                    tg.showAlert("Failed to load user data. Please try reopening the app.");
                 }
             };
 
-            const loadState = (userId) => {
-                const savedState = localStorage.getItem(`userState_${userId}`);
-                if (savedState) {
-                    userState = JSON.parse(savedState);
-                    if (userState.hasJoinedGroup === undefined) userState.hasJoinedGroup = false;
-                }
-                
-                const savedLeaderboard = localStorage.getItem('leaderboardUsers');
-                if (savedLeaderboard) {
-                    leaderboardUsers = JSON.parse(savedLeaderboard);
-                } else {
-                    leaderboardUsers = generateDefaultLeaderboard();
+            // Save data to Firebase
+            const saveStateToFirebase = async () => {
+                if (!userState.userId) return;
+                try {
+                    // Update the Firebase path for the current user
+                    await database.ref(`${USERS_REF}/${userState.userId}`).update({
+                        points: userState.points,
+                        dailyAdWatchCount: userState.dailyAdWatchCount,
+                        referralCount: userState.referralCount,
+                        lastAdWatchDate: userState.lastAdWatchDate,
+                        hasJoinedChannel: userState.hasJoinedChannel,
+                        hasJoinedGroup: userState.hasJoinedGroup,
+                        name: userState.name || tg.initDataUnsafe.user.first_name || 'User'
+                    });
+                } catch (error) {
+                    console.error("Error saving user state to Firebase:", error);
                 }
             };
-            
-            // --- Leaderboard Functions ---
+
+            // --- Leaderboard Functions: Simplified to use local state for demo ---
             const generateDefaultLeaderboard = () => {
                 const names = ['A. Karim', 'J. Hossain', 'M. Rahman', 'S. Ahmed', 'R. Khan', 'N. Islam', 'F. Akter', 'T. Hassan', 'Z. Mia', 'K. Begum'];
                 const basePoints = [15500, 12200, 9800, 8500, 7200, 6100, 5000, 4300, 3100, 2500];
                 const baseIds = [9123456, 8276543, 7389012, 6412345, 5578901, 4634567, 3790123, 2856789, 1923456, 1089012];
                 return names.map((name, index) => ({
-                    // More realistic 7-8 digit IDs
                     id: baseIds[index] + Math.floor(Math.random() * 500), 
                     name: name,
-                    points: basePoints[index] + Math.floor(Math.random() * 50) // Add small random variance
-                })).sort((a, b) => b.points - a.points); // Sort initially
+                    points: basePoints[index] + Math.floor(Math.random() * 50)
+                })).sort((a, b) => b.points - a.points);
             };
 
             const updateLeaderboardRanks = () => {
-                // Apply a small random change to points to simulate activity
-                leaderboardUsers.forEach(user => {
-                    // Change points by -10 to +10
-                    user.points += Math.floor(Math.random() * 21) - 10;
-                    user.points = Math.max(user.points, 1000); // Prevent points from becoming too low
-                });
-
-                // Add current user to leaderboard if they are in the top 10
-                const currentUserPoints = userState.points;
-                const currentUserId = userState.userId;
-                const userIndex = leaderboardUsers.findIndex(u => u.id === currentUserId);
-
-                if (userIndex === -1 && currentUserPoints > 2000) { // Example threshold to enter default leaderboard
-                    leaderboardUsers.push({ id: currentUserId, name: tg.initDataUnsafe.user.first_name || 'You', points: currentUserPoints, isCurrentUser: true });
-                } else if (userIndex !== -1) {
-                    leaderboardUsers[userIndex].points = currentUserPoints;
+                // In a production app, you'd fetch the top users from Firebase here.
+                // For this demo, we'll simulate the update.
+                leaderboardUsers = generateDefaultLeaderboard(); 
+                
+                // Add/Update current user's position
+                const currentUserIndex = leaderboardUsers.findIndex(u => u.id === userState.userId);
+                if (currentUserIndex === -1) {
+                    leaderboardUsers.push({ 
+                        id: userState.userId, 
+                        name: userState.name || 'You', 
+                        points: userState.points, 
+                        isCurrentUser: true 
+                    });
+                } else {
+                    leaderboardUsers[currentUserIndex].points = userState.points;
                 }
-
-                // Re-sort the leaderboard
+                
                 leaderboardUsers.sort((a, b) => b.points - a.points);
-                
-                // Trim to top 10 or 11 (if current user is included)
                 leaderboardUsers = leaderboardUsers.slice(0, 10);
-                
-                // Only render if on leaderboard page or after initial load
-                if (document.getElementById('leaderboard-page').classList.contains('active') || !document.getElementById('leaderboard-page').classList.contains('active')) {
+
+                if (document.getElementById('leaderboard-page').classList.contains('active')) {
                      renderLeaderboard();
                 }
-                saveState();
             };
-
+            
             const renderLeaderboard = () => {
                 leaderboardListElem.innerHTML = '';
                 leaderboardUsers.forEach((user, index) => {
@@ -655,10 +703,9 @@
                     item.className = 'leaderboard-item';
                     if (isCurrentUser) {
                         item.style.border = `2px solid ${tg.colorScheme === 'dark' ? 'var(--primary-color-dark)' : 'var(--primary-color-light)'}`;
-                        item.style.order = -1; // Keep user visible, though list is sorted by rank
+                        item.style.order = -1;
                     }
                     
-                    // User ID masking Logic: 670367•••
                     const idString = String(user.id);
                     const prefix = idString.length >= 6 ? idString.substring(0, 6) : idString;
                     const maskedId = `${prefix}•••`;
@@ -675,18 +722,14 @@
                 });
             };
             
-            // Set up interval for dynamic rank updates
             setInterval(updateLeaderboardRanks, LEADERBOARD_UPDATE_INTERVAL);
             
             // --- Core Functions ---
-            const initApp = () => {
+            const initApp = async () => {
                 tg.ready();
                 tg.expand();
                 document.body.className = `${tg.colorScheme}-theme`;
                 
-                // Hide loading UI once Telegram WebApp is ready and theme is set
-                loadingModal.style.display = 'none'; 
-
                 const user = tg.initDataUnsafe.user;
                 if (!user || !user.id) {
                     tg.showAlert("Could not verify user. Please open this app through Telegram.", () => tg.close());
@@ -694,19 +737,18 @@
                 }
                 
                 userState.userId = user.id;
-                loadState(user.id);
                 
-                const today = new Date().toISOString().slice(0, 10);
-                if (userState.lastAdWatchDate !== today) {
-                    userState.dailyAdWatchCount = 0;
-                    userState.lastAdWatchDate = today;
-                }
+                // 1. Load data from Firebase
+                await loadStateFromFirebase(user.id);
                 
-                updateLeaderboardRanks(); // Initial render and sort
+                // 2. Hide loading screen
+                loadingModal.style.display = 'none'; 
+
+                // 3. Initial UI update
+                updateLeaderboardRanks(); 
                 updateUI();
                 setupNavigation();
                 setupEventListeners();
-                saveState();
             };
             
             const updateUI = () => {
@@ -718,9 +760,13 @@
                 
                 userPointsElem.textContent = userState.points;
                 dailyAdsWatchedElem.textContent = userState.dailyAdWatchCount;
-                referralCountElem.textContent = userState.referrals.length;
+                // Referral count now comes from Firebase data
+                referralCountElem.textContent = userState.referralCount; 
 
-                referralLinkElem.value = `https://t.me/${BOT_USERNAME}?start=ref_${userState.userId}`;
+                // REFERRAL LINK LOGIC (Correctly encoded)
+                const referralId = userState.userId;
+                const encodedRefId = encodeURIComponent(`ref_${referralId}`); 
+                referralLinkElem.value = `https://t.me/${BOT_USERNAME}?start=${encodedRefId}`;
 
                 // Update task button states
                 if (userState.hasJoinedChannel) {
@@ -755,7 +801,7 @@
                 copyRefLinkBtn.addEventListener('click', copyReferralLink);
             };
 
-            const handleWatchAd = () => {
+            const handleWatchAd = async () => {
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
                     tg.showAlert("You have reached your daily ad watch limit."); return;
                 }
@@ -763,10 +809,12 @@
                 
                 const adPromise = window.show_10012357 ? show_10012357() : Promise.resolve();
                 
-                adPromise.then(() => {
+                adPromise.then(async () => {
                     userState.points += POINTS_PER_AD;
                     userState.dailyAdWatchCount++;
-                    saveState();
+                    
+                    await saveStateToFirebase(); // Save to Firebase
+                    
                     updateLeaderboardRanks();
                     updateUI();
                     tg.HapticFeedback.notificationOccurred('success');
@@ -778,31 +826,39 @@
                 });
             };
             
-            const handleJoinChannel = () => {
+            const handleJoinChannel = async () => {
                 if(userState.hasJoinedChannel) {
                     tg.showAlert('You have already claimed this bonus.'); return;
                 }
                 tg.openTelegramLink(CHANNEL_LINK);
-                setTimeout(() => {
+                
+                // Give user time to join, then grant bonus and save to Firebase
+                setTimeout(async () => {
                     userState.points += CHANNEL_JOIN_BONUS;
                     userState.hasJoinedChannel = true;
+                    
+                    await saveStateToFirebase();
+                    
                     tg.showAlert(`Thank you! You received ${CHANNEL_JOIN_BONUS} bonus taka.`);
-                    saveState();
                     updateLeaderboardRanks();
                     updateUI();
                 }, 3000);
             };
 
-            const handleJoinGroup = () => {
+            const handleJoinGroup = async () => {
                 if(userState.hasJoinedGroup) {
                     tg.showAlert('You have already claimed this bonus.'); return;
                 }
                 tg.openTelegramLink(GROUP_LINK);
-                setTimeout(() => {
+                
+                // Grant bonus and save to Firebase
+                setTimeout(async () => {
                     userState.points += GROUP_JOIN_BONUS;
                     userState.hasJoinedGroup = true;
+                    
+                    await saveStateToFirebase();
+                    
                     tg.showAlert(`Thank you! You received ${GROUP_JOIN_BONUS} bonus taka.`);
-                    saveState();
                     updateLeaderboardRanks();
                     updateUI();
                 }, 3000);
@@ -822,7 +878,7 @@
                 withdrawSubmitBtn.disabled = true;
 
                 userState.points -= amount;
-                saveState();
+                await saveStateToFirebase(); // Deduct points immediately
                 updateUI();
                 updateLeaderboardRanks();
                 
@@ -846,7 +902,7 @@
                     tg.HapticFeedback.notificationOccurred('error');
                     tg.showAlert("Failed to submit request. Your points have been returned.");
                     userState.points += amount;
-                    saveState();
+                    await saveStateToFirebase(); // Revert points
                     updateUI();
                     updateLeaderboardRanks();
                 } finally {
@@ -873,7 +929,6 @@
                         navButtons.forEach(btn => btn.classList.remove('active'));
                         button.classList.add('active');
                         
-                        // Special check for leaderboard to re-render when clicked
                         if (pageId === 'leaderboard-page') {
                              renderLeaderboard();
                         }
