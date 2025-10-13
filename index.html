@@ -455,9 +455,6 @@
                     <button id="copy-ref-link-btn" class="action-btn">
                         <i class="fas fa-copy"></i> Copy Referral Link
                     </button>
-                    <blockquote style="margin-top: 15px; text-align: left; font-size: 0.85rem; border-left: 4px solid var(--mango-dark); padding-left: 10px; color: var(--text-color-light);">
-                        ডেটা এখন Firebase-এ সেভ হচ্ছে। রেফারেল কাউন্ট সঠিকভাবে বাড়াতে, **আপনার বট ব্যাকএন্ডকেও Firebase-এ যুক্ত করে** নতুন ইউজার জয়েন হলে ডেটা আপডেট করতে হবে।
-                    </blockquote>
                 </div>
             </div>
 
@@ -542,7 +539,7 @@
   authDomain: "earn-38176.firebaseapp.com",
   databaseURL: "https://earn-38176-default-rtdb.firebaseio.com",
   projectId: "earn-38176",
-  storageBucket: "earn-38176.firebasestorage.app",
+  storageBucket: "earn-38176.appspot.com",
   messagingSenderId: "350056832143",
   appId: "1:350056832143:web:9ffeba3301bd73dfc364fa",
   measurementId: "G-2LGXC91KT5"
@@ -554,7 +551,6 @@
         }
         const database = firebase.database();
         const USERS_REF = 'users'; // Root path for user data
-        const LEADERBOARD_REF = 'leaderboard'; // Root path for global leaderboard data
         // ----------------------------------------------------
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -568,12 +564,12 @@
             const GROUP_LINK = "https://t.me/goodgmail";
             const DAILY_AD_LIMIT = 25;
             const POINTS_PER_AD = 3;
-            const CHANNEL_JOIN_BONUS = 30;
+            const CHANNEL_JOIN_BONUS = 15; // Corrected to 15 based on UI
             const GROUP_JOIN_BONUS = 10;
             const MIN_WITHDRAW_POINTS = 500;
             const LEADERBOARD_UPDATE_INTERVAL = 86400000; // 24 hours in milliseconds
 
-            // --- DOM Elements (omitted for brevity) ---
+            // --- DOM Elements ---
             const userPhotoElem = document.getElementById('user-photo');
             const userNameElem = document.getElementById('user-name');
             const userPointsElem = document.getElementById('user-points');
@@ -593,7 +589,7 @@
             let userState = {
                 points: 0,
                 dailyAdWatchCount: 0,
-                referralCount: 0, // Using a simple count, assuming bot updates this
+                referralCount: 0, 
                 lastAdWatchDate: null,
                 hasJoinedChannel: false,
                 hasJoinedGroup: false,
@@ -621,6 +617,12 @@
                             dailyAdWatchCount: dbData.lastAdWatchDate === today ? dbData.dailyAdWatchCount : 0,
                             lastAdWatchDate: today
                         };
+                        // Ensure required fields exist for old data
+                        userState.referralCount = userState.referralCount || 0;
+                        userState.hasJoinedChannel = userState.hasJoinedChannel || false;
+                        userState.hasJoinedGroup = userState.hasJoinedGroup || false;
+                        userState.name = userState.name || tg.initDataUnsafe.user.first_name || 'User';
+
                         console.log("State loaded from Firebase:", userState);
                     } else {
                         // Initialize new user data in Firebase
@@ -647,7 +649,7 @@
                         lastAdWatchDate: userState.lastAdWatchDate,
                         hasJoinedChannel: userState.hasJoinedChannel,
                         hasJoinedGroup: userState.hasJoinedGroup,
-                        name: userState.name || tg.initDataUnsafe.user.first_name || 'User'
+                        name: userState.name
                     });
                 } catch (error) {
                     console.error("Error saving user state to Firebase:", error);
@@ -655,6 +657,7 @@
             };
 
             // --- Leaderboard Functions: Simplified to use local state for demo ---
+            // In a live app, this would query and sort the top users from the Firebase USERS_REF.
             const generateDefaultLeaderboard = () => {
                 const names = ['A. Karim', 'J. Hossain', 'M. Rahman', 'S. Ahmed', 'R. Khan', 'N. Islam', 'F. Akter', 'T. Hassan', 'Z. Mia', 'K. Begum'];
                 const basePoints = [15500, 12200, 9800, 8500, 7200, 6100, 5000, 4300, 3100, 2500];
@@ -722,6 +725,7 @@
                 });
             };
             
+            // Set up a periodic check for leaderboard refresh (only for demo, real-time sync is better)
             setInterval(updateLeaderboardRanks, LEADERBOARD_UPDATE_INTERVAL);
             
             // --- Core Functions ---
@@ -754,13 +758,13 @@
             const updateUI = () => {
                 const user = tg.initDataUnsafe.user;
                 if (user) {
-                    userPhotoElem.src = user.photo_url || 'https://i.imgur.com/placeholder.png';
+                    // Placeholder image if no photo URL provided
+                    userPhotoElem.src = user.photo_url || 'https://i.imgur.com/placeholder.png'; 
                     userNameElem.innerHTML = `${user.first_name || ''} ${user.last_name || ''} <i class="fas fa-check-circle verified-icon"></i>`;
                 }
                 
                 userPointsElem.textContent = userState.points;
                 dailyAdsWatchedElem.textContent = userState.dailyAdWatchCount;
-                // Referral count now comes from Firebase data
                 referralCountElem.textContent = userState.referralCount; 
 
                 // REFERRAL LINK LOGIC (Correctly encoded)
@@ -807,9 +811,13 @@
                 }
                 loadingModal.style.display = 'flex';
                 
-                const adPromise = window.show_10012357 ? show_10012357() : Promise.resolve();
+                // Use a standard function to handle the ad display
+                const adPromise = window.show_10012357 ? window.show_10012357() : Promise.resolve();
                 
                 adPromise.then(async () => {
+                    // Check limit again (in case user spammed)
+                    if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) return; 
+
                     userState.points += POINTS_PER_AD;
                     userState.dailyAdWatchCount++;
                     
@@ -819,7 +827,8 @@
                     updateUI();
                     tg.HapticFeedback.notificationOccurred('success');
                     tg.showAlert(`Congratulations! You've earned ${POINTS_PER_AD} taka.`);
-                }).catch(() => {
+                }).catch((error) => {
+                    console.error("Ad error:", error);
                     tg.showAlert("Ad could not be loaded or was skipped. Please try again later.");
                 }).finally(() => {
                     loadingModal.style.display = 'none';
@@ -833,6 +842,7 @@
                 tg.openTelegramLink(CHANNEL_LINK);
                 
                 // Give user time to join, then grant bonus and save to Firebase
+                // NOTE: Proper verification of channel membership requires a bot backend.
                 setTimeout(async () => {
                     userState.points += CHANNEL_JOIN_BONUS;
                     userState.hasJoinedChannel = true;
@@ -842,7 +852,7 @@
                     tg.showAlert(`Thank you! You received ${CHANNEL_JOIN_BONUS} bonus taka.`);
                     updateLeaderboardRanks();
                     updateUI();
-                }, 3000);
+                }, 3000); // 3 seconds grace period for joining
             };
 
             const handleJoinGroup = async () => {
@@ -852,6 +862,7 @@
                 tg.openTelegramLink(GROUP_LINK);
                 
                 // Grant bonus and save to Firebase
+                // NOTE: Proper verification of group membership requires a bot backend.
                 setTimeout(async () => {
                     userState.points += GROUP_JOIN_BONUS;
                     userState.hasJoinedGroup = true;
@@ -861,7 +872,7 @@
                     tg.showAlert(`Thank you! You received ${GROUP_JOIN_BONUS} bonus taka.`);
                     updateLeaderboardRanks();
                     updateUI();
-                }, 3000);
+                }, 3000); // 3 seconds grace period for joining
             };
 
             const handleWithdraw = async (e) => {
