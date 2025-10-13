@@ -767,10 +767,11 @@
                 dailyAdsWatchedElem.textContent = userState.dailyAdWatchCount;
                 referralCountElem.textContent = userState.referralCount; 
 
-                // REFERRAL LINK LOGIC (Correctly encoded)
+                // REFERRAL LINK LOGIC (UPDATED FORMAT with startapp parameter)
                 const referralId = userState.userId;
                 const encodedRefId = encodeURIComponent(`ref_${referralId}`); 
-                referralLinkElem.value = `https://t.me/${BOT_USERNAME}?start=${encodedRefId}`;
+                // The new link structure for Mini Apps that also passes a parameter
+                referralLinkElem.value = `https://t.me/${BOT_USERNAME}/app?startapp=${encodedRefId}`;
 
                 // Update task button states
                 if (userState.hasJoinedChannel) {
