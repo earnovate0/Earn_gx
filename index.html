@@ -88,7 +88,7 @@
         
         .user-details h1 { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center;}
         
-        /* Unique Verified Badge Design - Blue */
+        /* Unique Verified Badge Design - Shadow REMOVED as requested */
         .verified-icon { 
             font-size: 1.0rem; 
             margin-left: 6px; 
@@ -96,7 +96,7 @@
             background-color: var(--verified-badge-color); 
             border-radius: 50%;
             padding: 3px; 
-            box-shadow: 0 0 0 1px #ffffff, 0 1px 4px rgba(0, 122, 255, 0.6); 
+            box-shadow: 0 0 0 1px #ffffff; /* Only keeping the white ring, shadow removed */
             position: relative;
             top: -1px;
         }
@@ -157,7 +157,7 @@
         .dark-theme .stat-card h3 { color: var(--subtle-text-dark); }
         .stat-card p { font-size: 1.6rem; font-weight: 800; }
         
-        /* Referral Section (Kept Mango-Light as requested) */
+        /* Referral Section */
         .referral-section { 
             margin-top: 30px; 
             padding: 25px; 
@@ -165,15 +165,6 @@
             text-align: center; 
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
-        /* Adjusted margin for rule box */
-        .rules-section {
-             margin-top: 20px; 
-             text-align: left; 
-             padding: 20px; 
-             border: 1px solid #007aff;
-             border-radius: 15px;
-        }
-        
         .light-theme .referral-section { 
             background-color: var(--mango-light); 
             border: 1px solid var(--primary-color-light); 
@@ -203,7 +194,7 @@
             color: var(--text-color-dark); 
         }
         
-        /* Action Button (Kept Mango as requested) */
+        /* Action Button */
         #copy-ref-link-btn { 
             width: 100%; 
             padding: 14px; 
@@ -249,7 +240,7 @@
         .dark-theme .task-container p { color: var(--subtle-text-dark); }
         .task-container .action-btn { max-width: 250px; }
 
-        /* Action Button (Kept Mango as requested) */
+        /* Action Button */
         .action-btn { 
             width: 100%; 
             padding: 15px; 
@@ -282,6 +273,7 @@
 
         /* Form Styles */
         #withdraw-page p { margin-bottom: 20px; font-weight: 600;}
+        #withdraw-page .referral-note { color: var(--primary-color-light); font-weight: 700; margin-bottom: 10px; }
         #withdraw-form .form-group { margin-bottom: 18px; }
         #withdraw-form label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.95rem;}
         #withdraw-form input, #withdraw-form select { 
@@ -314,7 +306,7 @@
             box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.3); 
         }
         
-        /* Bottom Navigation (Nav kept professional and subtle) */
+        /* Bottom Navigation */
         .bottom-nav { 
             position: fixed; 
             bottom: 0; left: 0; right: 0; 
@@ -350,7 +342,7 @@
         .light-theme .nav-btn.active { color: var(--primary-color-light); } 
         .dark-theme .nav-btn.active { color: var(--primary-color-dark); } 
 
-        /* Custom Professional Loading Modal (With Mango Icon) */
+        /* Custom Professional Loading Modal */
         .modal { 
             position: fixed; z-index: 2000; 
             left: 0; top: 0; width: 100%; height: 100%; 
@@ -386,7 +378,7 @@
             top: 50%;
         }
         
-        /* Leaderboard Styles (Clean and professional) */
+        /* Leaderboard Styles */
         .leaderboard-list {
             list-style: none;
             padding: 0;
@@ -429,86 +421,6 @@
             color: var(--subtle-text-light);
             margin: 0;
         }
-        
-        /* --- NEW POPUP STYLES --- */
-        #welcome-popup {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 3000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease-in-out;
-        }
-        #welcome-popup.open {
-            opacity: 1;
-            visibility: visible;
-        }
-        .popup-content {
-            background-color: var(--secondary-bg-light);
-            padding: 30px 20px;
-            border-radius: 15px;
-            max-width: 85%;
-            width: 350px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            transform: scale(0.9);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 2px solid var(--primary-color-light);
-        }
-        .dark-theme .popup-content {
-            background-color: var(--secondary-bg-dark);
-            border: 2px solid var(--primary-color-dark);
-        }
-        #welcome-popup.open .popup-content {
-            transform: scale(1);
-        }
-        .popup-content h3 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 15px;
-            color: var(--primary-color-light);
-        }
-        .popup-content p {
-            font-size: 1rem;
-            margin-bottom: 10px;
-            line-height: 1.4;
-            text-align: left;
-            padding: 0 10px;
-        }
-        .popup-content ul {
-            list-style: none;
-            padding: 0 10px;
-            margin: 15px 0 20px 0;
-            text-align: left;
-            border-left: 3px solid var(--primary-color-light);
-        }
-        .popup-content li {
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            padding-left: 10px;
-        }
-        .popup-content .highlight {
-            font-weight: 700;
-            color: var(--primary-color-light);
-        }
-        #close-popup-btn {
-            margin-top: 20px;
-            padding: 12px 25px;
-            background-color: var(--primary-color-light);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        #close-popup-btn:active {
-            background-color: var(--mango-dark);
-        }
     </style>
 </head>
 <body>
@@ -530,73 +442,73 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <h3>Daily Ads Watched</h3>
-                        <p><span class="user-balance"><span id="daily-ads-watched">00</span></span> / <span class="primary-text" id="ad-limit-display">25</span></p>
+                        <p><span class="user-balance"><span id="daily-ads-watched">00</span></span> / <span class="primary-text">25</span></p>
                     </div>
                     <div class="stat-card">
                         <h3>Total Referrals</h3>
                         <p class="user-balance"><span id="referral-count">00</span></p>
                     </div>
                 </div>
-                
                 <div class="referral-section">
                     <h3>Invite & Earn!</h3>
-                    <p>Share your link to get bonus points.</p>
+                    <p>Share your link to get a <span class="primary-text">৳150</span> bonus per referral.</p>
                     <input type="text" id="referral-link" readonly>
                     <button id="copy-ref-link-btn" class="action-btn">
                         <i class="fas fa-copy"></i> Copy Referral Link
                     </button>
                 </div>
-                
-                <div class="rules-section">
-                    <h3 style="text-align: center; color: #007aff; margin-top: 0;">📢 Important Rules</h3>
-                    <ul style="border-left: 3px solid #007aff; margin: 10px 0 15px 10px;">
-                        <li><span class="highlight">💸 Per Ad:</span> ৳<span class="primary-text">3</span></li>
-                        <li><span class="highlight">🎁 Join Bonus:</span> ৳<span class="primary-text">30</span></li>
-                        <li><span class="highlight">🤝 Per Referral:</span> ৳<span class="primary-text">45</span></li>
-                        <li><span class="highlight">🚫 VPN:</span> Strictly prohibited.</li>
-                        <li><span class="highlight">➡️ Withdraw Condition:</span> <span class="primary-text">20</span> successful referrals required.</li>
-                    </ul>
-                    <p style="text-align: center; color: var(--subtle-text-light);">Work with honesty and follow the rules for 100% payment, Insha'Allah. No investment needed!</p>
-                </div>
-                </div>
+            </div>
 
             <div id="tasks-page" class="page">
                 <h2>Complete Tasks</h2>
                 <div class="task-container">
                     <i class="fas fa-play-circle task-icon"></i>
                     <h3>Watch a Rewarded Ad</h3>
-                    <p>Earn <span class="primary-text" id="points-per-ad-display">3 TK</span> for every ad.</p>
+                    <p>Earn <span class="primary-text">12 TK</span> for every ad.</p> <!-- Updated Ad Bonus -->
                     <button id="watch-ad-btn" class="action-btn">Watch Ad</button>
                 </div>
+                <!-- NEW YouTube Task -->
+                <div class="task-container">
+                    <i class="fab fa-youtube task-icon"></i>
+                    <h3>Subscribe YouTube Channel</h3>
+                    <p>Get <span class="primary-text">৳20</span> bonus.</p> <!-- Assumed 20 TK bonus -->
+                    <button id="subscribe-youtube-btn" class="action-btn" data-state="open">Subscribe & Check</button>
+                </div>
+                <!-- End NEW YouTube Task -->
                 <div class="task-container">
                     <i class="fab fa-telegram-plane task-icon"></i>
                     <h3>Join Telegram Channel</h3>
-                    <p>Get <span class="primary-text" id="channel-bonus-display">৳15</span> bonus.</p>
+                    <p>Get <span class="primary-text">৳15</span> bonus.</p>
                     <button id="join-channel-btn" class="action-btn">Join & Claim Bonus</button>
                 </div>
                 <div class="task-container">
                     <i class="fas fa-users task-icon"></i>
                     <h3>Join Telegram Group</h3>
-                    <p>Get <span class="primary-text" id="group-bonus-display">৳10</span> bonus.</p>
+                    <p>Get <span class="primary-text">৳10</span> bonus.</p>
                     <button id="join-group-btn" class="action-btn">Join & Claim Bonus</button>
                 </div>
             </div>
             
             <div id="withdraw-page" class="page">
                 <h2>Withdraw</h2>
-                <p>Minimum <span class="primary-text" id="min-withdraw-display">500 TK</span> required to withdraw.</p>
+                <p>Minimum <span class="primary-text">500 TK</span> required to withdraw.</p>
+                <!-- New referral requirement note -->
+                <p class="referral-note" id="referral-requirement-note">
+                    <i class="fas fa-exclamation-triangle"></i> 20 Referrals MUST be completed to withdraw.
+                </p>
                 <form id="withdraw-form">
                     <div class="form-group">
                         <label for="withdraw-method">Method:</label>
                         <select id="withdraw-method" required>
                             <option value="Bkash">Bkash</option>
                             <option value="Nagad">Nagad</option>
-                            <option value="Binance">Binance</option>
+                            <option value="Payeer">Payeer</option> <!-- Updated Method -->
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="account-number">Account Number/ID:</label>
-                        <input type="text" id="account-number" placeholder="01xxxxxxxxx" required>
+                        <!-- Updated Placeholder for Payeer format -->
+                        <input type="text" id="account-number" placeholder="P0000000 (Payeer) / 01xxxxxxxxx (Bkash/Nagad)" required> 
                     </div>
                     <div class="form-group">
                         <label for="amount">Taka to Withdraw:</label>
@@ -631,45 +543,22 @@
         </div>
     </div>
     
-    <div id="welcome-popup" class="modal">
-        <div class="popup-content">
-            <h3>🔥 স্বাগতম! 🔥</h3>
-            <p style="text-align: center; color: var(--subtle-text-light);">
-                আসসালামু আলাইকুম, সততার সাথে পেমেন্ট করছি। নিয়ম মেনে কাজ করলে ১০০% পেমেন্ট পাবেন ইনশাআল্লাহ 🔥
-            </p>
-            <ul>
-                <li>⚡ জয়েন্ট বোনাস: <span class="highlight">৩০ টাকা</span></li>
-                <li>💸 প্রতি রেফারে: <span class="highlight">৪৫ টাকা</span></li>
-                <li>💰 প্রতি বিজ্ঞাপনে: <span class="highlight">৩ টাকা</span></li>
-                <li>💖 প্রতিদিন <span class="highlight">১৫ টা</span> করে বিজ্ঞাপন দেখার সুযোগ</li>
-            </ul>
-            <p style="text-align: center; font-weight: 700; color: green;">
-                🔥🔥 এই সাইটে কোনো ইনভেস্ট করতে হবে না। সম্পূর্ণ ফ্রি তে ইনকাম করতে পারবেন ধন্যবাদ।
-            </p>
-            <p style="font-size: 0.9rem; color: #cc0000; margin-top: 15px;">
-                📌 উইথড্র করতে কমপক্ষে <span class="highlight">২০ টি রেফার</span> করতে হবে।
-            </p>
-            <p style="font-size: 0.85rem; color: var(--subtle-text-light); margin-top: 10px;">
-                ~ কাজ করার ক্ষেত্রে কোনো ধরনের VPN ব্যবহার করবেন না। নিয়ম মেনে কাজ করুন এবং আমাদের টেলিগ্রাম চ্যানেলে যুক্ত থাকুন ✅
-            </p>
-            <button id="close-popup-btn">Okay, Understood</button>
-        </div>
-    </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src='//libtl.com/sdk.js' data-zone='10012357' data-sdk='show_10012357'></script>
     
     <script>
         // --- FIREBASE CONFIGURATION (MUST BE REPLACED) ---
+        // NOTE: This configuration is for Firebase Realtime Database
         const firebaseConfig = {
-  apiKey: "AIzaSyAgLRhh96lsBipd01gPmCQ8gF-3Q5DnFq0",
-  authDomain: "earn-38176.firebaseapp.com",
-  databaseURL: "https://earn-38176-default-rtdb.firebaseio.com",
-  projectId: "earn-38176",
-  storageBucket: "earn-38176.appspot.com",
-  messagingSenderId: "350056832143",
-  appId: "1:350056832143:web:9ffeba3301bd73dfc364fa",
-  measurementId: "G-2LGXC91KT5"
-};
+            apiKey: "AIzaSyAgLRhh96lsBipd01gPmCQ8gF-3Q5DnFq0",
+            authDomain: "earn-38176.firebaseapp.com",
+            databaseURL: "https://earn-38176-default-rtdb.firebaseio.com",
+            projectId: "earn-38176",
+            storageBucket: "earn-38176.appspot.com",
+            messagingSenderId: "350056832143",
+            appId: "1:350056832143:web:9ffeba3301bd73dfc364fa",
+            measurementId: "G-2LGXC91KT5"
+        };
         
         // Initialize Firebase
         if (!firebase.apps.length) {
@@ -677,28 +566,30 @@
         }
         const database = firebase.database();
         const USERS_REF = 'users'; // Root path for user data
+        const REFERRED_USERS_REF = 'referred_users'; // New path to track referred users
         // ----------------------------------------------------
 
         document.addEventListener('DOMContentLoaded', () => {
             const tg = window.Telegram.WebApp;
 
-            // --- Configuration ---
+            // --- Configuration (UPDATED) ---
             const BOT_TOKEN = "8253581338:AAGjghsJluvnnklV0TfQZVuvcK8w9Nxh2R0";
             const BOT_USERNAME = "mango_cash_bot";
             const ADMIN_CHAT_ID = "6703675335";
             const CHANNEL_LINK = "https://t.me/OnlineEarnEleven";
             const GROUP_LINK = "https://t.me/goodgmail";
+            const YOUTUBE_LINK = "https://youtube.com/@eleven-11-x?si=7KY0kSXDhZsOVEwm"; // New Link
             
-            // --- UPDATED CONSTANTS based on Popup Message ---
-            const DAILY_AD_LIMIT = 15; // Updated from 25
-            const POINTS_PER_AD = 3; 
-            const CHANNEL_JOIN_BONUS = 15; // Kept 15 from previous code as UI shows 15
-            const GROUP_JOIN_BONUS = 10; // Kept 10 from previous code as UI shows 10
-            const JOIN_BONUS = 30; // New: For join bonus mentioned in popup
-            const POINTS_PER_REFERRAL = 45; // New: For referral points mentioned in popup
+            const DAILY_AD_LIMIT = 25;
+            const POINTS_PER_AD = 12; // Updated from 3 to 12
+            const REFERRAL_BONUS = 150; // Updated from 45 to 150 (for the referrer)
+            const CHANNEL_JOIN_BONUS = 15;
+            const GROUP_JOIN_BONUS = 10;
+            const YOUTUBE_SUBSCRIBE_BONUS = 20; // New Bonus (Assumed 20 TK)
+            
             const MIN_WITHDRAW_POINTS = 500;
-            const MIN_REFERRALS_FOR_WITHDRAW = 20; // New: Condition from popup
-            const LEADERBOARD_UPDATE_INTERVAL = 86400000; // 24 hours in milliseconds
+            const MIN_REFERRALS_FOR_WITHDRAWAL = 20; // New requirement: 20 referrals
+            const LEADERBOARD_UPDATE_INTERVAL = 86400000;
 
             // --- DOM Elements ---
             const userPhotoElem = document.getElementById('user-photo');
@@ -709,16 +600,13 @@
             const watchAdBtn = document.getElementById('watch-ad-btn');
             const joinChannelBtn = document.getElementById('join-channel-btn');
             const joinGroupBtn = document.getElementById('join-group-btn');
+            const subscribeYoutubeBtn = document.getElementById('subscribe-youtube-btn'); // New element
             const withdrawForm = document.getElementById('withdraw-form');
             const withdrawSubmitBtn = document.getElementById('withdraw-submit-btn');
             const referralLinkElem = document.getElementById('referral-link');
             const copyRefLinkBtn = document.getElementById('copy-ref-link-btn');
             const loadingModal = document.getElementById('loading-modal');
             const leaderboardListElem = document.getElementById('leaderboard-list');
-            
-            // NEW POPUP ELEMENTS
-            const welcomePopup = document.getElementById('welcome-popup');
-            const closePopupBtn = document.getElementById('close-popup-btn');
 
             // --- State Management: Now mirrored with Firebase ---
             let userState = {
@@ -728,13 +616,12 @@
                 lastAdWatchDate: null,
                 hasJoinedChannel: false,
                 hasJoinedGroup: false,
+                hasSubscribedYoutube: false, // New state field
                 userId: null,
-                name: '',
-                hasReceivedJoinBonus: false // NEW state for one-time bonus
+                name: ''
             };
             
             let leaderboardUsers = [];
-            let homePageClickCount = 0; // NEW: Counter for popup logic
 
             // --- Database Functions ---
 
@@ -758,21 +645,16 @@
                         userState.referralCount = userState.referralCount || 0;
                         userState.hasJoinedChannel = userState.hasJoinedChannel || false;
                         userState.hasJoinedGroup = userState.hasJoinedGroup || false;
+                        userState.hasSubscribedYoutube = dbData.hasSubscribedYoutube || false; // Initialize new field
                         userState.name = userState.name || tg.initDataUnsafe.user.first_name || 'User';
-                        userState.hasReceivedJoinBonus = userState.hasReceivedJoinBonus || false; // NEW check
 
                         console.log("State loaded from Firebase:", userState);
                     } else {
                         // Initialize new user data in Firebase
                         userState.userId = userId;
                         userState.name = tg.initDataUnsafe.user.first_name || 'New User';
-                        
-                        // NEW: Grant join bonus immediately upon first load
-                        userState.points = JOIN_BONUS;
-                        userState.hasReceivedJoinBonus = true; 
-                        
                         await saveStateToFirebase();
-                        console.log("New user initialized and join bonus granted in Firebase.");
+                        console.log("New user initialized in Firebase.");
                     }
                 } catch (error) {
                     console.error("Error loading user state from Firebase:", error);
@@ -792,59 +674,15 @@
                         lastAdWatchDate: userState.lastAdWatchDate,
                         hasJoinedChannel: userState.hasJoinedChannel,
                         hasJoinedGroup: userState.hasJoinedGroup,
-                        name: userState.name,
-                        hasReceivedJoinBonus: userState.hasReceivedJoinBonus // NEW save
+                        hasSubscribedYoutube: userState.hasSubscribedYoutube, // Save new field
+                        name: userState.name
                     });
                 } catch (error) {
                     console.error("Error saving user state to Firebase:", error);
                 }
             };
-            
-            // --- Referral Logic (NEW) ---
-            const checkReferral = async () => {
-                const startParam = tg.initDataUnsafe.start_param;
-                if (startParam && startParam.startsWith('ref_') && userState.userId) {
-                    const referrerId = startParam.substring(4);
-                    if (referrerId != userState.userId) {
-                        try {
-                            const referrerRef = database.ref(`${USERS_REF}/${referrerId}`);
-                            const snapshot = await referrerRef.once('value');
-                            const referrerData = snapshot.val();
-                            
-                            if (referrerData) {
-                                // Check if user has already been referred
-                                const selfSnapshot = await database.ref(`${USERS_REF}/${userState.userId}/referrerId`).once('value');
-                                if (!selfSnapshot.exists()) {
-                                    // 1. Give bonus to referrer
-                                    const newRefPoints = (referrerData.points || 0) + POINTS_PER_REFERRAL;
-                                    const newRefUserCount = (referrerData.referralCount || 0) + 1;
-                                    await referrerRef.update({
-                                        points: newRefPoints,
-                                        referralCount: newRefUserCount
-                                    });
-                                    // 2. Mark current user as referred
-                                    await database.ref(`${USERS_REF}/${userState.userId}`).update({
-                                        referrerId: referrerId
-                                    });
-                                    
-                                    // Update local state if the user IS the referrer (unlikely in this flow, but good practice)
-                                    if (referrerId == userState.userId) {
-                                         userState.points = newRefPoints;
-                                         userState.referralCount = newRefUserCount;
-                                    }
 
-                                    console.log(`Referral successful. Referrer ${referrerId} received ${POINTS_PER_REFERRAL} points.`);
-                                    // Update local state for current user to reflect their referral count if they were the referrer
-                                }
-                            }
-                        } catch (error) {
-                            console.error("Error processing referral:", error);
-                        }
-                    }
-                }
-            };
-
-            // --- Leaderboard Functions: Simplified to use local state for demo ---
+            // --- Leaderboard Functions: Simulated for demo ---
             const generateDefaultLeaderboard = () => {
                 const names = ['A. Karim', 'J. Hossain', 'M. Rahman', 'S. Ahmed', 'R. Khan', 'N. Islam', 'F. Akter', 'T. Hassan', 'Z. Mia', 'K. Begum'];
                 const basePoints = [15500, 12200, 9800, 8500, 7200, 6100, 5000, 4300, 3100, 2500];
@@ -930,20 +768,48 @@
                 // 1. Load data from Firebase
                 await loadStateFromFirebase(user.id);
                 
-                // 2. Check for referral parameter
-                await checkReferral();
+                // 2. Check for Referral (Deep linking via startapp parameter)
+                const startParam = tg.initDataUnsafe.start_param;
+                
+                if (startParam && startParam.startsWith('ref_')) {
+                    const referrerId = parseInt(startParam.substring(4));
+                    const currentUserId = userState.userId;
+
+                    // Ensure the referrer is not the current user and it's a valid ID
+                    if (referrerId && referrerId !== currentUserId) {
+                        // Check if the current user has already been marked as referred
+                        const referredPath = `${REFERRED_USERS_REF}/${currentUserId}`;
+                        const isAlreadyReferred = await database.ref(referredPath).once('value');
+                        
+                        if (!isAlreadyReferred.exists()) {
+                            // Grant bonus to referrer and increment their count in a transaction
+                            const referrerRef = database.ref(`${USERS_REF}/${referrerId}`);
+                            referrerRef.transaction(currentData => {
+                                if (currentData) {
+                                    currentData.points = (currentData.points || 0) + REFERRAL_BONUS; 
+                                    currentData.referralCount = (currentData.referralCount || 0) + 1;
+                                    return currentData;
+                                }
+                                return currentData;
+                            }).then(() => {
+                                // Mark this user as having been referred to prevent double dipping
+                                database.ref(referredPath).set(referrerId);
+                                console.log(`User ${currentUserId} successfully referred by ${referrerId}. Referrer rewarded ${REFERRAL_BONUS} points.`);
+                            }).catch(error => {
+                                console.error("Referral transaction failed:", error);
+                            });
+                        }
+                    }
+                }
                 
                 // 3. Hide loading screen
                 loadingModal.style.display = 'none'; 
 
-                // 4. Initial UI update & popup check
+                // 4. Initial UI update
                 updateLeaderboardRanks(); 
                 updateUI();
                 setupNavigation();
                 setupEventListeners();
-                
-                // Initial check for popup on first load
-                showWelcomePopup(true);
             };
             
             const updateUI = () => {
@@ -957,19 +823,13 @@
                 userPointsElem.textContent = userState.points;
                 dailyAdsWatchedElem.textContent = userState.dailyAdWatchCount;
                 referralCountElem.textContent = userState.referralCount; 
-                
-                // Update UI based on new constants
-                document.getElementById('ad-limit-display').textContent = DAILY_AD_LIMIT;
-                document.getElementById('points-per-ad-display').textContent = `${POINTS_PER_AD} TK`;
-                document.getElementById('min-withdraw-display').textContent = `${MIN_WITHDRAW_POINTS} TK`;
 
-                // REFERRAL LINK LOGIC (UPDATED FORMAT with startapp parameter)
+                // REFERRAL LINK LOGIC
                 const referralId = userState.userId;
                 const encodedRefId = encodeURIComponent(`ref_${referralId}`); 
-                // The new link structure for Mini Apps that also passes a parameter
                 referralLinkElem.value = `https://t.me/${BOT_USERNAME}/app?startapp=${encodedRefId}`;
 
-                // Update task button states
+                // --- Update task button states ---
                 if (userState.hasJoinedChannel) {
                     joinChannelBtn.innerHTML = '<i class="fas fa-check"></i> Bonus Claimed';
                     joinChannelBtn.disabled = true;
@@ -983,6 +843,19 @@
                 } else {
                      joinGroupBtn.innerHTML = 'Join & Claim Bonus';
                      joinGroupBtn.disabled = false;
+                }
+                // NEW: YouTube task button state
+                 if (userState.hasSubscribedYoutube) {
+                    subscribeYoutubeBtn.innerHTML = '<i class="fas fa-check"></i> Bonus Claimed';
+                    subscribeYoutubeBtn.disabled = true;
+                } else {
+                    const currentState = subscribeYoutubeBtn.dataset.state;
+                    if (currentState === 'open') {
+                        subscribeYoutubeBtn.innerHTML = 'Subscribe & Check';
+                    } else if (currentState === 'check') {
+                         subscribeYoutubeBtn.innerHTML = 'Check Subscription';
+                    }
+                    subscribeYoutubeBtn.disabled = false;
                 }
                 
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
@@ -998,32 +871,10 @@
                 watchAdBtn.addEventListener('click', handleWatchAd);
                 joinChannelBtn.addEventListener('click', handleJoinChannel);
                 joinGroupBtn.addEventListener('click', handleJoinGroup);
+                subscribeYoutubeBtn.addEventListener('click', handleSubscribeYouTube); // New listener
                 withdrawForm.addEventListener('submit', handleWithdraw);
                 copyRefLinkBtn.addEventListener('click', copyReferralLink);
-                closePopupBtn.addEventListener('click', () => welcomePopup.classList.remove('open'));
             };
-            
-            // --- NEW: Welcome Popup Logic ---
-            const showWelcomePopup = (isInitialLoad = false) => {
-                if (isInitialLoad) {
-                    homePageClickCount = 1; // Start count at 1 for the initial load of the home page
-                } else {
-                    homePageClickCount++;
-                }
-
-                if (welcomePopup.classList.contains('open')) return; // Avoid re-opening if already open
-
-                // Logic: 4 times every 10 clicks/loads (10% * 4 = 40% chance)
-                if (homePageClickCount % 10 === 0 || homePageClickCount % 10 === 2 || homePageClickCount % 10 === 5 || homePageClickCount % 10 === 8) {
-                     welcomePopup.classList.add('open');
-                }
-                
-                // Ensure count wraps around
-                if (homePageClickCount >= 10) {
-                     homePageClickCount = homePageClickCount % 10;
-                }
-            };
-
 
             const handleWatchAd = async () => {
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
@@ -1031,17 +882,15 @@
                 }
                 loadingModal.style.display = 'flex';
                 
-                // Use a standard function to handle the ad display
                 const adPromise = window.show_10012357 ? window.show_10012357() : Promise.resolve();
                 
                 adPromise.then(async () => {
-                    // Check limit again (in case user spammed)
                     if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) return; 
 
                     userState.points += POINTS_PER_AD;
                     userState.dailyAdWatchCount++;
                     
-                    await saveStateToFirebase(); // Save to Firebase
+                    await saveStateToFirebase(); 
                     
                     updateLeaderboardRanks();
                     updateUI();
@@ -1055,14 +904,46 @@
                 });
             };
             
+            // --- NEW YouTube Subscribe Handler (Two-step click) ---
+            const handleSubscribeYouTube = async () => {
+                if(userState.hasSubscribedYoutube) {
+                    tg.showAlert('You have already claimed this bonus.'); return;
+                }
+                
+                const currentState = subscribeYoutubeBtn.dataset.state;
+
+                if (currentState === 'open') {
+                    // Step 1: Open the link and change the button state
+                    tg.openTelegramLink(YOUTUBE_LINK);
+                    subscribeYoutubeBtn.dataset.state = 'check';
+                    subscribeYoutubeBtn.textContent = 'Check Subscription';
+                    tg.showAlert("Please subscribe to the channel, then click 'Check Subscription' to claim your bonus.");
+                } else if (currentState === 'check') {
+                    // Step 2: Simulate checking and granting the bonus
+                    subscribeYoutubeBtn.classList.add('loading');
+                    
+                    setTimeout(async () => {
+                        userState.points += YOUTUBE_SUBSCRIBE_BONUS;
+                        userState.hasSubscribedYoutube = true;
+                        
+                        await saveStateToFirebase();
+                        
+                        tg.showAlert(`Bonus claimed! You received ${YOUTUBE_SUBSCRIBE_BONUS} bonus taka.`);
+                        
+                        subscribeYoutubeBtn.classList.remove('loading');
+                        updateLeaderboardRanks();
+                        updateUI();
+                    }, 1500); // 1.5 seconds delay to simulate check
+                }
+            };
+            // --- END NEW YouTube Subscribe Handler ---
+            
             const handleJoinChannel = async () => {
                 if(userState.hasJoinedChannel) {
                     tg.showAlert('You have already claimed this bonus.'); return;
                 }
                 tg.openTelegramLink(CHANNEL_LINK);
                 
-                // Give user time to join, then grant bonus and save to Firebase
-                // NOTE: Proper verification of channel membership requires a bot backend.
                 setTimeout(async () => {
                     userState.points += CHANNEL_JOIN_BONUS;
                     userState.hasJoinedChannel = true;
@@ -1072,7 +953,7 @@
                     tg.showAlert(`Thank you! You received ${CHANNEL_JOIN_BONUS} bonus taka.`);
                     updateLeaderboardRanks();
                     updateUI();
-                }, 3000); // 3 seconds grace period for joining
+                }, 3000); 
             };
 
             const handleJoinGroup = async () => {
@@ -1081,8 +962,6 @@
                 }
                 tg.openTelegramLink(GROUP_LINK);
                 
-                // Grant bonus and save to Firebase
-                // NOTE: Proper verification of group membership requires a bot backend.
                 setTimeout(async () => {
                     userState.points += GROUP_JOIN_BONUS;
                     userState.hasJoinedGroup = true;
@@ -1092,7 +971,7 @@
                     tg.showAlert(`Thank you! You received ${GROUP_JOIN_BONUS} bonus taka.`);
                     updateLeaderboardRanks();
                     updateUI();
-                }, 3000); // 3 seconds grace period for joining
+                }, 3000);
             };
 
             const handleWithdraw = async (e) => {
@@ -1104,22 +983,30 @@
                 if (isNaN(amount) || amount <= 0) { tg.showAlert("Please enter a valid amount."); return; }
                 if (amount < MIN_WITHDRAW_POINTS) { tg.showAlert(`Minimum withdrawal is ${MIN_WITHDRAW_POINTS} points.`); return; }
                 if (amount > userState.points) { tg.showAlert("You don't have enough balance."); return; }
-                // NEW: Referral check
-                if (userState.referralCount < MIN_REFERRALS_FOR_WITHDRAW) { 
-                    tg.showAlert(`You need at least ${MIN_REFERRALS_FOR_WITHDRAW} successful referrals to withdraw.`); 
+                
+                // NEW: Referral Check
+                if (userState.referralCount < MIN_REFERRALS_FOR_WITHDRAWAL) {
+                    tg.showAlert(`You need a minimum of ${MIN_REFERRALS_FOR_WITHDRAWAL} referrals to withdraw.`); 
                     return; 
                 }
+
+                // NEW: Basic format check for Payeer
+                if (method === 'Payeer' && !(/^P\d{7,15}$/i.test(accountNumber))) {
+                    tg.showAlert("For Payeer, the account number must start with 'P' followed by 7 to 15 digits (e.g., P1000000).");
+                    return;
+                }
+
 
                 withdrawSubmitBtn.classList.add('loading');
                 withdrawSubmitBtn.disabled = true;
 
                 userState.points -= amount;
-                await saveStateToFirebase(); // Deduct points immediately
+                await saveStateToFirebase(); 
                 updateUI();
                 updateLeaderboardRanks();
                 
                 const user = tg.initDataUnsafe.user;
-                const message = `<b>New Withdraw Request!</b>\n-----------------------------------\n<b>User:</b> ${user.first_name || ''} ${user.last_name || ''} (@${user.username || 'N/A'})\n<b>User ID:</b> <code>${user.id}</code>\n<b>Referrals:</b> ${userState.referralCount}\n-----------------------------------\n<b>Method:</b> ${method}\n<b>Account:</b> <code>${accountNumber}</code>\n<b>Amount:</b> ${amount} Points\n-----------------------------------\n<b>Date:</b> ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}`;
+                const message = `<b>New Withdraw Request!</b>\n-----------------------------------\n<b>User:</b> ${user.first_name || ''} ${user.last_name || ''} (@${user.username || 'N/A'})\n<b>User ID:</b> <code>${user.id}</code>\n-----------------------------------\n<b>Method:</b> ${method}\n<b>Account:</b> <code>${accountNumber}</code>\n<b>Amount:</b> ${amount} Points\n-----------------------------------\n<b>Date:</b> ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })}`;
                 
                 const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
                 try {
@@ -1131,7 +1018,7 @@
                     const result = await response.json();
                     if (result.ok) {
                         tg.HapticFeedback.notificationOccurred('success');
-                        tg.showAlert("Withdrawal request submitted successfully!");
+                        tg.showAlert("Withdrawal request submitted successfully! Your request will be processed soon.");
                         withdrawForm.reset();
                     } else { throw new Error(result.description); }
                 } catch (error) {
@@ -1160,7 +1047,6 @@
                 navButtons.forEach(button => {
                     button.addEventListener('click', () => {
                         const pageId = button.dataset.page;
-                        
                         pages.forEach(page => page.classList.remove('active'));
                         document.getElementById(pageId).classList.add('active');
                         navButtons.forEach(btn => btn.classList.remove('active'));
@@ -1168,8 +1054,6 @@
                         
                         if (pageId === 'leaderboard-page') {
                              renderLeaderboard();
-                        } else if (pageId === 'home-page') { // NEW: Trigger popup check on Home click
-                             showWelcomePopup();
                         }
                     });
                 });
@@ -1180,3 +1064,4 @@
     </script>
 </body>
 </html>
+
