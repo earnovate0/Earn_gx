@@ -11,7 +11,7 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-    <!-- Using Firebase SDKs provided by the user (Firebase 8 Realtime DB) -->
+    <!-- Using Firebase SDKs provided in the original code -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -363,14 +363,13 @@
             background-color: rgba(0, 0, 0, 0.7); 
             justify-content: center; align-items: center; 
             display: none; 
-            /* Added for smooth fade in */
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            animation: modalFadeIn 0.3s ease-out forwards;
         }
-        .modal.show {
-            display: flex;
-            opacity: 1;
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
+        
         .modal-content { 
             padding: 0;
             border-radius: 15px; 
@@ -399,6 +398,72 @@
             top: 50%;
         }
         
+        /* Welcome Notice Modal Specific Styles */
+        #welcome-modal .modal-content {
+            background-color: var(--secondary-bg-light);
+            max-width: 90%;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: block;
+            position: relative;
+            animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .dark-theme #welcome-modal .modal-content {
+             background-color: var(--secondary-bg-dark);
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        #welcome-modal h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-color-light);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark-theme #welcome-modal h3 {
+            color: var(--primary-color-dark);
+        }
+        #welcome-modal p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            text-align: left;
+            margin-bottom: 15px;
+            color: var(--text-color-light);
+        }
+        .dark-theme #welcome-modal p {
+            color: var(--text-color-dark);
+        }
+        #welcome-modal ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 15px 0;
+            border-left: 3px solid var(--primary-color-light);
+            padding-left: 10px;
+        }
+        #welcome-modal li {
+            font-weight: 600;
+            padding: 3px 0;
+            font-size: 0.9rem;
+        }
+        #welcome-modal .close-btn {
+            background-color: var(--primary-color-light);
+            color: #fff;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-top: 15px;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        #welcome-modal .close-btn:active {
+            background-color: var(--mango-dark);
+        }
+
         /* Leaderboard Styles (Clean and professional) */
         .leaderboard-list {
             list-style: none;
@@ -442,71 +507,6 @@
             color: var(--subtle-text-light);
             margin: 0;
         }
-        
-        /* --- WELCOME MODAL STYLES (NEW) --- */
-        #welcome-modal .modal-content {
-            background-color: var(--secondary-bg-light);
-            width: 90%;
-            max-width: 400px;
-            padding: 25px;
-            display: block;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-            transform: scale(0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Springy Animation */
-        }
-        #welcome-modal.show .modal-content {
-            transform: scale(1);
-        }
-        .dark-theme #welcome-modal .modal-content {
-            background-color: var(--secondary-bg-dark);
-        }
-        
-        .welcome-icon {
-            font-size: 3rem;
-            color: var(--primary-color-light);
-            margin-bottom: 15px;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        #welcome-modal h3 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary-color-light);
-            margin-bottom: 10px;
-        }
-        #welcome-modal p {
-            font-size: 1rem;
-            line-height: 1.6;
-            text-align: left;
-            margin-bottom: 20px;
-            color: var(--text-color-light);
-        }
-        .dark-theme #welcome-modal p {
-            color: var(--text-color-dark);
-        }
-        .highlight {
-            font-weight: 700;
-            color: var(--primary-color-light);
-        }
-        .modal-footer button {
-            background-color: var(--primary-color-light);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .modal-footer button:active {
-            background-color: var(--mango-dark);
-        }
-
     </style>
 </head>
 <body>
@@ -514,7 +514,7 @@
     <div id="app">
         <header class="profile-header">
             <div class="profile-info">
-                <img id="user-photo" src="https://placehold.co/55x55/ff9900/ffffff?text=U" onerror="this.onerror=null; this.src='https://placehold.co/55x55/ff9900/ffffff?text=U';" alt="User Photo">
+                <img id="user-photo" src="" alt="User Photo">
                 <div class="user-details">
                     <h1 id="user-name">Loading... <i class="fas fa-check-circle verified-icon"></i></h1>
                     <p> Balance: ৳<span class="user-balance"><span id="user-points">0</span> TK</span></p>
@@ -618,7 +618,7 @@
         </nav>
     </div>
 
-    <!-- General Loading Modal -->
+    <!-- Loading Modal -->
     <div id="loading-modal" class="modal" style="display: flex;">
         <div class="modal-content">
             <div class="app-loader"></div>
@@ -626,19 +626,25 @@
         </div>
     </div>
     
-    <!-- Welcome Notice Modal (NEW) -->
+    <!-- Welcome Notice Modal (New) -->
     <div id="welcome-modal" class="modal">
         <div class="modal-content">
-            <i class="fas fa-hand-holding-usd welcome-icon"></i>
-            <h3>🔥 স্বাগতম! (Welcome!) 🔥</h3>
-            <p id="welcome-message"></p>
-            <div class="modal-footer">
-                <button onclick="document.getElementById('welcome-modal').classList.remove('show');">বুঝেছি (Got It)</button>
-            </div>
+            <h3><i class="fas fa-fire" style="margin-right: 10px;"></i> 🔥 স্বাগতম! (Welcome!) 🔥</h3>
+            <p style="margin-bottom: 5px;">আসসালামু আলাইকুম। আমরা সততা এবং নির্ভরযোগ্যতার সাথে পেমেন্ট করে থাকি। আপনি যদি আমাদের সকল নিয়ম মেনে কাজ করেন, তবে ইনশাআল্লাহ আপনি ১০০% পেমেন্ট পাবেন।</p>
+            <p>💸 আয়ের সুযোগসমূহ:</p>
+            <ul>
+                <li>জয়েন্ট বোনাস: <span class="primary-text">৩০</span> টাকা</li>
+                <li>প্রতি রেফারে: <span class="primary-text">১৫০</span> টাকা</li>
+                <li>প্রতি বিজ্ঞাপনে: <span class="primary-text">১২</span> টাকা</li>
+            </ul>
+            <p>🎁 প্রতিদিন <span class="primary-text">৩৫</span> টি করে বিজ্ঞাপন দেখার সুযোগ রয়েছে। সবচেয়ে ভালো দিক হলো, এই সাইটে সম্পূর্ণ বিনামূল্যে কাজ করে ইনকাম করতে পারবেন— কোনো ধরনের ইনভেস্টমেন্টের প্রয়োজন নেই। ধন্যবাদ!</p>
+            <p>✅ গুরুত্বপূর্ণ নির্দেশনা: <span style="font-weight: 700;">১০০% পেমেন্টের গ্যারান্টি রয়েছে!</span> পেমেন্ট করা হয় বিকাশ এবং নগদ-এর মাধ্যমে। কাজ করার সময় কোনো ধরনের <span style="font-weight: 700;">VPN ব্যবহার করবেন না।</span> অবশ্যই সকল নিয়মাবলী মেনে চলুন এবং আমাদের টেলিগ্রাম চ্যানেলে যুক্ত থাকুন।</p>
+            <button class="close-btn" onclick="document.getElementById('welcome-modal').style.display='none'">বুঝেছি (Got It)</button>
         </div>
     </div>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Ad SDK - Note: This library is included by the user. -->
     <script src='//libtl.com/sdk.js' data-zone='10012357' data-sdk='show_10012357'></script>
     
     <script>
@@ -676,15 +682,15 @@
             
             // Bonuses and Limits
             const DAILY_AD_LIMIT = 25;
-            const POINTS_PER_AD = 12; // UPDATED from 3 to 12
-            const PER_REFER_BONUS = 150; // New constant for referral bonus
+            const POINTS_PER_AD = 12; 
+            const PER_REFER_BONUS = 150; 
+            const JOIN_BONUS = 30; // Updated to 30 TK as per the notice text
             const CHANNEL_JOIN_BONUS = 15;
             const GROUP_JOIN_BONUS = 10;
-            const YOUTUBE_JOIN_BONUS = 18; // Bonus for new YouTube task
+            const YOUTUBE_JOIN_BONUS = 18; 
             const MIN_WITHDRAW_POINTS = 500;
-            const MIN_REFERRALS_FOR_WITHDRAW = 20; // NEW: Must have 20 referrals to withdraw
-            const LEADERBOARD_UPDATE_INTERVAL = 86400000; // 24 hours in milliseconds
-            const WELCOME_MODAL_CHANCE = 0.4; // 4 out of 10 times
+            const MIN_REFERRALS_FOR_WITHDRAW = 20; 
+            const LEADERBOARD_UPDATE_INTERVAL = 86400000; 
 
             // --- DOM Elements ---
             const userPhotoElem = document.getElementById('user-photo');
@@ -695,16 +701,15 @@
             const watchAdBtn = document.getElementById('watch-ad-btn');
             const joinChannelBtn = document.getElementById('join-channel-btn');
             const joinGroupBtn = document.getElementById('join-group-btn');
-            const subscribeYouTubeBtn = document.getElementById('subscribe-youtube-btn'); // New
+            const subscribeYouTubeBtn = document.getElementById('subscribe-youtube-btn'); 
             const withdrawForm = document.getElementById('withdraw-form');
-            const withdrawSubmitBtn = document.getElementById('withdraw-submit-btn');
             const withdrawMethodSelect = document.getElementById('withdraw-method');
             const accountNumberInput = document.getElementById('account-number');
+            const withdrawSubmitBtn = document.getElementById('withdraw-submit-btn');
             const referralLinkElem = document.getElementById('referral-link');
             const copyRefLinkBtn = document.getElementById('copy-ref-link-btn');
             const loadingModal = document.getElementById('loading-modal');
-            const welcomeModal = document.getElementById('welcome-modal'); // NEW
-            const welcomeMessageElem = document.getElementById('welcome-message'); // NEW
+            const welcomeModal = document.getElementById('welcome-modal'); // New
             const leaderboardListElem = document.getElementById('leaderboard-list');
 
             // --- State Management: Now mirrored with Firebase ---
@@ -715,8 +720,10 @@
                 lastAdWatchDate: null,
                 hasJoinedChannel: false,
                 hasJoinedGroup: false,
-                hasSubscribedYouTube: false, // New field
-                referrerId: null, // New field to track who referred this user
+                hasSubscribedYouTube: false, 
+                referrerId: null, 
+                isNewUser: true, // New flag for initial bonus logic
+                homeVisitCount: 0, // New field for popup frequency tracking
                 userId: null,
                 name: ''
             };
@@ -735,25 +742,29 @@
                         userState = {
                             ...dbData,
                             userId: userId,
+                            isNewUser: false, // Existing user
                             // Reset daily ad count if date has changed
                             dailyAdWatchCount: dbData.lastAdWatchDate === today ? dbData.dailyAdWatchCount : 0,
                             lastAdWatchDate: today
                         };
-                        // Ensure required new fields exist for old data
+                        // Ensure required new fields exist for old data and update defaults
                         userState.referralCount = userState.referralCount || 0;
                         userState.hasJoinedChannel = userState.hasJoinedChannel || false;
                         userState.hasJoinedGroup = userState.hasJoinedGroup || false;
-                        userState.hasSubscribedYouTube = userState.hasSubscribedYouTube || false; // New field check
-                        userState.referrerId = userState.referrerId || null; // New field check
+                        userState.hasSubscribedYouTube = userState.hasSubscribedYouTube || false; 
+                        userState.referrerId = userState.referrerId || null; 
+                        userState.homeVisitCount = userState.homeVisitCount || 0; // Initialize visit count
                         userState.name = userState.name || tg.initDataUnsafe.user.first_name || 'User';
 
                         console.log("State loaded from Firebase:", userState);
                     } else {
-                        // Initialize new user data in Firebase
+                        // Initialize new user data with JOIN_BONUS
                         userState.userId = userId;
                         userState.name = tg.initDataUnsafe.user.first_name || 'New User';
+                        userState.points = JOIN_BONUS; // Grant initial join bonus
+                        userState.isNewUser = true;
                         await saveStateToFirebase();
-                        console.log("New user initialized in Firebase.");
+                        console.log("New user initialized in Firebase with Join Bonus.");
                     }
                 } catch (error) {
                     console.error("Error loading user state from Firebase:", error);
@@ -771,8 +782,9 @@
                         lastAdWatchDate: userState.lastAdWatchDate,
                         hasJoinedChannel: userState.hasJoinedChannel,
                         hasJoinedGroup: userState.hasJoinedGroup,
-                        hasSubscribedYouTube: userState.hasSubscribedYouTube, // Save new field
-                        referrerId: userState.referrerId, // Save new field
+                        hasSubscribedYouTube: userState.hasSubscribedYouTube, 
+                        referrerId: userState.referrerId, 
+                        homeVisitCount: userState.homeVisitCount, // Save new field
                         name: userState.name
                     });
                 } catch (error) {
@@ -806,34 +818,47 @@
             const checkForReferralBonus = async () => {
                 if (userState.referrerId) {
                     console.log("Referrer already recorded.");
-                    return; // Already processed
+                    return; 
                 }
 
-                // Check for 'startapp' parameter in initData
                 const urlParams = tg.initData;
                 const match = urlParams ? urlParams.match(/startapp=(ref_[0-9]+)/) : null;
                 
                 if (match && match[1]) {
-                    const referrerId = match[1].substring(4); // Extract ID from 'ref_ID'
+                    const referrerId = match[1].substring(4); 
                     
-                    // Prevent self-referral and ensure referrer is different
                     if (String(referrerId) === String(userState.userId)) {
                         console.log("Self-referral detected.");
                         return;
                     }
 
-                    // 1. Record the referrer in the current user's state
                     userState.referrerId = referrerId;
                     await saveStateToFirebase(); 
                     console.log(`User recorded referrer: ${referrerId}`);
                     
-                    // 2. Grant bonus and update referral count to the referrer
                     await updateReferrer(referrerId);
                     
-                    // Alert the user that they were referred (optional/informational)
-                    tg.showAlert(`You were referred! Your referrer earned ${PER_REFER_BONUS} TK.`);
+                    // We only show the referral alert on first time load if referred
+                    // tg.showAlert(`You were referred! Your referrer earned ${PER_REFER_BONUS} TK.`);
                 }
             };
+
+            // --- Welcome Modal Logic (New) ---
+            const showWelcomeNoticeIfRequired = async () => {
+                // 1. Increment visit count and save state
+                userState.homeVisitCount++;
+                await saveStateToFirebase();
+
+                // 2. Check the condition (4 out of 10 times, e.g., N % 10 in {1, 3, 6, 9})
+                const cycleValue = userState.homeVisitCount % 10;
+                const showOnVisits = [1, 3, 6, 9]; // Visits 1, 3, 6, 9 show the popup.
+
+                if (showOnVisits.includes(cycleValue)) {
+                    welcomeModal.style.display = 'flex';
+                } else {
+                    welcomeModal.style.display = 'none';
+                }
+            }
 
 
             // --- Leaderboard Functions: Simplified to use local state for demo ---
@@ -849,10 +874,8 @@
             };
 
             const updateLeaderboardRanks = () => {
-                // In a production app, you'd fetch the top users from Firebase here.
                 leaderboardUsers = generateDefaultLeaderboard(); 
                 
-                // Add/Update current user's position
                 const currentUserIndex = leaderboardUsers.findIndex(u => u.id === userState.userId);
                 if (currentUserIndex === -1) {
                     leaderboardUsers.push({ 
@@ -903,7 +926,6 @@
                 });
             };
             
-            // Set up a periodic check for leaderboard refresh (only for demo, real-time sync is better)
             setInterval(updateLeaderboardRanks, LEADERBOARD_UPDATE_INTERVAL);
             
             // --- Core Functions ---
@@ -923,7 +945,7 @@
                 // 1. Load data from Firebase
                 await loadStateFromFirebase(user.id);
                 
-                // 2. Handle referral check *after* loading the state to ensure we know if they are a first-time visitor
+                // 2. Handle referral check *after* loading the state
                 await checkForReferralBonus(); 
                 
                 // 3. Hide loading screen
@@ -935,41 +957,11 @@
                 setupNavigation();
                 setupEventListeners();
                 
-                // 5. Check and show welcome modal immediately after load
-                checkAndShowWelcomeModal(); 
-                
-                // Initialize Account Number formatting listener
+                // 5. Show welcome notice on initial load (which is the home page)
+                showWelcomeNoticeIfRequired();
+
                 updateAccountNumberPlaceholder();
             };
-            
-            // --- NEW: Welcome Modal Logic ---
-            const welcomeContent = `
-                <p>আসসালামু আলাইকুম। আমরা সততা এবং নির্ভরযোগ্যতার সাথে পেমেন্ট করে থাকি। আপনি যদি আমাদের সকল নিয়ম মেনে কাজ করেন, তবে ইনশাআল্লাহ আপনি <span class="highlight">১০০% পেমেন্ট পাবেন।</span></p>
-                <p>💸 আয়ের সুযোগসমূহ:</p>
-                <ul>
-                    <li>- জয়েন্ট বোনাস: <span class="highlight">${CHANNEL_JOIN_BONUS + GROUP_JOIN_BONUS + YOUTUBE_JOIN_BONUS} টাকা</span> (টাস্ক সম্পূর্ণ করলে)</li>
-                    <li>- প্রতি রেফারে: <span class="highlight">৳${PER_REFER_BONUS} টাকা</span></li>
-                    <li>- প্রতি বিজ্ঞাপনে: <span class="highlight">৳${POINTS_PER_AD} টাকা</span></li>
-                </ul>
-                <p>🎁 প্রতিদিন <span class="highlight">${DAILY_AD_LIMIT} টি</span> করে বিজ্ঞাপন দেখার সুযোগ রয়েছে। সবচেয়ে ভালো দিক হলো, এই সাইটে সম্পূর্ণ <span class="highlight">বিনামূল্যে কাজ করে ইনকাম</span> করতে পারবেন— কোনো ধরনের ইনভেস্টমেন্টের প্রয়োজন নেই। ধন্যবাদ!</p>
-                <p>✅ গুরুত্বপূর্ণ নির্দেশনা:</p>
-                <ul>
-                    <li>- ১০০% পেমেন্টের গ্যারান্টি রয়েছে! পেমেন্ট করা হয় <span class="highlight">বিকাশ এবং নগদ-এর মাধ্যমে।</span></li>
-                    <li>- কাজ করার সময় কোনো ধরনের <span class="highlight">VPN ব্যবহার করবেন না।</span></li>
-                    <li>- অবশ্যই সকল নিয়মাবলী মেনে চলুন এবং আমাদের টেলিগ্রাম চ্যানেলে যুক্ত থাকুন।</li>
-                </ul>
-            `;
-            
-            welcomeMessageElem.innerHTML = welcomeContent;
-
-            const checkAndShowWelcomeModal = () => {
-                // Check if a random number is less than the desired chance (40%)
-                if (Math.random() < WELCOME_MODAL_CHANCE) {
-                    welcomeModal.classList.add('show');
-                }
-            };
-            // --- END NEW: Welcome Modal Logic ---
-
             
             const updateUI = () => {
                 const user = tg.initDataUnsafe.user;
@@ -1003,7 +995,6 @@
                      joinGroupBtn.disabled = false;
                 }
                 
-                // New YouTube Task Button State Logic
                 if (userState.hasSubscribedYouTube) {
                     subscribeYouTubeBtn.innerHTML = '<i class="fas fa-check"></i> Bonus Claimed';
                     subscribeYouTubeBtn.disabled = true;
@@ -1028,13 +1019,12 @@
                 watchAdBtn.addEventListener('click', handleWatchAd);
                 joinChannelBtn.addEventListener('click', handleJoinChannel);
                 joinGroupBtn.addEventListener('click', handleJoinGroup);
-                subscribeYouTubeBtn.addEventListener('click', handleSubscribeYouTube); // New Listener
+                subscribeYouTubeBtn.addEventListener('click', handleSubscribeYouTube); 
                 withdrawForm.addEventListener('submit', handleWithdraw);
                 copyRefLinkBtn.addEventListener('click', copyReferralLink);
                 withdrawMethodSelect.addEventListener('change', updateAccountNumberPlaceholder);
             };
             
-            // --- Account Number Placeholder Update (New) ---
             const updateAccountNumberPlaceholder = () => {
                 const method = withdrawMethodSelect.value;
                 if (method === 'Payeer') {
@@ -1042,7 +1032,7 @@
                     accountNumberInput.type = 'text';
                 } else {
                     accountNumberInput.placeholder = '01xxxxxxxxx';
-                    accountNumberInput.type = 'text'; // Keep type text for flexible number/Bkash/Nagad
+                    accountNumberInput.type = 'text'; 
                 }
             };
 
@@ -1058,7 +1048,7 @@
                 adPromise.then(async () => {
                     if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) return; 
 
-                    userState.points += POINTS_PER_AD; // Updated Bonus
+                    userState.points += POINTS_PER_AD; 
                     userState.dailyAdWatchCount++;
                     
                     await saveStateToFirebase(); 
@@ -1075,22 +1065,16 @@
                 });
             };
             
-            // --- YouTube Task Handler (New) ---
             const handleSubscribeYouTube = async () => {
                 if(userState.hasSubscribedYouTube) {
                     tg.showAlert('You have already claimed this bonus.'); return;
                 }
 
                 if (subscribeYouTubeBtn.dataset.linkOpened !== 'true') {
-                    // Step 1: Open Link and mark as opened
                     tg.openTelegramLink(YOUTUBE_LINK);
                     subscribeYouTubeBtn.dataset.linkOpened = 'true';
-                    updateUI(); // Updates button text to 'Check Subscription & Claim'
+                    updateUI(); 
                 } else {
-                    // Step 2: User returns and clicks 'Check', grant bonus
-                    
-                    // NOTE: Verification is still simulated as a backend is required for real verification.
-                    
                     userState.points += YOUTUBE_JOIN_BONUS;
                     userState.hasSubscribedYouTube = true;
                     
@@ -1109,7 +1093,6 @@
                 }
                 tg.openTelegramLink(CHANNEL_LINK);
                 
-                // Grant bonus after a short delay (simulating successful join check)
                 setTimeout(async () => {
                     userState.points += CHANNEL_JOIN_BONUS;
                     userState.hasJoinedChannel = true;
@@ -1128,7 +1111,6 @@
                 }
                 tg.openTelegramLink(GROUP_LINK);
                 
-                // Grant bonus after a short delay (simulating successful join check)
                 setTimeout(async () => {
                     userState.points += GROUP_JOIN_BONUS;
                     userState.hasJoinedGroup = true;
@@ -1151,13 +1133,11 @@
                 if (amount < MIN_WITHDRAW_POINTS) { tg.showAlert(`Minimum withdrawal is ${MIN_WITHDRAW_POINTS} points.`); return; }
                 if (amount > userState.points) { tg.showAlert("You don't have enough balance."); return; }
                 
-                // NEW: Referral Check
                 if (userState.referralCount < MIN_REFERRALS_FOR_WITHDRAW) {
                      tg.showAlert(`You need at least ${MIN_REFERRALS_FOR_WITHDRAW} referrals to withdraw. You currently have ${userState.referralCount}.`); 
                      return; 
                 }
                 
-                // NEW: Payeer format validation
                 if (method === 'Payeer' && !/^P\d{6,15}$/.test(accountNumber)) {
                     tg.showAlert("Please enter a valid Payeer ID (e.g., P1234567).");
                     return;
@@ -1168,7 +1148,7 @@
                 withdrawSubmitBtn.disabled = true;
 
                 userState.points -= amount;
-                await saveStateToFirebase(); // Deduct points immediately
+                await saveStateToFirebase(); 
                 updateUI();
                 updateLeaderboardRanks();
                 
@@ -1192,7 +1172,7 @@
                     tg.HapticFeedback.notificationOccurred('error');
                     tg.showAlert("Failed to submit request. Your points have been returned.");
                     userState.points += amount;
-                    await saveStateToFirebase(); // Revert points
+                    await saveStateToFirebase(); 
                     updateUI();
                     updateLeaderboardRanks();
                 } finally {
@@ -1214,6 +1194,7 @@
                 navButtons.forEach(button => {
                     button.addEventListener('click', () => {
                         const pageId = button.dataset.page;
+                        
                         pages.forEach(page => page.classList.remove('active'));
                         document.getElementById(pageId).classList.add('active');
                         navButtons.forEach(btn => btn.classList.remove('active'));
@@ -1221,14 +1202,12 @@
                         
                         if (pageId === 'leaderboard-page') {
                              renderLeaderboard();
-                        }
-                        
-                        // NEW: Check for welcome modal on home page navigation
-                        if (pageId === 'home-page') {
-                             checkAndShowWelcomeModal();
+                        } else if (pageId === 'home-page') {
+                             // Check and show welcome notice when navigating back to home
+                             showWelcomeNoticeIfRequired();
                         } else {
-                             // Ensure modal is hidden when navigating away
-                             welcomeModal.classList.remove('show');
+                            // Hide the welcome modal when navigating away
+                            welcomeModal.style.display = 'none';
                         }
                     });
                 });
