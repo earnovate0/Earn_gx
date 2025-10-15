@@ -11,7 +11,7 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-    <!-- Using Firebase SDKs provided in the original code -->
+    <!-- Using Firebase SDKs provided by the user (Firebase 8 Realtime DB) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -363,6 +363,13 @@
             background-color: rgba(0, 0, 0, 0.7); 
             justify-content: center; align-items: center; 
             display: none; 
+            /* Added for smooth fade in */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.show {
+            display: flex;
+            opacity: 1;
         }
         .modal-content { 
             padding: 0;
@@ -435,6 +442,71 @@
             color: var(--subtle-text-light);
             margin: 0;
         }
+        
+        /* --- WELCOME MODAL STYLES (NEW) --- */
+        #welcome-modal .modal-content {
+            background-color: var(--secondary-bg-light);
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            display: block;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Springy Animation */
+        }
+        #welcome-modal.show .modal-content {
+            transform: scale(1);
+        }
+        .dark-theme #welcome-modal .modal-content {
+            background-color: var(--secondary-bg-dark);
+        }
+        
+        .welcome-icon {
+            font-size: 3rem;
+            color: var(--primary-color-light);
+            margin-bottom: 15px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        #welcome-modal h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-color-light);
+            margin-bottom: 10px;
+        }
+        #welcome-modal p {
+            font-size: 1rem;
+            line-height: 1.6;
+            text-align: left;
+            margin-bottom: 20px;
+            color: var(--text-color-light);
+        }
+        .dark-theme #welcome-modal p {
+            color: var(--text-color-dark);
+        }
+        .highlight {
+            font-weight: 700;
+            color: var(--primary-color-light);
+        }
+        .modal-footer button {
+            background-color: var(--primary-color-light);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .modal-footer button:active {
+            background-color: var(--mango-dark);
+        }
+
     </style>
 </head>
 <body>
@@ -442,7 +514,7 @@
     <div id="app">
         <header class="profile-header">
             <div class="profile-info">
-                <img id="user-photo" src="" alt="User Photo">
+                <img id="user-photo" src="https://placehold.co/55x55/ff9900/ffffff?text=U" onerror="this.onerror=null; this.src='https://placehold.co/55x55/ff9900/ffffff?text=U';" alt="User Photo">
                 <div class="user-details">
                     <h1 id="user-name">Loading... <i class="fas fa-check-circle verified-icon"></i></h1>
                     <p> Balance: ৳<span class="user-balance"><span id="user-points">0</span> TK</span></p>
@@ -546,10 +618,23 @@
         </nav>
     </div>
 
+    <!-- General Loading Modal -->
     <div id="loading-modal" class="modal" style="display: flex;">
         <div class="modal-content">
             <div class="app-loader"></div>
             <i class="fas fa-seedling mango-icon"></i>
+        </div>
+    </div>
+    
+    <!-- Welcome Notice Modal (NEW) -->
+    <div id="welcome-modal" class="modal">
+        <div class="modal-content">
+            <i class="fas fa-hand-holding-usd welcome-icon"></i>
+            <h3>🔥 স্বাগতম! (Welcome!) 🔥</h3>
+            <p id="welcome-message"></p>
+            <div class="modal-footer">
+                <button onclick="document.getElementById('welcome-modal').classList.remove('show');">বুঝেছি (Got It)</button>
+            </div>
         </div>
     </div>
     
@@ -599,6 +684,7 @@
             const MIN_WITHDRAW_POINTS = 500;
             const MIN_REFERRALS_FOR_WITHDRAW = 20; // NEW: Must have 20 referrals to withdraw
             const LEADERBOARD_UPDATE_INTERVAL = 86400000; // 24 hours in milliseconds
+            const WELCOME_MODAL_CHANCE = 0.4; // 4 out of 10 times
 
             // --- DOM Elements ---
             const userPhotoElem = document.getElementById('user-photo');
@@ -617,6 +703,8 @@
             const referralLinkElem = document.getElementById('referral-link');
             const copyRefLinkBtn = document.getElementById('copy-ref-link-btn');
             const loadingModal = document.getElementById('loading-modal');
+            const welcomeModal = document.getElementById('welcome-modal'); // NEW
+            const welcomeMessageElem = document.getElementById('welcome-message'); // NEW
             const leaderboardListElem = document.getElementById('leaderboard-list');
 
             // --- State Management: Now mirrored with Firebase ---
@@ -749,7 +837,6 @@
 
 
             // --- Leaderboard Functions: Simplified to use local state for demo ---
-            // In a live app, this would query and sort the top users from the Firebase USERS_REF.
             const generateDefaultLeaderboard = () => {
                 const names = ['A. Karim', 'J. Hossain', 'M. Rahman', 'S. Ahmed', 'R. Khan', 'N. Islam', 'F. Akter', 'T. Hassan', 'Z. Mia', 'K. Begum'];
                 const basePoints = [15500, 12200, 9800, 8500, 7200, 6100, 5000, 4300, 3100, 2500];
@@ -763,7 +850,6 @@
 
             const updateLeaderboardRanks = () => {
                 // In a production app, you'd fetch the top users from Firebase here.
-                // For this demo, we'll simulate the update.
                 leaderboardUsers = generateDefaultLeaderboard(); 
                 
                 // Add/Update current user's position
@@ -849,14 +935,46 @@
                 setupNavigation();
                 setupEventListeners();
                 
+                // 5. Check and show welcome modal immediately after load
+                checkAndShowWelcomeModal(); 
+                
                 // Initialize Account Number formatting listener
                 updateAccountNumberPlaceholder();
             };
             
+            // --- NEW: Welcome Modal Logic ---
+            const welcomeContent = `
+                <p>আসসালামু আলাইকুম। আমরা সততা এবং নির্ভরযোগ্যতার সাথে পেমেন্ট করে থাকি। আপনি যদি আমাদের সকল নিয়ম মেনে কাজ করেন, তবে ইনশাআল্লাহ আপনি <span class="highlight">১০০% পেমেন্ট পাবেন।</span></p>
+                <p>💸 আয়ের সুযোগসমূহ:</p>
+                <ul>
+                    <li>- জয়েন্ট বোনাস: <span class="highlight">${CHANNEL_JOIN_BONUS + GROUP_JOIN_BONUS + YOUTUBE_JOIN_BONUS} টাকা</span> (টাস্ক সম্পূর্ণ করলে)</li>
+                    <li>- প্রতি রেফারে: <span class="highlight">৳${PER_REFER_BONUS} টাকা</span></li>
+                    <li>- প্রতি বিজ্ঞাপনে: <span class="highlight">৳${POINTS_PER_AD} টাকা</span></li>
+                </ul>
+                <p>🎁 প্রতিদিন <span class="highlight">${DAILY_AD_LIMIT} টি</span> করে বিজ্ঞাপন দেখার সুযোগ রয়েছে। সবচেয়ে ভালো দিক হলো, এই সাইটে সম্পূর্ণ <span class="highlight">বিনামূল্যে কাজ করে ইনকাম</span> করতে পারবেন— কোনো ধরনের ইনভেস্টমেন্টের প্রয়োজন নেই। ধন্যবাদ!</p>
+                <p>✅ গুরুত্বপূর্ণ নির্দেশনা:</p>
+                <ul>
+                    <li>- ১০০% পেমেন্টের গ্যারান্টি রয়েছে! পেমেন্ট করা হয় <span class="highlight">বিকাশ এবং নগদ-এর মাধ্যমে।</span></li>
+                    <li>- কাজ করার সময় কোনো ধরনের <span class="highlight">VPN ব্যবহার করবেন না।</span></li>
+                    <li>- অবশ্যই সকল নিয়মাবলী মেনে চলুন এবং আমাদের টেলিগ্রাম চ্যানেলে যুক্ত থাকুন।</li>
+                </ul>
+            `;
+            
+            welcomeMessageElem.innerHTML = welcomeContent;
+
+            const checkAndShowWelcomeModal = () => {
+                // Check if a random number is less than the desired chance (40%)
+                if (Math.random() < WELCOME_MODAL_CHANCE) {
+                    welcomeModal.classList.add('show');
+                }
+            };
+            // --- END NEW: Welcome Modal Logic ---
+
+            
             const updateUI = () => {
                 const user = tg.initDataUnsafe.user;
                 if (user) {
-                    userPhotoElem.src = user.photo_url || 'https://i.imgur.com/placeholder.png'; 
+                    userPhotoElem.src = user.photo_url || 'https://placehold.co/55x55/ff9900/ffffff?text=U'; 
                     userNameElem.innerHTML = `${user.first_name || ''} ${user.last_name || ''} <i class="fas fa-check-circle verified-icon"></i>`;
                 }
                 
@@ -1103,6 +1221,14 @@
                         
                         if (pageId === 'leaderboard-page') {
                              renderLeaderboard();
+                        }
+                        
+                        // NEW: Check for welcome modal on home page navigation
+                        if (pageId === 'home-page') {
+                             checkAndShowWelcomeModal();
+                        } else {
+                             // Ensure modal is hidden when navigating away
+                             welcomeModal.classList.remove('show');
                         }
                     });
                 });
