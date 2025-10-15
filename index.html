@@ -11,7 +11,6 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-    <!-- Using Firebase SDKs provided in the original code -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -178,6 +177,26 @@
         .referral-section h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;}
         .referral-section p { font-size: 0.9rem; margin-bottom: 15px; }
         
+        /* NEW: Referral Note Styling */
+        .referral-note {
+            text-align: left;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .light-theme .referral-note {
+            background-color: var(--secondary-bg-light);
+            border: 1px solid var(--border-color-light);
+            color: var(--text-color-light);
+        }
+        .dark-theme .referral-note {
+            background-color: var(--bg-color-dark);
+            border: 1px solid var(--border-color-dark);
+            color: var(--text-color-dark);
+        }
+
         #referral-link { 
             width: 100%; 
             padding: 12px; 
@@ -363,13 +382,7 @@
             background-color: rgba(0, 0, 0, 0.7); 
             justify-content: center; align-items: center; 
             display: none; 
-            animation: modalFadeIn 0.3s ease-out forwards;
         }
-        @keyframes modalFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
         .modal-content { 
             padding: 0;
             border-radius: 15px; 
@@ -398,72 +411,6 @@
             top: 50%;
         }
         
-        /* Welcome Notice Modal Specific Styles */
-        #welcome-modal .modal-content {
-            background-color: var(--secondary-bg-light);
-            max-width: 90%;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            display: block;
-            position: relative;
-            animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        .dark-theme #welcome-modal .modal-content {
-             background-color: var(--secondary-bg-dark);
-        }
-        @keyframes zoomIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        #welcome-modal h3 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary-color-light);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .dark-theme #welcome-modal h3 {
-            color: var(--primary-color-dark);
-        }
-        #welcome-modal p {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            text-align: left;
-            margin-bottom: 15px;
-            color: var(--text-color-light);
-        }
-        .dark-theme #welcome-modal p {
-            color: var(--text-color-dark);
-        }
-        #welcome-modal ul {
-            list-style: none;
-            padding-left: 0;
-            margin: 15px 0;
-            border-left: 3px solid var(--primary-color-light);
-            padding-left: 10px;
-        }
-        #welcome-modal li {
-            font-weight: 600;
-            padding: 3px 0;
-            font-size: 0.9rem;
-        }
-        #welcome-modal .close-btn {
-            background-color: var(--primary-color-light);
-            color: #fff;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            margin-top: 15px;
-            width: 100%;
-            transition: background-color 0.2s;
-        }
-        #welcome-modal .close-btn:active {
-            background-color: var(--mango-dark);
-        }
-
         /* Leaderboard Styles (Clean and professional) */
         .leaderboard-list {
             list-style: none;
@@ -507,6 +454,72 @@
             color: var(--subtle-text-light);
             margin: 0;
         }
+
+        /* --- NEW NOTICE MODAL STYLES --- */
+        #notice-modal .modal-content {
+            background-color: var(--secondary-bg-light);
+            border-radius: 15px;
+            max-width: 90%;
+            width: 400px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: block; /* Override default flex for content styling */
+        }
+        .dark-theme #notice-modal .modal-content {
+            background-color: var(--secondary-bg-dark);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5) translateY(50%); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        #notice-modal h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: var(--primary-color-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark-theme #notice-modal h3 {
+             color: var(--primary-color-dark);
+        }
+
+        #notice-modal h3 i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        #notice-modal p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            text-align: justify;
+            margin-bottom: 10px;
+        }
+
+        #notice-modal .action-btn {
+            margin-top: 20px;
+            background-color: var(--primary-color-light);
+        }
+        /* Highlighted text within the modal */
+        #notice-modal .highlight {
+            font-weight: 700;
+            color: var(--primary-color-light);
+        }
+        #notice-modal .notice-section {
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid var(--border-color-light);
+        }
+        .dark-theme #notice-modal .notice-section {
+            border: 1px solid var(--border-color-dark);
+            background-color: var(--bg-color-dark);
+        }
+
     </style>
 </head>
 <body>
@@ -528,8 +541,7 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <h3>Daily Ads Watched</h3>
-                        <p><span class="user-balance"><span id="daily-ads-watched">00</span></span> / <span class="primary-text">25</span></p>
-                    </div>
+                        <p><span class="user-balance"><span id="daily-ads-watched">00</span></span> / <span class="primary-text">35</span></p> </div>
                     <div class="stat-card">
                         <h3>Total Referrals</h3>
                         <p class="user-balance"><span id="referral-count">00</span></p>
@@ -542,7 +554,14 @@
                     <button id="copy-ref-link-btn" class="action-btn">
                         <i class="fas fa-copy"></i> Copy Referral Link
                     </button>
-                </div>
+                    
+                    <div class="referral-note">
+                        <p><span class="primary-text">✅ গুরুত্বপূর্ণ নির্দেশনা:</span></p>
+                        <p>১০০% পেমেন্টের গ্যারান্টি রয়েছে! পেমেন্ট করা হয় <span class="highlight">বিকাশ এবং নগদ</span>-এর মাধ্যমে।</p>
+                        <p>কাজ করার সময় কোনো ধরনের <span class="highlight">VPN ব্যবহার করবেন না।</span></p>
+                        <p>অবশ্যই সকল নিয়মাবলী মেনে চলুন এবং আমাদের টেলিগ্রাম চ্যানেলে যুক্ত থাকুন।</p>
+                    </div>
+                    </div>
             </div>
 
             <div id="tasks-page" class="page">
@@ -553,7 +572,6 @@
                     <p>Earn <span class="primary-text">৳12</span> for every ad.</p>
                     <button id="watch-ad-btn" class="action-btn">Watch Ad</button>
                 </div>
-                <!-- New YouTube Task -->
                 <div class="task-container">
                     <i class="fab fa-youtube task-icon"></i>
                     <h3>Subscribe YouTube Channel</h3>
@@ -618,7 +636,6 @@
         </nav>
     </div>
 
-    <!-- Loading Modal -->
     <div id="loading-modal" class="modal" style="display: flex;">
         <div class="modal-content">
             <div class="app-loader"></div>
@@ -626,30 +643,29 @@
         </div>
     </div>
     
-    <!-- Welcome Notice Modal (New) -->
-    <div id="welcome-modal" class="modal">
+    <div id="notice-modal" class="modal">
         <div class="modal-content">
-            <h3><i class="fas fa-fire" style="margin-right: 10px;"></i> 🔥 স্বাগতম! (Welcome!) 🔥</h3>
-            <p style="margin-bottom: 5px;">আসসালামু আলাইকুম। আমরা সততা এবং নির্ভরযোগ্যতার সাথে পেমেন্ট করে থাকি। আপনি যদি আমাদের সকল নিয়ম মেনে কাজ করেন, তবে ইনশাআল্লাহ আপনি ১০০% পেমেন্ট পাবেন।</p>
-            <p>💸 আয়ের সুযোগসমূহ:</p>
-            <ul>
-                <li>জয়েন্ট বোনাস: <span class="primary-text">৩০</span> টাকা</li>
-                <li>প্রতি রেফারে: <span class="primary-text">১৫০</span> টাকা</li>
-                <li>প্রতি বিজ্ঞাপনে: <span class="primary-text">১২</span> টাকা</li>
-            </ul>
-            <p>🎁 প্রতিদিন <span class="primary-text">৩৫</span> টি করে বিজ্ঞাপন দেখার সুযোগ রয়েছে। সবচেয়ে ভালো দিক হলো, এই সাইটে সম্পূর্ণ বিনামূল্যে কাজ করে ইনকাম করতে পারবেন— কোনো ধরনের ইনভেস্টমেন্টের প্রয়োজন নেই। ধন্যবাদ!</p>
-            <p>✅ গুরুত্বপূর্ণ নির্দেশনা: <span style="font-weight: 700;">১০০% পেমেন্টের গ্যারান্টি রয়েছে!</span> পেমেন্ট করা হয় বিকাশ এবং নগদ-এর মাধ্যমে। কাজ করার সময় কোনো ধরনের <span style="font-weight: 700;">VPN ব্যবহার করবেন না।</span> অবশ্যই সকল নিয়মাবলী মেনে চলুন এবং আমাদের টেলিগ্রাম চ্যানেলে যুক্ত থাকুন।</p>
-            <button class="close-btn" onclick="document.getElementById('welcome-modal').style.display='none'">বুঝেছি (Got It)</button>
+            <h3><i class="fas fa-bullhorn"></i> 🔥 স্বাগতম! (Welcome!) 🔥</h3>
+            <p>আসসালামু আলাইকুম। আমরা সততা এবং নির্ভরযোগ্যতার সাথে পেমেন্ট করে থাকি। আপনি যদি আমাদের সকল নিয়ম মেনে কাজ করেন, তবে ইনশাআল্লাহ আপনি <span class="highlight">১০০% পেমেন্ট পাবেন।</span></p>
+            
+            <div class="notice-section">
+                <p>💸 আয়ের সুযোগসমূহ:</p>
+                <ul>
+                    <li>জয়েন্ট বোনাস: <span class="highlight">৩০ টাকা</span></li>
+                    <li>প্রতি রেফারে: <span class="highlight">১৫০ টাকা</span></li>
+                    <li>প্রতি বিজ্ঞাপনে: <span class="highlight">১২ টাকা</span></li>
+                </ul>
+                <p>🎁 প্রতিদিন <span class="highlight">৩৫ টি করে বিজ্ঞাপন</span> দেখার সুযোগ রয়েছে। সবচেয়ে ভালো দিক হলো, এই সাইটে সম্পূর্ণ বিনামূল্যে কাজ করে ইনকাম করতে পারবেন— কোনো ধরনের ইনভেস্টমেন্টের প্রয়োজন নেই। ধন্যবাদ!</p>
+            </div>
+            
+            <button id="close-notice-btn" class="action-btn">বুঝতে পেরেছি (Got It)</button>
         </div>
     </div>
-    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Ad SDK - Note: This library is included by the user. -->
     <script src='//libtl.com/sdk.js' data-zone='10012357' data-sdk='show_10012357'></script>
     
     <script>
         // --- FIREBASE CONFIGURATION (MUST BE REPLACED) ---
-        // NOTE: Keeping the user's provided Firebase config and API key structure.
         const firebaseConfig = {
             apiKey: "AIzaSyAgLRhh96lsBipd01gPmCQ8gF-3Q5DnFq0",
             authDomain: "earn-38176.firebaseapp.com",
@@ -681,10 +697,9 @@
             const YOUTUBE_LINK = "https://youtube.com/@eleven-11-x?si=7KY0kSXDhZsOVEwm";
             
             // Bonuses and Limits
-            const DAILY_AD_LIMIT = 25;
+            const DAILY_AD_LIMIT = 35; // UPDATED from 25 to 35
             const POINTS_PER_AD = 12; 
             const PER_REFER_BONUS = 150; 
-            const JOIN_BONUS = 30; // Updated to 30 TK as per the notice text
             const CHANNEL_JOIN_BONUS = 15;
             const GROUP_JOIN_BONUS = 10;
             const YOUTUBE_JOIN_BONUS = 18; 
@@ -703,14 +718,18 @@
             const joinGroupBtn = document.getElementById('join-group-btn');
             const subscribeYouTubeBtn = document.getElementById('subscribe-youtube-btn'); 
             const withdrawForm = document.getElementById('withdraw-form');
+            const withdrawSubmitBtn = document.getElementById('withdraw-submit-btn');
             const withdrawMethodSelect = document.getElementById('withdraw-method');
             const accountNumberInput = document.getElementById('account-number');
-            const withdrawSubmitBtn = document.getElementById('withdraw-submit-btn');
             const referralLinkElem = document.getElementById('referral-link');
             const copyRefLinkBtn = document.getElementById('copy-ref-link-btn');
             const loadingModal = document.getElementById('loading-modal');
-            const welcomeModal = document.getElementById('welcome-modal'); // New
             const leaderboardListElem = document.getElementById('leaderboard-list');
+            
+            // NEW MODAL ELEMENTS
+            const noticeModal = document.getElementById('notice-modal');
+            const closeNoticeBtn = document.getElementById('close-notice-btn');
+
 
             // --- State Management: Now mirrored with Firebase ---
             let userState = {
@@ -722,10 +741,10 @@
                 hasJoinedGroup: false,
                 hasSubscribedYouTube: false, 
                 referrerId: null, 
-                isNewUser: true, // New flag for initial bonus logic
-                homeVisitCount: 0, // New field for popup frequency tracking
                 userId: null,
-                name: ''
+                name: '',
+                // NEW: Counter for home page visits to control notice frequency
+                homeVisitCount: 0 
             };
             
             let leaderboardUsers = [];
@@ -742,29 +761,28 @@
                         userState = {
                             ...dbData,
                             userId: userId,
-                            isNewUser: false, // Existing user
                             // Reset daily ad count if date has changed
                             dailyAdWatchCount: dbData.lastAdWatchDate === today ? dbData.dailyAdWatchCount : 0,
                             lastAdWatchDate: today
                         };
-                        // Ensure required new fields exist for old data and update defaults
+                        // Ensure required new fields exist for old data
                         userState.referralCount = userState.referralCount || 0;
                         userState.hasJoinedChannel = userState.hasJoinedChannel || false;
                         userState.hasJoinedGroup = userState.hasJoinedGroup || false;
                         userState.hasSubscribedYouTube = userState.hasSubscribedYouTube || false; 
                         userState.referrerId = userState.referrerId || null; 
-                        userState.homeVisitCount = userState.homeVisitCount || 0; // Initialize visit count
                         userState.name = userState.name || tg.initDataUnsafe.user.first_name || 'User';
+                        userState.homeVisitCount = userState.homeVisitCount || 0; // NEW FIELD INIT
 
                         console.log("State loaded from Firebase:", userState);
                     } else {
-                        // Initialize new user data with JOIN_BONUS
+                        // Initialize new user data in Firebase
                         userState.userId = userId;
                         userState.name = tg.initDataUnsafe.user.first_name || 'New User';
-                        userState.points = JOIN_BONUS; // Grant initial join bonus
-                        userState.isNewUser = true;
+                        userState.points = 30; // UPDATED: 30 Taka Join Bonus
+                        userState.homeVisitCount = 0; // NEW FIELD INIT
                         await saveStateToFirebase();
-                        console.log("New user initialized in Firebase with Join Bonus.");
+                        console.log("New user initialized in Firebase.");
                     }
                 } catch (error) {
                     console.error("Error loading user state from Firebase:", error);
@@ -784,8 +802,8 @@
                         hasJoinedGroup: userState.hasJoinedGroup,
                         hasSubscribedYouTube: userState.hasSubscribedYouTube, 
                         referrerId: userState.referrerId, 
-                        homeVisitCount: userState.homeVisitCount, // Save new field
-                        name: userState.name
+                        name: userState.name,
+                        homeVisitCount: userState.homeVisitCount // SAVE NEW FIELD
                     });
                 } catch (error) {
                     console.error("Error saving user state to Firebase:", error);
@@ -814,7 +832,7 @@
                 }
             };
             
-            // --- Referral Check Logic (New) ---
+            // --- Referral Check Logic ---
             const checkForReferralBonus = async () => {
                 if (userState.referrerId) {
                     console.log("Referrer already recorded.");
@@ -838,27 +856,9 @@
                     
                     await updateReferrer(referrerId);
                     
-                    // We only show the referral alert on first time load if referred
-                    // tg.showAlert(`You were referred! Your referrer earned ${PER_REFER_BONUS} TK.`);
+                    tg.showAlert(`You were referred! Your referrer earned ${PER_REFER_BONUS} TK.`);
                 }
             };
-
-            // --- Welcome Modal Logic (New) ---
-            const showWelcomeNoticeIfRequired = async () => {
-                // 1. Increment visit count and save state
-                userState.homeVisitCount++;
-                await saveStateToFirebase();
-
-                // 2. Check the condition (4 out of 10 times, e.g., N % 10 in {1, 3, 6, 9})
-                const cycleValue = userState.homeVisitCount % 10;
-                const showOnVisits = [1, 3, 6, 9]; // Visits 1, 3, 6, 9 show the popup.
-
-                if (showOnVisits.includes(cycleValue)) {
-                    welcomeModal.style.display = 'flex';
-                } else {
-                    welcomeModal.style.display = 'none';
-                }
-            }
 
 
             // --- Leaderboard Functions: Simplified to use local state for demo ---
@@ -945,7 +945,7 @@
                 // 1. Load data from Firebase
                 await loadStateFromFirebase(user.id);
                 
-                // 2. Handle referral check *after* loading the state
+                // 2. Handle referral check *after* loading the state to ensure we know if they are a first-time visitor
                 await checkForReferralBonus(); 
                 
                 // 3. Hide loading screen
@@ -957,8 +957,8 @@
                 setupNavigation();
                 setupEventListeners();
                 
-                // 5. Show welcome notice on initial load (which is the home page)
-                showWelcomeNoticeIfRequired();
+                // Initial Home Page Notice Display
+                showHomeNotice();
 
                 updateAccountNumberPlaceholder();
             };
@@ -966,7 +966,7 @@
             const updateUI = () => {
                 const user = tg.initDataUnsafe.user;
                 if (user) {
-                    userPhotoElem.src = user.photo_url || 'https://placehold.co/55x55/ff9900/ffffff?text=U'; 
+                    userPhotoElem.src = user.photo_url || 'https://i.imgur.com/placeholder.png'; 
                     userNameElem.innerHTML = `${user.first_name || ''} ${user.last_name || ''} <i class="fas fa-check-circle verified-icon"></i>`;
                 }
                 
@@ -1023,6 +1023,7 @@
                 withdrawForm.addEventListener('submit', handleWithdraw);
                 copyRefLinkBtn.addEventListener('click', copyReferralLink);
                 withdrawMethodSelect.addEventListener('change', updateAccountNumberPlaceholder);
+                closeNoticeBtn.addEventListener('click', () => noticeModal.style.display = 'none'); // NEW
             };
             
             const updateAccountNumberPlaceholder = () => {
@@ -1035,6 +1036,17 @@
                     accountNumberInput.type = 'text'; 
                 }
             };
+
+            // --- NEW: Home Notice Logic ---
+            const showHomeNotice = async () => {
+                userState.homeVisitCount = (userState.homeVisitCount + 1) % 10;
+                await saveStateToFirebase();
+
+                // Show the modal 4 out of every 10 times (count 1, 3, 6, 9)
+                if ([1, 3, 6, 9].includes(userState.homeVisitCount)) {
+                    noticeModal.style.display = 'flex';
+                }
+            }
 
 
             const handleWatchAd = async () => {
@@ -1194,7 +1206,6 @@
                 navButtons.forEach(button => {
                     button.addEventListener('click', () => {
                         const pageId = button.dataset.page;
-                        
                         pages.forEach(page => page.classList.remove('active'));
                         document.getElementById(pageId).classList.add('active');
                         navButtons.forEach(btn => btn.classList.remove('active'));
@@ -1203,11 +1214,7 @@
                         if (pageId === 'leaderboard-page') {
                              renderLeaderboard();
                         } else if (pageId === 'home-page') {
-                             // Check and show welcome notice when navigating back to home
-                             showWelcomeNoticeIfRequired();
-                        } else {
-                            // Hide the welcome modal when navigating away
-                            welcomeModal.style.display = 'none';
+                             showHomeNotice(); // NEW: Show notice on home page switch
                         }
                     });
                 });
@@ -1218,4 +1225,3 @@
     </script>
 </body>
 </html>
-
