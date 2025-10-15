@@ -11,6 +11,7 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
+    <!-- Using Firebase SDKs provided in the original code -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -88,7 +89,7 @@
         
         .user-details h1 { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center;}
         
-        /* Unique Verified Badge Design - Blue */
+        /* Unique Verified Badge Design - Shadow REMOVED as requested */
         .verified-icon { 
             font-size: 1.0rem; 
             margin-left: 6px; 
@@ -96,7 +97,7 @@
             background-color: var(--verified-badge-color); 
             border-radius: 50%;
             padding: 3px; 
-            box-shadow: 0 0 0 1px #ffffff, 0 1px 4px rgba(0, 122, 255, 0.6); 
+            box-shadow: 0 0 0 1px #ffffff; /* Shadow removed */
             position: relative;
             top: -1px;
         }
@@ -273,6 +274,20 @@
 
         /* Form Styles */
         #withdraw-page p { margin-bottom: 20px; font-weight: 600;}
+        #withdraw-page .withdraw-note {
+            background-color: #fff2e6;
+            color: #cc7a00;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            border: 1px solid var(--primary-color-light);
+        }
+        .dark-theme #withdraw-page .withdraw-note {
+            background-color: #331f00;
+            color: var(--primary-color-dark);
+            border-color: var(--primary-color-dark);
+        }
         #withdraw-form .form-group { margin-bottom: 18px; }
         #withdraw-form label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.95rem;}
         #withdraw-form input, #withdraw-form select { 
@@ -449,8 +464,8 @@
                     </div>
                 </div>
                 <div class="referral-section">
-                    <h3>Invite & Earn!</h3>
-                    <p>Share your link to get bonus points.</p>
+                    <h3>Invite & Earn <span class="primary-text">৳150</span> per Refer!</h3>
+                    <p>Share your link to get bonus points. Referral bonus is only granted upon the referred user's first app launch.</p>
                     <input type="text" id="referral-link" readonly>
                     <button id="copy-ref-link-btn" class="action-btn">
                         <i class="fas fa-copy"></i> Copy Referral Link
@@ -463,8 +478,15 @@
                 <div class="task-container">
                     <i class="fas fa-play-circle task-icon"></i>
                     <h3>Watch a Rewarded Ad</h3>
-                    <p>Earn <span class="primary-text">3 TK</span> for every ad.</p>
+                    <p>Earn <span class="primary-text">৳12</span> for every ad.</p>
                     <button id="watch-ad-btn" class="action-btn">Watch Ad</button>
+                </div>
+                <!-- New YouTube Task -->
+                <div class="task-container">
+                    <i class="fab fa-youtube task-icon"></i>
+                    <h3>Subscribe YouTube Channel</h3>
+                    <p>Get <span class="primary-text">৳18</span> bonus.</p>
+                    <button id="subscribe-youtube-btn" class="action-btn">Subscribe & Claim</button>
                 </div>
                 <div class="task-container">
                     <i class="fab fa-telegram-plane task-icon"></i>
@@ -482,14 +504,16 @@
             
             <div id="withdraw-page" class="page">
                 <h2>Withdraw</h2>
-                <p>Minimum <span class="primary-text">500 TK</span> required to withdraw.</p>
+                <div class="withdraw-note">
+                    Minimum <span class="primary-text">500 TK</span> required and <span class="primary-text">20 referrals</span> must be completed to withdraw.
+                </div>
                 <form id="withdraw-form">
                     <div class="form-group">
                         <label for="withdraw-method">Method:</label>
                         <select id="withdraw-method" required>
                             <option value="Bkash">Bkash</option>
                             <option value="Nagad">Nagad</option>
-                            <option value="Binance">Binance</option>
+                            <option value="Payeer">Payeer</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -534,16 +558,17 @@
     
     <script>
         // --- FIREBASE CONFIGURATION (MUST BE REPLACED) ---
+        // NOTE: Keeping the user's provided Firebase config and API key structure.
         const firebaseConfig = {
-  apiKey: "AIzaSyAgLRhh96lsBipd01gPmCQ8gF-3Q5DnFq0",
-  authDomain: "earn-38176.firebaseapp.com",
-  databaseURL: "https://earn-38176-default-rtdb.firebaseio.com",
-  projectId: "earn-38176",
-  storageBucket: "earn-38176.appspot.com",
-  messagingSenderId: "350056832143",
-  appId: "1:350056832143:web:9ffeba3301bd73dfc364fa",
-  measurementId: "G-2LGXC91KT5"
-};
+            apiKey: "AIzaSyAgLRhh96lsBipd01gPmCQ8gF-3Q5DnFq0",
+            authDomain: "earn-38176.firebaseapp.com",
+            databaseURL: "https://earn-38176-default-rtdb.firebaseio.com",
+            projectId: "earn-38176",
+            storageBucket: "earn-38176.appspot.com",
+            messagingSenderId: "350056832143",
+            appId: "1:350056832143:web:9ffeba3301bd73dfc364fa",
+            measurementId: "G-2LGXC91KT5"
+        };
         
         // Initialize Firebase
         if (!firebase.apps.length) {
@@ -556,17 +581,23 @@
         document.addEventListener('DOMContentLoaded', () => {
             const tg = window.Telegram.WebApp;
 
-            // --- Configuration ---
+            // --- Configuration (UPDATED) ---
             const BOT_TOKEN = "8253581338:AAGjghsJluvnnklV0TfQZVuvcK8w9Nxh2R0";
             const BOT_USERNAME = "mango_cash_bot";
             const ADMIN_CHAT_ID = "6703675335";
             const CHANNEL_LINK = "https://t.me/OnlineEarnEleven";
             const GROUP_LINK = "https://t.me/goodgmail";
+            const YOUTUBE_LINK = "https://youtube.com/@eleven-11-x?si=7KY0kSXDhZsOVEwm";
+            
+            // Bonuses and Limits
             const DAILY_AD_LIMIT = 25;
-            const POINTS_PER_AD = 3;
-            const CHANNEL_JOIN_BONUS = 15; // Corrected to 15 based on UI
+            const POINTS_PER_AD = 12; // UPDATED from 3 to 12
+            const PER_REFER_BONUS = 150; // New constant for referral bonus
+            const CHANNEL_JOIN_BONUS = 15;
             const GROUP_JOIN_BONUS = 10;
+            const YOUTUBE_JOIN_BONUS = 18; // Bonus for new YouTube task
             const MIN_WITHDRAW_POINTS = 500;
+            const MIN_REFERRALS_FOR_WITHDRAW = 20; // NEW: Must have 20 referrals to withdraw
             const LEADERBOARD_UPDATE_INTERVAL = 86400000; // 24 hours in milliseconds
 
             // --- DOM Elements ---
@@ -578,8 +609,11 @@
             const watchAdBtn = document.getElementById('watch-ad-btn');
             const joinChannelBtn = document.getElementById('join-channel-btn');
             const joinGroupBtn = document.getElementById('join-group-btn');
+            const subscribeYouTubeBtn = document.getElementById('subscribe-youtube-btn'); // New
             const withdrawForm = document.getElementById('withdraw-form');
             const withdrawSubmitBtn = document.getElementById('withdraw-submit-btn');
+            const withdrawMethodSelect = document.getElementById('withdraw-method');
+            const accountNumberInput = document.getElementById('account-number');
             const referralLinkElem = document.getElementById('referral-link');
             const copyRefLinkBtn = document.getElementById('copy-ref-link-btn');
             const loadingModal = document.getElementById('loading-modal');
@@ -593,6 +627,8 @@
                 lastAdWatchDate: null,
                 hasJoinedChannel: false,
                 hasJoinedGroup: false,
+                hasSubscribedYouTube: false, // New field
+                referrerId: null, // New field to track who referred this user
                 userId: null,
                 name: ''
             };
@@ -600,8 +636,6 @@
             let leaderboardUsers = [];
 
             // --- Database Functions ---
-
-            // Load data from Firebase
             const loadStateFromFirebase = async (userId) => {
                 try {
                     const snapshot = await database.ref(`${USERS_REF}/${userId}`).once('value');
@@ -617,10 +651,12 @@
                             dailyAdWatchCount: dbData.lastAdWatchDate === today ? dbData.dailyAdWatchCount : 0,
                             lastAdWatchDate: today
                         };
-                        // Ensure required fields exist for old data
+                        // Ensure required new fields exist for old data
                         userState.referralCount = userState.referralCount || 0;
                         userState.hasJoinedChannel = userState.hasJoinedChannel || false;
                         userState.hasJoinedGroup = userState.hasJoinedGroup || false;
+                        userState.hasSubscribedYouTube = userState.hasSubscribedYouTube || false; // New field check
+                        userState.referrerId = userState.referrerId || null; // New field check
                         userState.name = userState.name || tg.initDataUnsafe.user.first_name || 'User';
 
                         console.log("State loaded from Firebase:", userState);
@@ -637,11 +673,9 @@
                 }
             };
 
-            // Save data to Firebase
             const saveStateToFirebase = async () => {
                 if (!userState.userId) return;
                 try {
-                    // Update the Firebase path for the current user
                     await database.ref(`${USERS_REF}/${userState.userId}`).update({
                         points: userState.points,
                         dailyAdWatchCount: userState.dailyAdWatchCount,
@@ -649,12 +683,70 @@
                         lastAdWatchDate: userState.lastAdWatchDate,
                         hasJoinedChannel: userState.hasJoinedChannel,
                         hasJoinedGroup: userState.hasJoinedGroup,
+                        hasSubscribedYouTube: userState.hasSubscribedYouTube, // Save new field
+                        referrerId: userState.referrerId, // Save new field
                         name: userState.name
                     });
                 } catch (error) {
                     console.error("Error saving user state to Firebase:", error);
                 }
             };
+            
+            // Function to update a referrer's referral count and points
+            const updateReferrer = async (referrerId) => {
+                try {
+                    const refRef = database.ref(`${USERS_REF}/${referrerId}`);
+                    const snapshot = await refRef.once('value');
+                    const referrerData = snapshot.val();
+
+                    if (referrerData) {
+                        const newReferralCount = (referrerData.referralCount || 0) + 1;
+                        const newPoints = (referrerData.points || 0) + PER_REFER_BONUS;
+
+                        await refRef.update({
+                            referralCount: newReferralCount,
+                            points: newPoints
+                        });
+                        console.log(`Referrer ${referrerId} updated: +1 referral, +${PER_REFER_BONUS} points.`);
+                    }
+                } catch (error) {
+                    console.error("Error updating referrer:", error);
+                }
+            };
+            
+            // --- Referral Check Logic (New) ---
+            const checkForReferralBonus = async () => {
+                if (userState.referrerId) {
+                    console.log("Referrer already recorded.");
+                    return; // Already processed
+                }
+
+                // Check for 'startapp' parameter in initData
+                const urlParams = tg.initData;
+                const match = urlParams ? urlParams.match(/startapp=(ref_[0-9]+)/) : null;
+                
+                if (match && match[1]) {
+                    const referrerId = match[1].substring(4); // Extract ID from 'ref_ID'
+                    
+                    // Prevent self-referral and ensure referrer is different
+                    if (String(referrerId) === String(userState.userId)) {
+                        console.log("Self-referral detected.");
+                        return;
+                    }
+
+                    // 1. Record the referrer in the current user's state
+                    userState.referrerId = referrerId;
+                    await saveStateToFirebase(); 
+                    console.log(`User recorded referrer: ${referrerId}`);
+                    
+                    // 2. Grant bonus and update referral count to the referrer
+                    await updateReferrer(referrerId);
+                    
+                    // Alert the user that they were referred (optional/informational)
+                    tg.showAlert(`You were referred! Your referrer earned ${PER_REFER_BONUS} TK.`);
+                }
+            };
+
 
             // --- Leaderboard Functions: Simplified to use local state for demo ---
             // In a live app, this would query and sort the top users from the Firebase USERS_REF.
@@ -745,20 +837,25 @@
                 // 1. Load data from Firebase
                 await loadStateFromFirebase(user.id);
                 
-                // 2. Hide loading screen
+                // 2. Handle referral check *after* loading the state to ensure we know if they are a first-time visitor
+                await checkForReferralBonus(); 
+                
+                // 3. Hide loading screen
                 loadingModal.style.display = 'none'; 
 
-                // 3. Initial UI update
+                // 4. Initial UI update
                 updateLeaderboardRanks(); 
                 updateUI();
                 setupNavigation();
                 setupEventListeners();
+                
+                // Initialize Account Number formatting listener
+                updateAccountNumberPlaceholder();
             };
             
             const updateUI = () => {
                 const user = tg.initDataUnsafe.user;
                 if (user) {
-                    // Placeholder image if no photo URL provided
                     userPhotoElem.src = user.photo_url || 'https://i.imgur.com/placeholder.png'; 
                     userNameElem.innerHTML = `${user.first_name || ''} ${user.last_name || ''} <i class="fas fa-check-circle verified-icon"></i>`;
                 }
@@ -767,10 +864,9 @@
                 dailyAdsWatchedElem.textContent = userState.dailyAdWatchCount;
                 referralCountElem.textContent = userState.referralCount; 
 
-                // REFERRAL LINK LOGIC (UPDATED FORMAT with startapp parameter)
+                // REFERRAL LINK LOGIC
                 const referralId = userState.userId;
                 const encodedRefId = encodeURIComponent(`ref_${referralId}`); 
-                // The new link structure for Mini Apps that also passes a parameter
                 referralLinkElem.value = `https://t.me/${BOT_USERNAME}/app?startapp=${encodedRefId}`;
 
                 // Update task button states
@@ -789,6 +885,18 @@
                      joinGroupBtn.disabled = false;
                 }
                 
+                // New YouTube Task Button State Logic
+                if (userState.hasSubscribedYouTube) {
+                    subscribeYouTubeBtn.innerHTML = '<i class="fas fa-check"></i> Bonus Claimed';
+                    subscribeYouTubeBtn.disabled = true;
+                } else if (subscribeYouTubeBtn.dataset.linkOpened === 'true') {
+                    subscribeYouTubeBtn.innerHTML = 'Check Subscription & Claim';
+                    subscribeYouTubeBtn.disabled = false;
+                } else {
+                    subscribeYouTubeBtn.innerHTML = 'Subscribe & Claim';
+                    subscribeYouTubeBtn.disabled = false;
+                }
+                
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
                     watchAdBtn.textContent = 'Daily Limit Reached';
                     watchAdBtn.disabled = true;
@@ -802,9 +910,24 @@
                 watchAdBtn.addEventListener('click', handleWatchAd);
                 joinChannelBtn.addEventListener('click', handleJoinChannel);
                 joinGroupBtn.addEventListener('click', handleJoinGroup);
+                subscribeYouTubeBtn.addEventListener('click', handleSubscribeYouTube); // New Listener
                 withdrawForm.addEventListener('submit', handleWithdraw);
                 copyRefLinkBtn.addEventListener('click', copyReferralLink);
+                withdrawMethodSelect.addEventListener('change', updateAccountNumberPlaceholder);
             };
+            
+            // --- Account Number Placeholder Update (New) ---
+            const updateAccountNumberPlaceholder = () => {
+                const method = withdrawMethodSelect.value;
+                if (method === 'Payeer') {
+                    accountNumberInput.placeholder = 'P1000000';
+                    accountNumberInput.type = 'text';
+                } else {
+                    accountNumberInput.placeholder = '01xxxxxxxxx';
+                    accountNumberInput.type = 'text'; // Keep type text for flexible number/Bkash/Nagad
+                }
+            };
+
 
             const handleWatchAd = async () => {
                 if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) {
@@ -812,17 +935,15 @@
                 }
                 loadingModal.style.display = 'flex';
                 
-                // Use a standard function to handle the ad display
                 const adPromise = window.show_10012357 ? window.show_10012357() : Promise.resolve();
                 
                 adPromise.then(async () => {
-                    // Check limit again (in case user spammed)
                     if (userState.dailyAdWatchCount >= DAILY_AD_LIMIT) return; 
 
-                    userState.points += POINTS_PER_AD;
+                    userState.points += POINTS_PER_AD; // Updated Bonus
                     userState.dailyAdWatchCount++;
                     
-                    await saveStateToFirebase(); // Save to Firebase
+                    await saveStateToFirebase(); 
                     
                     updateLeaderboardRanks();
                     updateUI();
@@ -836,14 +957,41 @@
                 });
             };
             
+            // --- YouTube Task Handler (New) ---
+            const handleSubscribeYouTube = async () => {
+                if(userState.hasSubscribedYouTube) {
+                    tg.showAlert('You have already claimed this bonus.'); return;
+                }
+
+                if (subscribeYouTubeBtn.dataset.linkOpened !== 'true') {
+                    // Step 1: Open Link and mark as opened
+                    tg.openTelegramLink(YOUTUBE_LINK);
+                    subscribeYouTubeBtn.dataset.linkOpened = 'true';
+                    updateUI(); // Updates button text to 'Check Subscription & Claim'
+                } else {
+                    // Step 2: User returns and clicks 'Check', grant bonus
+                    
+                    // NOTE: Verification is still simulated as a backend is required for real verification.
+                    
+                    userState.points += YOUTUBE_JOIN_BONUS;
+                    userState.hasSubscribedYouTube = true;
+                    
+                    await saveStateToFirebase();
+                    
+                    tg.showAlert(`Thank you for subscribing! You received ${YOUTUBE_JOIN_BONUS} bonus taka.`);
+                    updateLeaderboardRanks();
+                    updateUI();
+                }
+            };
+
+
             const handleJoinChannel = async () => {
                 if(userState.hasJoinedChannel) {
                     tg.showAlert('You have already claimed this bonus.'); return;
                 }
                 tg.openTelegramLink(CHANNEL_LINK);
                 
-                // Give user time to join, then grant bonus and save to Firebase
-                // NOTE: Proper verification of channel membership requires a bot backend.
+                // Grant bonus after a short delay (simulating successful join check)
                 setTimeout(async () => {
                     userState.points += CHANNEL_JOIN_BONUS;
                     userState.hasJoinedChannel = true;
@@ -853,7 +1001,7 @@
                     tg.showAlert(`Thank you! You received ${CHANNEL_JOIN_BONUS} bonus taka.`);
                     updateLeaderboardRanks();
                     updateUI();
-                }, 3000); // 3 seconds grace period for joining
+                }, 3000); 
             };
 
             const handleJoinGroup = async () => {
@@ -862,8 +1010,7 @@
                 }
                 tg.openTelegramLink(GROUP_LINK);
                 
-                // Grant bonus and save to Firebase
-                // NOTE: Proper verification of group membership requires a bot backend.
+                // Grant bonus after a short delay (simulating successful join check)
                 setTimeout(async () => {
                     userState.points += GROUP_JOIN_BONUS;
                     userState.hasJoinedGroup = true;
@@ -873,18 +1020,31 @@
                     tg.showAlert(`Thank you! You received ${GROUP_JOIN_BONUS} bonus taka.`);
                     updateLeaderboardRanks();
                     updateUI();
-                }, 3000); // 3 seconds grace period for joining
+                }, 3000); 
             };
 
             const handleWithdraw = async (e) => {
                 e.preventDefault();
-                const method = document.getElementById('withdraw-method').value;
-                const accountNumber = document.getElementById('account-number').value;
+                const method = withdrawMethodSelect.value;
+                const accountNumber = accountNumberInput.value;
                 const amount = parseInt(document.getElementById('amount').value, 10);
 
                 if (isNaN(amount) || amount <= 0) { tg.showAlert("Please enter a valid amount."); return; }
                 if (amount < MIN_WITHDRAW_POINTS) { tg.showAlert(`Minimum withdrawal is ${MIN_WITHDRAW_POINTS} points.`); return; }
                 if (amount > userState.points) { tg.showAlert("You don't have enough balance."); return; }
+                
+                // NEW: Referral Check
+                if (userState.referralCount < MIN_REFERRALS_FOR_WITHDRAW) {
+                     tg.showAlert(`You need at least ${MIN_REFERRALS_FOR_WITHDRAW} referrals to withdraw. You currently have ${userState.referralCount}.`); 
+                     return; 
+                }
+                
+                // NEW: Payeer format validation
+                if (method === 'Payeer' && !/^P\d{6,15}$/.test(accountNumber)) {
+                    tg.showAlert("Please enter a valid Payeer ID (e.g., P1234567).");
+                    return;
+                }
+                
 
                 withdrawSubmitBtn.classList.add('loading');
                 withdrawSubmitBtn.disabled = true;
@@ -953,3 +1113,4 @@
     </script>
 </body>
 </html>
+
