@@ -4,108 +4,70 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Niva Coin App</title>
-
-  <!-- Telegram Web App Script -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- Tailwind CSS & Fonts -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-
   <style type="text/tailwindcss">
-    body { font-family: 'Inter', sans-serif; }
-    .page { display: none; }
-    .page.active { display: block; }
-    .loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #00D27F; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .loading-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:9999; }
-    .hidden { display: none !important; }
-    .payment-method-label {
-        border: 2px solid #4A4A4A;
-        transition: all 0.2s ease-in-out;
-    }
-    .payment-method-radio:checked + .payment-method-label {
-        border-color: #00D27F;
-        background-color: #00D27F20;
-    }
+    body { font-family: 'Inter', sans-serif; } .page { display: none; } .page.active { display: block; } .loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #00D27F; width: 40px; height: 40px; animation: spin 1s linear infinite; } @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .loading-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:9999; } .hidden { display: none !important; } .payment-method-label { border: 2px solid #4A4A4A; transition: all 0.2s ease-in-out; } .payment-method-radio:checked + .payment-method-label { border-color: #00D27F; background-color: #00D27F20; }
   </style>
-
-  <script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#00D27F", "background": "#000000", "card-background": "#1A1A1A", "text-primary": "#FFFFFF", "text-secondary": "#A0A0A0", }, fontFamily: { "display": ["Inter", "sans-serif"] }, borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"}, } } }</script>
+  <script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "primary": "#00D27F", "background": "#000000", "card-background": "#1A1A1A", "text-primary": "#FFFFFF", "text-secondary": "#A0A0A0", }, fontFamily: { "display": ["Inter", "sans-serif"] } } } }</script>
 </head>
-
 <body class="bg-background font-display text-text-primary antialiased">
 
-  <div id="loading-overlay" class="loading-overlay">
-    <div class="loader" role="status" aria-label="Loading"></div>
-  </div>
+  <div id="loading-overlay" class="loading-overlay"><div class="loader"></div></div>
+  <div id="error-container" class="hidden flex items-center justify-center min-h-screen p-4 text-center"><p>This app can only be used inside Telegram.</p></div>
   
-  <div id="error-container" class="hidden flex items-center justify-center min-h-screen p-4 text-center">
-    <p class="text-text-secondary">This app can only be used inside Telegram.</p>
-  </div>
-  
-  <div id="app-container" class="relative min-h-screen w-full flex-col group/design-root overflow-x-hidden hidden">
+  <div id="app-container" class="relative min-h-screen w-full flex-col hidden">
     <!-- Dashboard -->
     <main id="page-dashboard" class="page flex-1 pb-28">
-      <div class="flex items-center p-4">
-        <h2 class="text-xl font-bold leading-tight tracking-[-0.015em] flex-1 text-text-secondary">Dashboard</h2>
-        <div class="flex size-10 shrink-0 items-center justify-end"><img class="user-profile-pic object-cover rounded-full size-10 border-2 border-primary" src="logo19.jpg" alt="User Avatar"></div>
-      </div>
-      <h1 id="welcome-message" class="text-3xl font-bold leading-tight px-4 text-left pb-4 pt-4">Welcome!</h1>
+      <div class="flex items-center p-4"><h2 class="text-xl font-bold flex-1 text-text-secondary">Dashboard</h2><div class="flex size-10 shrink-0 items-center justify-end"><img class="user-profile-pic object-cover rounded-full size-10 border-2 border-primary" src="logo19.jpg" alt="User Avatar"></div></div>
+      <h1 id="welcome-message" class="text-3xl font-bold px-4 pb-4 pt-4">Welcome!</h1>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 px-4 py-2">
-        <button id="goto-sell-niva-btn" class="flex w-full items-center justify-center rounded-lg h-14 bg-primary text-background font-bold gap-2"><span class="material-symbols-outlined">toll</span><span class="truncate">Sell Niva Coins</span></button>
-        <button id="goto-sell-gmail-btn" class="flex w-full items-center justify-center rounded-lg h-14 bg-primary text-background font-bold gap-2"><span class="material-symbols-outlined">mail</span><span class="truncate">Sell Gmail IDs</span></button>
+        <button id="goto-sell-niva-btn" class="flex w-full items-center justify-center rounded-lg h-14 bg-primary text-background font-bold gap-2"><span class="material-symbols-outlined">toll</span><span>Sell Niva Coins</span></button>
+        <button id="goto-sell-gmail-btn" class="flex w-full items-center justify-center rounded-lg h-14 bg-primary text-background font-bold gap-2"><span class="material-symbols-outlined">mail</span><span>Sell Gmail IDs</span></button>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-        <div class="flex flex-col rounded-lg bg-card-background shadow-md p-4"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-8 h-8 bg-primary/20 rounded-full"><span class="material-symbols-outlined text-primary text-lg">toll</span></div><p class="text-base font-semibold">Niva Coin Sales</p></div><div class="flex items-end justify-between"><div class="flex flex-col gap-0.5"><p id="dashboard-niva-requests" class="text-text-secondary text-sm">...</p><p id="dashboard-niva-total" class="text-text-secondary text-sm">...</p></div><button class="nav-btn flex min-w-[70px] items-center justify-center rounded-md h-8 px-3 bg-card-background text-primary border border-primary text-xs font-medium" data-page="page-history">View</button></div></div>
-        <div class="flex flex-col rounded-lg bg-card-background shadow-md p-4"><div class="flex items-center gap-3 mb-2"><div class="flex items-center justify-center w-8 h-8 bg-primary/20 rounded-full"><span class="material-symbols-outlined text-primary text-lg">mail</span></div><p class="text-base font-semibold">Gmail ID Sales</p></div><div class="flex items-end justify-between"><div class="flex flex-col gap-0.5"><p id="dashboard-gmail-pending" class="text-text-secondary text-sm">...</p></div><button class="nav-btn flex min-w-[70px] items-center justify-center rounded-md h-8 px-3 bg-card-background text-primary border border-primary text-xs font-medium" data-page="page-history">View</button></div></div>
-        <div class="col-span-1 md:col-span-2"><div class="flex flex-col rounded-lg bg-card-background shadow-md p-4"><div class="flex items-center justify-between mb-2"><p class="text-base font-semibold">Market Rates</p><p class="text-xs font-bold text-red-500">Live</p></div><div class="flex flex-col gap-1"><p class="text-sm font-medium">Niva Coin: <span id="dashboard-niva-rate" class="text-primary font-bold">...</span></p><p class="text-sm font-medium">Gmail ID: <span id="dashboard-gmail-rate" class="text-primary font-bold">...</span></p></div></div></div>
+        <div><div class="flex flex-col rounded-lg bg-card-background p-4"><div class="flex items-center gap-3 mb-2"><div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary text-lg">toll</span></div><p>Niva Coin Sales</p></div><div class="flex items-end justify-between"><div class="flex flex-col"><p id="dashboard-niva-requests" class="text-sm text-text-secondary">...</p><p id="dashboard-niva-total" class="text-sm text-text-secondary">...</p></div><button class="nav-btn-internal flex items-center justify-center rounded-md h-8 px-3 bg-card-background text-primary border border-primary text-xs font-medium" data-page="page-history">View</button></div></div></div>
+        <div><div class="flex flex-col rounded-lg bg-card-background p-4"><div class="flex items-center gap-3 mb-2"><div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary text-lg">mail</span></div><p>Gmail ID Sales</p></div><div class="flex items-end justify-between"><p id="dashboard-gmail-pending" class="text-sm text-text-secondary">...</p><button class="nav-btn-internal flex items-center justify-center rounded-md h-8 px-3 bg-card-background text-primary border border-primary text-xs font-medium" data-page="page-history">View</button></div></div></div>
+        <div class="col-span-1 md:col-span-2"><div class="flex flex-col rounded-lg bg-card-background p-4"><div class="flex justify-between mb-2"><p>Market Rates</p><p class="text-xs font-bold text-red-500">Live</p></div><div class="flex flex-col gap-1"><p class="text-sm">Niva Coin: <span id="dashboard-niva-rate" class="text-primary font-bold">...</span></p><p class="text-sm">Gmail ID: <span id="dashboard-gmail-rate" class="text-primary font-bold">...</span></p></div></div></div>
       </div>
     </main>
 
     <!-- Sell Niva Page -->
-    <main id="page-sell-niva" class="page flex-grow px-4 py-2 pb-28">
-      <header class="flex items-center py-2 justify-between"><button class="nav-btn text-white flex size-10 shrink-0 items-center justify-center" data-page="page-dashboard"><span class="material-symbols-outlined text-2xl">arrow_back</span></button><h1 class="text-white text-lg font-bold text-center flex-1">Sell Your Niva Coin</h1><div class="size-10"></div></header>
-      <div class="rounded-xl bg-card-background shadow-sm mb-6 mt-4 p-4"><p class="text-white text-lg font-bold">Current Rate: <span id="sell-niva-rate" class="text-primary">...</span></p></div>
+    <main id="page-sell-niva" class="page flex-grow p-4 pb-28">
+      <header class="flex items-center py-2 justify-between"><button class="nav-btn-internal text-white flex size-10 items-center justify-center -ml-2" data-page="page-dashboard"><span class="material-symbols-outlined text-2xl">arrow_back</span></button><h1 class="text-lg font-bold flex-1 text-center">Sell Your Niva Coin</h1><div class="size-8"></div></header>
+      <div class="rounded-xl bg-card-background my-4 p-4"><p class="text-lg font-bold">Current Rate: <span id="sell-niva-rate" class="text-primary">...</span></p></div>
       <form id="sell-niva-form" class="space-y-6">
-          <div><label class="flex flex-col"><p class="text-white text-base font-medium pb-2">Amount to Sell</p><div class="relative"><input id="niva-amount-input" required class="form-input w-full rounded-lg text-white focus:ring-primary/50 border-slate-700 bg-card-background h-14 p-[15px] pr-16" placeholder="e.g., 1000" type="number" step="any"/><span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">NIVA</span></div></label><p id="niva-payout-text" class="text-slate-300 text-base pt-2">You will receive: ~৳0.00</p></div>
-          <div><h2 class="text-white text-lg font-bold pb-2">Proof of Transfer</h2><p class="text-slate-400 text-sm pb-4">Upload a screenshot showing the transaction is complete.</p><div class="relative flex flex-col items-center justify-center w-full min-h-[160px] p-6 border-2 border-dashed border-slate-700 rounded-xl bg-card-background"><div id="niva-upload-prompt" class="flex flex-col items-center justify-center text-center cursor-pointer"><span class="material-symbols-outlined text-4xl text-slate-400 mb-2">upload_file</span><p class="text-base font-medium text-white">Attach Screenshot</p><p class="text-sm text-slate-400">Click to upload</p></div><div id="niva-preview-container" class="hidden relative w-full"><img id="niva-image-preview" src="#" alt="Screenshot Preview" class="w-full h-auto max-h-48 rounded-lg object-cover"><button id="remove-niva-image-btn" type="button" class="absolute top-2 right-2 text-white bg-black/50 flex size-8 items-center justify-center rounded-full"><span class="material-symbols-outlined text-xl">close</span></button></div><input id="niva-file-input" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file" accept="image/*"/></div></div>
-          <div><h2 class="text-white text-lg font-bold pb-3">Payment Details</h2><div class="grid grid-cols-2 gap-4 mb-4"><div><input type="radio" id="niva-bkash" name="paymentMethodNiva" value="Bkash" class="hidden payment-method-radio" required checked><label for="niva-bkash" class="payment-method-label flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer"><img src="./bkash.jpg" class="h-6" alt="Bkash Logo"><span class="text-white font-semibold">Bkash</span></label></div><div><input type="radio" id="niva-nagad" name="paymentMethodNiva" value="Nagad" class="hidden payment-method-radio" required><label for="niva-nagad" class="payment-method-label flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer"><img src="./nagad.jpg" class="h-6" alt="Nagad Logo"><span class="text-white font-semibold">Nagad</span></label></div></div><label class="flex flex-col"><p class="text-white text-base font-medium pb-2">Payment Number</p><input id="niva-payment-number" required class="form-input w-full rounded-lg text-white focus:ring-primary/50 border-slate-700 bg-card-background h-14 p-[15px]" placeholder="01XXXXXXXXX" type="tel" pattern="01[0-9]{9}" maxlength="11"/></label></div>
-          <button type="submit" class="w-full bg-primary text-background font-bold text-base py-3.5 px-6 rounded-lg !mt-8">Submit Sell Order</button>
+          <div><label class="block mb-2">Amount to Sell</label><div class="relative"><input id="niva-amount-input" required class="form-input w-full rounded-lg text-white border-slate-700 bg-card-background h-14 p-4 pr-16" placeholder="e.g., 1000" type="number" step="any"/><span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">NIVA</span></div><p id="niva-payout-text" class="text-slate-300 pt-2">You will receive: ~৳0.00</p></div>
+          <div><h2 class="text-lg font-bold mb-2">Proof of Transfer</h2><p class="text-sm text-slate-400 mb-4">Upload a screenshot of the completed transaction.</p><div class="relative w-full min-h-[160px] p-6 border-2 border-dashed border-slate-700 rounded-xl bg-card-background"><div id="niva-upload-prompt" class="flex flex-col items-center justify-center text-center cursor-pointer"><span class="material-symbols-outlined text-4xl text-slate-400 mb-2">upload_file</span><p>Attach Screenshot</p></div><div id="niva-preview-container" class="hidden absolute inset-2"><img id="niva-image-preview" src="#" alt="Preview" class="w-full h-full rounded-lg object-cover"><button id="remove-niva-image-btn" type="button" class="absolute top-2 right-2 text-white bg-black/50 flex size-8 items-center justify-center rounded-full"><span class="material-symbols-outlined text-xl">close</span></button></div><input id="niva-file-input" required class="absolute inset-0 opacity-0 cursor-pointer" type="file" accept="image/*"/></div></div>
+          <div><h2 class="text-lg font-bold mb-3">Payment Details</h2><div class="grid grid-cols-2 gap-4 mb-4"><div><input type="radio" id="niva-bkash" name="paymentMethodNiva" value="Bkash" class="hidden payment-method-radio" required checked><label for="niva-bkash" class="payment-method-label flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer"><img src="./bkash.jpg" class="h-6" alt="Bkash"><span class="font-semibold">Bkash</span></label></div><div><input type="radio" id="niva-nagad" name="paymentMethodNiva" value="Nagad" class="hidden payment-method-radio" required><label for="niva-nagad" class="payment-method-label flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer"><img src="./nagad.jpg" class="h-6" alt="Nagad"><span class="font-semibold">Nagad</span></label></div></div><label class="block"><span class="mb-2 block">Payment Number</span><input id="niva-payment-number" required class="form-input w-full rounded-lg text-white border-slate-700 bg-card-background h-14 p-4" placeholder="01XXXXXXXXX" type="tel" pattern="01[0-9]{9}" maxlength="11"/></label></div>
+          <button type="submit" class="w-full bg-primary text-background font-bold py-3.5 px-6 rounded-lg !mt-8">Submit Sell Order</button>
       </form>
     </main>
 
     <!-- Sell Gmail Page -->
-    <main id="page-sell-gmail" class="page flex-grow px-4 flex flex-col pb-28">
-      <header class="flex items-center py-2 justify-between"><button class="nav-btn flex size-12 shrink-0 items-center" data-page="page-dashboard"><span class="material-symbols-outlined text-2xl text-white">arrow_back</span></button><h2 class="text-white text-lg font-bold flex-1 text-center">Sell Gmail IDs</h2><div class="w-12"></div></header>
+    <main id="page-sell-gmail" class="page flex-grow p-4 pb-28">
+      <header class="flex items-center py-2 justify-between"><button class="nav-btn-internal text-white flex size-10 items-center justify-center -ml-2" data-page="page-dashboard"><span class="material-symbols-outlined text-2xl">arrow_back</span></button><h2 class="text-lg font-bold flex-1 text-center">Sell Gmail IDs</h2><div class="size-8"></div></header>
       <form id="sell-gmail-form" class="flex flex-col flex-grow space-y-6 mt-4">
-          <div><p class="text-gray-300 text-base pb-3">Upload your Excel file. Ensure it's in .xlsx or .csv format.</p><div class="relative flex flex-col items-center gap-6 rounded-xl border-2 border-dashed border-gray-700 px-6 py-10 cursor-pointer"><div id="gmail-upload-prompt"><span class="material-symbols-outlined text-5xl text-gray-400 text-center w-full">cloud_upload</span><p class="text-white text-lg font-bold text-center">Tap to select a file</p><p class="text-gray-400 text-sm text-center">Only .xlsx and .csv files are accepted</p></div><input id="gmail-file-input" required type="file" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"/></div><div id="gmail-file-display" class="hidden items-center gap-4 rounded-xl border border-gray-700 bg-card-background p-4 mt-4"><div class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20 text-primary"><span class="material-symbols-outlined text-2xl">description</span></div><div class="flex-1 min-w-0"><p id="gmail-file-name" class="text-white font-medium break-words"></p><p id="gmail-file-size" class="text-gray-400 text-sm"></p></div><button id="remove-gmail-file-btn" type="button" class="text-gray-400 flex size-10 items-center justify-center rounded-full hover:bg-gray-800 shrink-0"><span class="material-symbols-outlined text-2xl">close</span></button></div></div>
-          <div><h2 class="text-white text-lg font-bold pb-3">Payment Details</h2><div class="grid grid-cols-2 gap-4 mb-4"><div><input type="radio" id="gmail-bkash" name="paymentMethodGmail" value="Bkash" class="hidden payment-method-radio" required checked><label for="gmail-bkash" class="payment-method-label flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer"><img src="./bkash.jpg" class="h-6" alt="Bkash Logo"><span class="text-white font-semibold">Bkash</span></label></div><div><input type="radio" id="gmail-nagad" name="paymentMethodGmail" value="Nagad" class="hidden payment-method-radio" required><label for="gmail-nagad" class="payment-method-label flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer"><img src="./nagad.jpg" class="h-6" alt="Nagad Logo"><span class="text-white font-semibold">Nagad</span></label></div></div><label class="flex flex-col"><p class="text-white text-base font-medium pb-2">Payment Number</p><input id="gmail-payment-number" required class="form-input w-full rounded-lg text-white focus:ring-primary/50 border-slate-700 bg-card-background h-14 p-[15px]" placeholder="01XXXXXXXXX" type="tel" pattern="01[0-9]{9}" maxlength="11"/></label></div>
-          <div class="flex-grow"></div><div class="pb-6 pt-4"><button type="submit" class="w-full h-12 bg-primary text-background font-bold rounded-xl">Submit Request</button></div>
+          <div><p class="text-gray-300 mb-3">Upload your .xlsx or .csv file.</p><div class="relative flex flex-col items-center justify-center gap-6 rounded-xl border-2 border-dashed border-gray-700 px-6 py-10 cursor-pointer"><div id="gmail-upload-prompt"><span class="material-symbols-outlined text-5xl text-gray-400 mx-auto">cloud_upload</span><p class="font-bold text-center">Tap to select a file</p></div><input id="gmail-file-input" required type="file" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="absolute inset-0 opacity-0 cursor-pointer"/></div><div id="gmail-file-display" class="hidden items-center gap-4 rounded-xl border border-gray-700 bg-card-background p-4 mt-4"><div class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20 text-primary shrink-0"><span class="material-symbols-outlined text-2xl">description</span></div><div class="flex-1 min-w-0"><p id="gmail-file-name" class="font-medium break-words"></p><p id="gmail-file-size" class="text-sm text-gray-400"></p></div><button id="remove-gmail-file-btn" type="button" class="text-gray-400 flex size-10 items-center justify-center rounded-full shrink-0"><span class="material-symbols-outlined text-2xl">close</span></button></div></div>
+          <div><h2 class="text-lg font-bold mb-3">Payment Details</h2><div class="grid grid-cols-2 gap-4 mb-4"><div><input type="radio" id="gmail-bkash" name="paymentMethodGmail" value="Bkash" class="hidden payment-method-radio" required checked><label for="gmail-bkash" class="payment-method-label flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer"><img src="./bkash.jpg" class="h-6" alt="Bkash"><span>Bkash</span></label></div><div><input type="radio" id="gmail-nagad" name="paymentMethodGmail" value="Nagad" class="hidden payment-method-radio" required><label for="gmail-nagad" class="payment-method-label flex items-center justify-center gap-2 p-3 rounded-lg cursor-pointer"><img src="./nagad.jpg" class="h-6" alt="Nagad"><span>Nagad</span></label></div></div><label><span class="mb-2 block">Payment Number</span><input id="gmail-payment-number" required class="form-input w-full rounded-lg text-white border-slate-700 bg-card-background h-14 p-4" placeholder="01XXXXXXXXX" type="tel" pattern="01[0-9]{9}" maxlength="11"/></label></div>
+          <div class="flex-grow"></div><div class="pt-4"><button type="submit" class="w-full h-12 bg-primary text-background font-bold rounded-xl">Submit Request</button></div>
       </form>
     </main>
 
-    <main id="page-history" class="page flex-1 pb-28"><header class="py-2 px-4"><h1 class="text-white text-lg font-bold text-center">My Sell Requests</h1></header><div id="history-list-container" class="px-4 pt-6 space-y-3"><div class="text-center text-text-secondary">Loading history...</div></div></main>
+    <main id="page-history" class="page flex-1 pb-28"><header class="py-4 px-4"><h1 class="text-lg font-bold text-center">My Sell Requests</h1></header><div id="history-list-container" class="px-4 pt-2 space-y-3"><div class="text-center text-text-secondary">Loading history...</div></div></main>
     
-    <main id="page-profile" class="page flex-1 px-4 py-6 pb-28">
-      <h1 class="text-lg font-bold text-white text-center mb-6">Settings</h1>
-      <div class="flex w-full flex-col gap-8">
-        <section class="flex w-full items-center gap-4 rounded-xl bg-card-background p-4 shadow-sm">
-          <div class="relative shrink-0"><img class="user-profile-pic object-cover rounded-full h-16 w-16 border-2 border-primary" src="logo19.jpg" alt="User Avatar"></div>
-          <div class="flex flex-col min-w-0"><p id="profile-name" class="text-lg font-bold text-white truncate">...</p><p id="profile-id" class="text-sm text-text-secondary break-all">...</p></div>
-        </section>
-        <section>
-          <h2 class="px-2 text-sm font-semibold uppercase text-text-secondary mb-3">Activity Summary</h2>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4"><span class="material-symbols-outlined text-primary text-3xl">toll</span><p class="text-xs text-text-secondary">Total Coins Sold</p><p id="profile-coins-sold" class="text-xl font-bold text-white">0</p></div>
-            <div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4"><span class="material-symbols-outlined text-primary text-3xl">alternate_email</span><p class="text-xs text-text-secondary">Total Gmail IDs Sold</p><p id="profile-gmail-sold" class="text-xl font-bold text-white">0</p></div>
-          </div>
-        </section>
+    <main id="page-profile" class="page flex-1 p-4 pb-28">
+      <h1 class="text-lg font-bold text-center mb-6">Settings</h1>
+      <div class="flex flex-col gap-8">
+        <section class="flex w-full items-center gap-4 rounded-xl bg-card-background p-4"><div class="shrink-0"><img class="user-profile-pic object-cover rounded-full h-16 w-16 border-2 border-primary" src="logo19.jpg" alt="User Avatar"></div><div class="min-w-0"><p id="profile-name" class="text-lg font-bold truncate">...</p><p id="profile-id" class="text-sm text-text-secondary break-all">...</p></div></section>
+        <section><h2 class="px-2 mb-3 text-sm font-semibold uppercase text-text-secondary">Activity Summary</h2><div class="grid grid-cols-2 gap-4"><div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4"><span class="material-symbols-outlined text-primary text-3xl">toll</span><p class="text-xs text-text-secondary">Total Coins Sold</p><p id="profile-coins-sold" class="text-xl font-bold">0</p></div><div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4"><span class="material-symbols-outlined text-primary text-3xl">alternate_email</span><p class="text-xs text-text-secondary">Total Gmail IDs Sold</p><p id="profile-gmail-sold" class="text-xl font-bold">0</p></div></div></section>
       </div>
     </main>
     
     <div class="fixed bottom-0 left-0 right-0 h-20 bg-card-background/90 backdrop-blur-sm border-t border-text-secondary/10">
-      <div class="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
+      <div class="grid h-full max-w-lg grid-cols-4 mx-auto">
         <button class="nav-btn inline-flex flex-col items-center justify-center px-5 text-primary" data-page="page-dashboard"><span class="material-symbols-outlined text-2xl mb-1">dashboard</span><span class="text-xs">Dashboard</span></button>
         <button class="nav-btn inline-flex flex-col items-center justify-center px-5 text-text-secondary" data-page="page-sell-niva"><span class="material-symbols-outlined text-2xl mb-1">add_circle</span><span class="text-xs">Sell</span></button>
         <button class="nav-btn inline-flex flex-col items-center justify-center px-5 text-text-secondary" data-page="page-history"><span class="material-symbols-outlined text-2xl mb-1">history</span><span class="text-xs">History</span></button>
@@ -120,121 +82,213 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // --- Firebase Configuration ---
       const firebaseConfig = {
           apiKey: "AIzaSyDdaD_A6kdO5foFF4HQfsxDq8dIvE-pahE",
           authDomain: "tournament-d2a6d.firebaseapp.com",
-          databaseURL: "https://tournament-d2a6d-default-rtdb.firebaseio.com",
           projectId: "tournament-d2a6d",
           storageBucket: "tournament-d2a6d.appspot.com",
           messagingSenderId: "904131703215",
           appId: "1:904131703215:web:380e616e04dc3e084fff5a",
-          measurementId: "G-K0VP9FK8YT"
       };
 
-      // --- Global Variables & Helpers ---
       const $ = (id) => document.getElementById(id);
       const showLoader = () => $('loading-overlay').classList.remove('hidden');
       const hideLoader = () => $('loading-overlay').classList.add('hidden');
-      let db, storage;
+      let db, storage, telegramUser;
+      let marketRates = { nivaRate: 7.5, gmailRate: 13 };
 
-      // --- Main App Logic ---
       function startApp() {
         try {
-          // Initialize Firebase
           if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
           db = firebase.firestore();
           storage = firebase.storage();
 
-          // Check if running inside Telegram
           if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
-            tg.ready(); tg.expand();
-            const telegramUser = tg.initDataUnsafe?.user;
+            tg.ready();
+            tg.expand();
+            telegramUser = tg.initDataUnsafe?.user;
             
             if (telegramUser?.id) {
-              const userId = telegramUser.id.toString();
-              const userName = telegramUser.first_name || 'User';
-              const photoUrl = telegramUser.photo_url;
-              initializeAppUI(userId, userName, photoUrl);
+              initializeAppUI();
             } else {
-              // Handle cases where user data is not available
-              throw new Error("Could not retrieve Telegram user data.");
+              throw new Error("Could not get Telegram user data.");
             }
           } else {
-            // Not running in Telegram
             $('error-container').classList.remove('hidden');
             hideLoader();
           }
         } catch (error) {
-          console.error("App initialization failed:", error);
-          alert("An error occurred. Please try restarting the app.");
+          console.error("App failed to start:", error);
+          alert("Could not start the app. Please try again.");
           hideLoader();
         }
       }
       
-      function initializeAppUI(userId, userName, photoUrl) {
-        // Update profile pictures
-        const profilePics = document.querySelectorAll('.user-profile-pic');
-        profilePics.forEach(pic => pic.src = photoUrl || 'logo19.jpg');
-        
-        // Update user info
-        $('welcome-message').textContent = `Welcome, ${userName}!`;
-        $('profile-name').textContent = userName;
+      function initializeAppUI() {
+        const { id: userId, first_name: userName, photo_url: photoUrl } = telegramUser;
+        document.querySelectorAll('.user-profile-pic').forEach(pic => pic.src = photoUrl || 'logo19.jpg');
+        $('welcome-message').textContent = `Welcome, ${userName || 'User'}!`;
+        $('profile-name').textContent = userName || 'User';
         $('profile-id').textContent = `Telegram ID: ${userId}`;
         
-        // Show the app and load data
-        $('app-container').classList.remove('hidden'); 
-        showPage('page-dashboard', userId);
+        $('app-container').classList.remove('hidden');
+        setupEventListeners();
+        showPage('page-dashboard');
+        
         listenForRateChanges();
-        loadDashboardData(userId); 
-        loadProfileData(userId); 
-        attachFormEventListeners(userId, userName, photoUrl); 
-        hideLoader(); 
+        loadDashboardData(); 
+        loadProfileData(); 
+        hideLoader();
+      }
+
+      function setupEventListeners() {
+        const { id: userId, first_name: userName, photo_url: photoUrl } = telegramUser;
+        const createPayload = (pm, pn) => ({ userId: userId.toString(), userName, userPhotoUrl: photoUrl || null, status: 'Processing', requestDate: firebase.firestore.FieldValue.serverTimestamp(), paymentMethod: pm, paymentNumber: pn });
+
+        // Page navigation
+        document.querySelectorAll('.nav-btn, .nav-btn-internal').forEach(btn => {
+            btn.addEventListener('click', () => showPage(btn.dataset.page));
+        });
+        $('goto-sell-niva-btn').addEventListener('click', () => showPage('page-sell-niva'));
+        $('goto-sell-gmail-btn').addEventListener('click', () => showPage('page-sell-gmail'));
+        
+        // Niva form
+        const nivaFileInput = $('niva-file-input');
+        $('niva-amount-input').addEventListener('input', () => {
+            const amount = parseFloat($('niva-amount-input').value) || 0;
+            $('niva-payout-text').textContent = `You will receive: ~৳${(amount / 1000 * marketRates.nivaRate).toFixed(2)}`;
+        });
+        nivaFileInput.addEventListener('change', () => {
+            const file = nivaFileInput.files[0];
+            if (file) {
+                $('niva-image-preview').src = URL.createObjectURL(file);
+                $('niva-upload-prompt').classList.add('hidden');
+                $('niva-preview-container').classList.remove('hidden');
+            }
+        });
+        $('remove-niva-image-btn').addEventListener('click', () => {
+            nivaFileInput.value = '';
+            $('niva-image-preview').src = '#';
+            $('niva-upload-prompt').classList.remove('hidden');
+            $('niva-preview-container').classList.add('hidden');
+        });
+        $('sell-niva-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); showLoader();
+            try {
+                const file = nivaFileInput.files[0];
+                if (!file) throw new Error("Please upload a screenshot.");
+                const filePath = `niva_proofs/${userId}/${Date.now()}-${file.name}`;
+                const uploadTask = await storage.ref(filePath).put(file);
+                const downloadURL = await uploadTask.ref.getDownloadURL();
+                const payload = createPayload($('sell-niva-form').paymentMethodNiva.value, $('niva-payment-number').value);
+                payload.type = 'niva-coin';
+                payload.amount = parseFloat($('niva-amount-input').value);
+                payload.proofImageUrl = downloadURL;
+                await db.collection('sellRequests').add(payload);
+                alert('Request submitted successfully!');
+                e.target.reset();
+                $('remove-niva-image-btn').click();
+                showPage('page-history');
+            } catch (err) { alert(`Submission Failed: ${err.message}`); console.error(err); } 
+            finally { hideLoader(); }
+        });
+
+        // Gmail form
+        const gmailFileInput = $('gmail-file-input');
+        gmailFileInput.addEventListener('change', () => {
+            const file = gmailFileInput.files[0];
+            if (file) {
+                $('gmail-file-name').textContent = file.name;
+                $('gmail-file-size').textContent = `${(file.size/1024).toFixed(2)} KB`;
+                $('gmail-upload-prompt').classList.add('hidden');
+                $('gmail-file-display').classList.remove('hidden');
+            }
+        });
+        $('remove-gmail-file-btn').addEventListener('click', () => {
+            gmailFileInput.value = '';
+            $('gmail-upload-prompt').classList.remove('hidden');
+            $('gmail-file-display').classList.add('hidden');
+        });
+        $('sell-gmail-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); showLoader();
+            try {
+                const file = gmailFileInput.files[0];
+                if (!file) throw new Error("Please upload a file.");
+                const filePath = `gmail_files/${userId}/${Date.now()}-${file.name}`;
+                const uploadTask = await storage.ref(filePath).put(file);
+                const downloadURL = await uploadTask.ref.getDownloadURL();
+                const payload = createPayload($('sell-gmail-form').paymentMethodGmail.value, $('gmail-payment-number').value);
+                payload.type = 'gmail-id';
+                payload.fileUrl = downloadURL;
+                payload.fileName = file.name;
+                payload.fileSize = file.size;
+                await db.collection('sellRequests').add(payload);
+                alert('Request submitted successfully!');
+                e.target.reset();
+                $('remove-gmail-file-btn').click();
+                showPage('page-history');
+            } catch (err) { alert(`Submission Failed: ${err.message}`); console.error(err); } 
+            finally { hideLoader(); }
+        });
       }
       
-      // --- Event Listeners & Data Functions (All confirmed working) ---
+      function showPage(pageId) {
+        if (!pageId) return;
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        $(pageId)?.classList.add('active');
 
-      let marketRates = { nivaRate: 7.5, gmailRate: 13 };
-
-      function updateRateDisplays() {
-        const nivaRateText = `৳${marketRates.nivaRate} /k`;
-        const gmailRateText = `৳${marketRates.gmailRate}`;
-        $('dashboard-niva-rate').textContent = nivaRateText;
-        $('dashboard-gmail-rate').textContent = gmailRateText;
-        $('sell-niva-rate').textContent = nivaRateText;
-        $('niva-amount-input').dispatchEvent(new Event('input'));
+        if (pageId === 'page-history') loadHistoryData();
+        
+        document.querySelectorAll('.nav-btn').forEach(b => {
+            b.classList.toggle('text-primary', b.dataset.page === pageId);
+            b.classList.toggle('text-text-secondary', b.dataset.page !== pageId);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
       function listenForRateChanges() {
         db.collection('settings').doc('rates').onSnapshot(doc => {
             marketRates = { nivaRate: doc.data()?.nivaRate || 7.5, gmailRate: doc.data()?.gmailRate || 13 };
-            updateRateDisplays();
-        }, err => {
-            console.error("Rate fetch error: ", err);
-            updateRateDisplays(); // Use defaults on error
-        });
+            const nivaRateText = `৳${marketRates.nivaRate} /k`;
+            const gmailRateText = `৳${marketRates.gmailRate}`;
+            $('dashboard-niva-rate').textContent = nivaRateText;
+            $('dashboard-gmail-rate').textContent = gmailRateText;
+            $('sell-niva-rate').textContent = nivaRateText;
+        }, () => updateRateDisplays());
       }
 
-      function loadHistoryData(userId) {
+      function loadHistoryData() {
         const container = $('history-list-container');
-        db.collection('sellRequests').where('userId', '==', userId).orderBy('requestDate', 'desc').onSnapshot(snapshot => { 
+        db.collection('sellRequests').where('userId', '==', telegramUser.id.toString()).orderBy('requestDate', 'desc')
+          .onSnapshot(snapshot => { 
             container.innerHTML = snapshot.empty ? `<p class="text-center text-text-secondary">No requests found.</p>` : ''; 
             snapshot.forEach(doc => {
-                const req = doc.data(); const icon = req.type === 'niva-coin' ? 'toll' : 'mail'; const title = req.type === 'niva-coin' ? `${(req.amount || 0).toLocaleString()} Niva Coin` : `${req.fileName}`; const date = req.requestDate ? new Date(req.requestDate.seconds * 1000).toLocaleDateString('en-GB') : 'N/A'; let statusColor = req.status === 'Completed' ? 'green' : req.status === 'Rejected' ? 'red' : 'orange';
-                container.insertAdjacentHTML('beforeend', `<div class="flex items-center gap-4 bg-card-background p-4 rounded-xl shadow-sm"><div class="text-white flex items-center justify-center rounded-lg bg-primary/20 shrink-0 w-12 h-12"><span class="material-symbols-outlined text-primary">${icon}</span></div><div class="flex-1 min-w-0"><p class="text-white font-medium truncate">${title}</p><p class="text-zinc-400 text-sm">${date}</p></div><div class="shrink-0"><div class="flex items-center justify-center rounded-full px-3 py-1 bg-${statusColor}-400/20 text-${statusColor}-400"><p class="text-xs font-semibold">${req.status}</p></div></div></div>`);
+                const req = doc.data(); const icon = req.type === 'niva-coin' ? 'toll' : 'mail'; const title = req.type === 'niva-coin' ? `${(req.amount || 0).toLocaleString()} Coin` : `${req.fileName}`; const date = req.requestDate ? new Date(req.requestDate.seconds * 1000).toLocaleDateString('en-GB') : 'N/A'; let sC = req.status === 'Completed' ? 'green' : req.status === 'Rejected' ? 'red' : 'orange';
+                container.insertAdjacentHTML('beforeend', `<div class="flex items-center gap-4 bg-card-background p-3 rounded-xl"><div class="flex items-center justify-center rounded-lg bg-primary/20 shrink-0 w-12 h-12"><span class="material-symbols-outlined text-primary">${icon}</span></div><div class="flex-1 min-w-0"><p class="font-medium truncate">${title}</p><p class="text-zinc-400 text-sm">${date}</p></div><div class="shrink-0"><div class="rounded-full px-3 py-1 bg-${sC}-400/20 text-${sC}-400"><p class="text-xs font-semibold">${req.status}</p></div></div></div>`);
             }); 
-        }, err => { container.innerHTML = `<p class="text-center text-red-400">Could not load history.</p>`; }); 
+        }, () => { container.innerHTML = `<p class="text-center text-red-400">Could not load history.</p>`; }); 
       }
       
-      function loadDashboardData(userId) { /* ... same as before ... */ }
-      function loadProfileData(userId) { /* ... same as before ... */ }
-      function attachFormEventListeners(userId, userName, photoUrl) { /* ... same as before ... */ }
-      const allPages = document.querySelectorAll('.page'); function showPage(pageId, userId) { /* ... same as before ... */ }
-      // The rest of the helper functions from previous response
-      loadDashboardData=(e)=>{db.collection("sellRequests").where("userId","==",e).onSnapshot(e=>{let t=0,a=0,l=0;e.forEach(e=>{const r=e.data();"niva-coin"===r.type&&(t++,a+=Number(r.amount||0)),"gmail-id"===r.type&&"Processing"===r.status&&l++}),$("dashboard-niva-requests").textContent=`${t} Requests`,$("dashboard-niva-total").textContent=`${a.toLocaleString()} Coins Total`,$("dashboard-gmail-pending").textContent=`${l} IDs Pending`})},loadProfileData=(e)=>{db.collection("sellRequests").where("userId","==",e).onSnapshot(e=>{let t=0,a=0;e.forEach(e=>{const l=e.data();"Completed"===l.status&&("niva-coin"===l.type&&(t+=Number(l.amount||0)),"gmail-id"===l.type&&(a+=l.count||1))}),$("profile-coins-sold").textContent=t.toLocaleString(),$("profile-gmail-sold").textContent=a.toLocaleString()})},attachFormEventListeners=(e,t,a)=>{const l=t=>(a=>({userId:e,userName:t,userPhotoUrl:a||null,status:"Processing",requestDate:firebase.firestore.FieldValue.serverTimestamp(),paymentMethod:t,paymentNumber:a}))(t,$("niva-payment-number").value);$("sell-niva-form").addEventListener("submit",async t=>{t.preventDefault(),showLoader();try{const r=parseFloat($("niva-amount-input").value),n=$("niva-file-input").files[0],o=document.querySelector('input[name="paymentMethodNiva"]:checked').value,i=$("niva-payment-number").value;if(!n)throw new Error("Please upload a screenshot.");const d=`niva_proofs/${e}/${Date.now()}-${n.name}`,s=await storage.ref(d).put(n),c=await s.ref.getDownloadURL();await db.collection("sellRequests").add({...l(o,i),type:"niva-coin",amount:r,proofImageUrl:c}),alert("Sell request submitted successfully!"),t.target.reset(),$("remove-niva-image-btn").click(),showPage("page-history",e)}catch(t){alert(`Failed to submit request. Error: ${t.message}`)}finally{hideLoader()}}),$("sell-gmail-form").addEventListener("submit",async t=>{t.preventDefault(),showLoader();try{const r=$("gmail-file-input").files[0],n=document.querySelector('input[name="paymentMethodGmail"]:checked').value,o=$("gmail-payment-number").value;if(!r)throw new Error("Please upload a file.");const i=`gmail_files/${e}/${Date.now()}-${r.name}`,d=await storage.ref(i).put(r),s=await d.ref.getDownloadURL();await db.collection("sellRequests").add({...l(n,o),type:"gmail-id",fileUrl:s,fileName:r.name,fileSize:r.size}),alert("Gmail file submitted successfully!"),t.target.reset(),$("remove-gmail-file-btn").click(),showPage("page-history",e)}catch(t){alert(`Failed to submit Gmail file. Error: ${t.message}`)}finally{hideLoader()}});const r=document.querySelectorAll(".nav-btn");r.forEach(t=>{t.dataset.page&&t.addEventListener("click",()=>showPage(t.dataset.page,e))})},showPage=(e,t)=>{allPages.forEach(e=>e.classList.remove("active")),$(e)?.classList.add("active"),"page-history"===e&&t&&loadHistoryData(t);const a=document.querySelectorAll(".fixed .nav-btn"),l=Array.from(a).find(t=>t.dataset.page===e);a.forEach(e=>{e.dataset.page&&(e.classList.remove("text-primary"),e.classList.add("text-text-secondary"))}),l&&(l.classList.add("text-primary"),l.classList.remove("text-text-secondary")),window.scrollTo({top:0,behavior:"smooth"})},$("niva-amount-input").addEventListener("input",e=>{const t=parseFloat(e.target.value)||0,a=marketRates.nivaRate;$("niva-payout-text").textContent=`You will receive: ~৳${(t/1e3*a).toFixed(2)}`});const nivaFileInput=$("niva-file-input");nivaFileInput.addEventListener("change",e=>{const t=e.target.files[0];if(t&&t.type.startsWith("image/")){const a=new FileReader;a.onload=e=>{$("niva-image-preview").src=e.target.result,$("niva-upload-prompt").classList.add("hidden"),$("niva-preview-container").classList.remove("hidden")},a.readAsDataURL(t)}}),$("remove-niva-image-btn").addEventListener("click",()=>{nivaFileInput.value="",$("niva-image-preview").src="#",$("niva-upload-prompt").classList.remove("hidden"),$("niva-preview-container").classList.add("hidden")});const gmailFileInput=$("gmail-file-input");gmailFileInput.addEventListener("change",e=>{const t=e.target.files[0];t&&($("gmail-file-name").textContent=t.name,$("gmail-file-size").textContent=`${(t.size/1024).toFixed(2)} KB`,$("gmail-file-display").classList.remove("hidden"),$("gmail-upload-prompt").classList.add("hidden"))}),$("remove-gmail-file-btn").addEventListener("click",()=>{gmailFileInput.value="",$("gmail-file-display").classList.add("hidden"),$("gmail-upload-prompt").classList.remove("hidden")});
+      function loadDashboardData() {
+          db.collection('sellRequests').where('userId','==', telegramUser.id.toString()).onSnapshot(snapshot => { 
+              let nivaReqs = 0, nivaTotal = 0, gmailPending = 0; 
+              snapshot.forEach(d => { const data = d.data(); if (data.type === 'niva-coin') { nivaReqs++; nivaTotal += Number(data.amount || 0); } if (data.type === 'gmail-id' && data.status === 'Processing') gmailPending++; }); 
+              $('dashboard-niva-requests').textContent = `${nivaReqs} Requests`; 
+              $('dashboard-niva-total').textContent = `${nivaTotal.toLocaleString()} Coins`; 
+              $('dashboard-gmail-pending').textContent = `${gmailPending} IDs Pending`; 
+          }); 
+      }
 
-      // --- Start the Application ---
+      function loadProfileData() {
+          db.collection('sellRequests').where('userId','==', telegramUser.id.toString()).onSnapshot(snapshot => { 
+              let coinsSold = 0, gmailSold = 0; 
+              snapshot.forEach(d => { const data = d.data(); if (data.status === 'Completed') { if (data.type === 'niva-coin') coinsSold += Number(data.amount || 0); if (data.type === 'gmail-id') gmailSold += (data.count || 1); } }); 
+              $('profile-coins-sold').textContent = coinsSold.toLocaleString(); 
+              $('profile-gmail-sold').textContent = gmailSold.toLocaleString(); 
+          });
+      }
+
       startApp();
     });
   </script>
