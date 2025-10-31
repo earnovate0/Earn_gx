@@ -19,7 +19,6 @@
   <div id="error-container" class="hidden flex items-center justify-center min-h-screen p-4 text-center"><p>This app can only be used inside Telegram.</p></div>
   
   <div id="app-container" class="relative min-h-screen w-full flex-col hidden">
-    <!-- All your HTML content from before goes here. I'm omitting it for brevity, but make sure it's the same as the previous Firebase versions. -->
     <!-- Dashboard -->
     <main id="page-dashboard" class="page flex-1 pb-28">
       <div class="flex items-center p-4"><h2 class="text-xl font-bold flex-1 text-text-secondary">Dashboard</h2><div class="flex size-10 shrink-0 items-center justify-end"><img class="user-profile-pic object-cover rounded-full size-10 border-2 border-primary" src="logo19.jpg" alt="User Avatar"></div></div>
@@ -60,7 +59,6 @@
         <section class="flex w-full items-center gap-4 rounded-xl bg-card-background p-4"><div class="shrink-0"><img class="user-profile-pic object-cover rounded-full h-16 w-16 border-2 border-primary" src="logo19.jpg" alt="User Avatar"></div><div class="min-w-0"><p id="profile-name" class="text-lg font-bold truncate">...</p><p id="profile-id" class="text-sm text-text-secondary break-all">...</p></div></section>
         <section><h2 class="px-2 mb-3 text-sm font-semibold uppercase text-text-secondary">Activity Summary</h2><div class="grid grid-cols-2 gap-4"><div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4"><span class="material-symbols-outlined text-primary text-3xl">toll</span><p class="text-xs text-text-secondary">Total Coins Sold</p><p id="profile-coins-sold" class="text-xl font-bold">0</p></div><div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4"><span class="material-symbols-outlined text-primary text-3xl">alternate_email</span><p class="text-xs text-text-secondary">Total Gmail IDs Sold</p><p id="profile-gmail-sold" class="text-xl font-bold">0</p></div></div></section>
         
-        <!-- Admin Panel Section -->
         <section id="admin-panel" class="hidden">
           <h2 class="px-2 mb-3 text-sm font-semibold uppercase text-text-secondary">Admin Panel</h2>
           <div class="bg-card-background rounded-xl p-4 space-y-4">
@@ -100,62 +98,50 @@
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-
   <script>
-    // This is the full, correct JavaScript code from our first successful Firebase version.
     document.addEventListener('DOMContentLoaded', () => {
-      const firebaseConfig = {
-        apiKey: "AIzaSyCAQtTRKgOizQjgqCbIZ_Z357LQD2Woee8",
-        authDomain: "earnovate-bot.firebaseapp.com",
-        databaseURL: "https://earnovate-bot-default-rtdb.firebaseio.com",
-        projectId: "earnovate-bot",
-        storageBucket: "earnovate-bot.appspot.com",
-        messagingSenderId: "395184310691",
-        appId: "1:395184310691:web:9a0a2e5ad0e954b527b216",
-        measurementId: "G-S6G9YSP2HN"
-      };
-      
       const ADMIN_TELEGRAM_ID = '6703675335';
       const $ = (id) => document.getElementById(id);
       const showLoader = () => $('loading-overlay').classList.remove('hidden');
       const hideLoader = () => $('loading-overlay').classList.add('hidden');
-      let db, storage, telegramUser, auth, tg;
+      
+      let telegramUser;
+      let tg;
+      let marketRates = { nivaRate: 7.5, gmailRate: 13 };
+
+      const getLocalRequests = () => JSON.parse(localStorage.getItem('sellRequests')) || [];
+      const saveLocalRequests = (requests) => localStorage.setItem('sellRequests', JSON.stringify(requests));
+      const getLocalRates = () => JSON.parse(localStorage.getItem('marketRates')) || { nivaRate: 7.5, gmailRate: 13 };
+      const saveLocalRates = (rates) => localStorage.setItem('marketRates', JSON.stringify(rates));
+      
+      // <<<--- NEW: Helper function to read file as Base64 Data URL
+      function readFileAsDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+        });
+      }
 
       function startApp() {
         try {
-          if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-          db = firebase.firestore();
-          storage = firebase.storage();
-          auth = firebase.auth();
-          
           if (window.Telegram && window.Telegram.WebApp) {
             tg = window.Telegram.WebApp;
-            tg.ready(); 
+            tg.ready();
             tg.expand();
             telegramUser = tg.initDataUnsafe?.user;
-
             if (telegramUser?.id) {
-              auth.signInAnonymously().then(() => {
-                initializeAppUI();
-              }).catch(err => {
-                console.error("Firebase sign-in failed:", err);
-                tg.showAlert("Could not connect to the server. Please try again.");
-              });
+              initializeAppUI();
             } else {
-              throw new Error("Could not get Telegram user data.");
+              throw new Error("Could not get Telegram user data. Please open this in Telegram.");
             }
           } else {
             $('error-container').classList.remove('hidden');
           }
         } catch (error) {
           console.error("App failed to start:", error);
-          if (tg) tg.showAlert("Could not start the app. Please try again.");
-          else alert("Could not start the app. Please try again.");
-          hideLoader();
+          alert("Could not start the app. Please try again later.");
         }
       }
       
@@ -168,120 +154,163 @@
         
         if (id.toString() === ADMIN_TELEGRAM_ID) {
             $('admin-panel').classList.remove('hidden');
-            loadAdminData();
         }
         
         $('app-container').classList.remove('hidden');
         setupEventListeners();
+        loadAndDisplayRates();
         showPage('page-dashboard');
-        listenForRateChanges();
-        loadDashboardData(); 
-        loadProfileData(); 
-        hideLoader();
       }
 
       function setupEventListeners() {
-        const { id: userId, first_name: userName, photo_url: photoUrl } = telegramUser;
-        const createPayload = (pm, pn) => ({ 
-            userId: auth.currentUser.uid,
-            telegramId: userId.toString(), 
-            userName, 
-            userPhotoUrl: photoUrl || null, 
-            status: 'Processing', 
-            requestDate: firebase.firestore.FieldValue.serverTimestamp(), 
-            paymentMethod: pm, 
-            paymentNumber: pn 
+        document.querySelectorAll('.nav-btn, .nav-btn-internal').forEach(btn => {
+          btn.addEventListener('click', () => showPage(btn.dataset.page));
         });
 
-        document.querySelectorAll('.nav-btn, .nav-btn-internal').forEach(btn => { btn.addEventListener('click', () => showPage(btn.dataset.page)); });
+        $('niva-amount-input').addEventListener('input', () => {
+          const amount = parseFloat($('niva-amount-input').value) || 0;
+          $('niva-payout-text').textContent = `You will receive: ~৳${(amount / 1000 * marketRates.nivaRate).toFixed(2)}`;
+        });
         
         const nivaFileInput = $('niva-file-input');
-        $('niva-amount-input').addEventListener('input', () => { 
-          const amount = parseFloat($('niva-amount-input').value) || 0; 
-          const nivaRate = parseFloat($('dashboard-niva-rate').textContent.replace('৳','').replace('/k','')) || 0;
-          $('niva-payout-text').textContent = `You will receive: ~৳${(amount / 1000 * nivaRate).toFixed(2)}`; 
+        nivaFileInput.addEventListener('change', () => {
+          const file = nivaFileInput.files[0];
+          if (file) {
+            $('niva-image-preview').src = URL.createObjectURL(file);
+            $('niva-upload-prompt').classList.add('hidden');
+            $('niva-preview-container').classList.remove('hidden');
+          }
         });
-        nivaFileInput.addEventListener('change', () => { const file = nivaFileInput.files[0]; if (file) { $('niva-image-preview').src = URL.createObjectURL(file); $('niva-upload-prompt').classList.add('hidden'); $('niva-preview-container').classList.remove('hidden'); } });
-        $('remove-niva-image-btn').addEventListener('click', (e) => { e.preventDefault(); nivaFileInput.value = null; $('niva-image-preview').src = '#'; $('niva-upload-prompt').classList.remove('hidden'); $('niva-preview-container').classList.add('hidden'); });
-        
-        $('sell-niva-form').addEventListener('submit', async (e) => { 
-            e.preventDefault(); 
-            showLoader(); 
-            try { 
-                const file = nivaFileInput.files[0]; 
-                if (!file) throw new Error("Please upload a screenshot."); 
-                const filePath = `niva_proofs/${auth.currentUser.uid}/${Date.now()}-${file.name}`; 
-                const downloadURL = await (await storage.ref(filePath).put(file)).ref.getDownloadURL(); 
-                const payload = createPayload($('sell-niva-form').paymentMethodNiva.value, $('niva-payment-number').value); 
-                payload.type = 'niva-coin'; 
-                payload.amount = parseFloat($('niva-amount-input').value); 
-                payload.proofImageUrl = downloadURL; 
-                await db.collection('sellRequests').add(payload); 
-                tg.showAlert('Request submitted successfully!'); 
-                e.target.reset(); 
-                $('remove-niva-image-btn').click(); 
-                showPage('page-history'); 
-            } catch (err) { 
-                tg.showAlert(`Submission Failed: ${err.message}`); 
-                console.error(err); 
-            } finally { 
-                hideLoader(); 
-            } 
+        $('remove-niva-image-btn').addEventListener('click', (e) => {
+          e.preventDefault();
+          nivaFileInput.value = null;
+          $('niva-image-preview').src = '#';
+          $('niva-upload-prompt').classList.remove('hidden');
+          $('niva-preview-container').classList.add('hidden');
         });
         
-        const gmailFileInput = $('gmail-file-input');
-        gmailFileInput.addEventListener('change', () => { const file = gmailFileInput.files[0]; if (file) { $('gmail-file-name').textContent = file.name; $('gmail-file-size').textContent = `${(file.size/1024).toFixed(2)} KB`; $('gmail-upload-prompt').classList.add('hidden'); $('gmail-file-display').classList.remove('hidden'); } });
-        $('remove-gmail-file-btn').addEventListener('click', (e) => { e.preventDefault(); gmailFileInput.value = null; $('gmail-upload-prompt').classList.remove('hidden'); $('gmail-file-display').classList.add('hidden'); });
-        
-        $('sell-gmail-form').addEventListener('submit', async (e) => { 
-            e.preventDefault(); 
-            showLoader(); 
-            try { 
-                const file = gmailFileInput.files[0]; 
-                if (!file) throw new Error("Please upload a file."); 
-                const filePath = `gmail_files/${auth.currentUser.uid}/${Date.now()}-${file.name}`; 
-                const downloadURL = await (await storage.ref(filePath).put(file)).ref.getDownloadURL(); 
-                const payload = createPayload($('sell-gmail-form').paymentMethodGmail.value, $('gmail-payment-number').value); 
-                payload.type = 'gmail-id'; 
-                payload.fileUrl = downloadURL; 
-                payload.fileName = file.name; 
-                payload.fileSize = file.size; 
-                await db.collection('sellRequests').add(payload); 
-                tg.showAlert('Request submitted successfully!'); 
-                e.target.reset(); 
-                $('remove-gmail-file-btn').click(); 
-                showPage('page-history'); 
-            } catch (err) { 
-                tg.showAlert(`Submission Failed: ${err.message}`); 
-                console.error(err); 
-            } finally { 
-                hideLoader(); 
-            } 
+        // <<<--- MODIFIED: Niva form submission is now async
+        $('sell-niva-form').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          showLoader();
+          try {
+            const file = nivaFileInput.files[0];
+            if (!file) throw new Error("Please upload a screenshot.");
+            
+            const proofImageUrl = await readFileAsDataURL(file); // Read file as Base64
+            
+            const allRequests = getLocalRequests();
+            const payload = createPayload($('sell-niva-form').paymentMethodNiva.value, $('niva-payment-number').value);
+            payload.type = 'niva-coin';
+            payload.amount = parseFloat($('niva-amount-input').value);
+            payload.proofImageUrl = proofImageUrl; // Save Base64 string
+            
+            allRequests.push(payload);
+            saveLocalRequests(allRequests);
+
+            tg.showAlert('Request submitted successfully!');
+            e.target.reset();
+            $('remove-niva-image-btn').click();
+            showPage('page-history');
+          } catch (err) {
+            tg.showAlert(`Submission Failed: ${err.message}`);
+            console.error(err);
+          } finally {
+            hideLoader();
+          }
         });
 
+        const gmailFileInput = $('gmail-file-input');
+        gmailFileInput.addEventListener('change', () => {
+          const file = gmailFileInput.files[0];
+          if (file) {
+            $('gmail-file-name').textContent = file.name;
+            $('gmail-file-size').textContent = `${(file.size / 1024).toFixed(2)} KB`;
+            $('gmail-upload-prompt').classList.add('hidden');
+            $('gmail-file-display').classList.remove('hidden');
+          }
+        });
+        $('remove-gmail-file-btn').addEventListener('click', (e) => {
+          e.preventDefault();
+          gmailFileInput.value = null;
+          $('gmail-upload-prompt').classList.remove('hidden');
+          $('gmail-file-display').classList.add('hidden');
+        });
+        
+        // <<<--- MODIFIED: Gmail form submission is now async
+        $('sell-gmail-form').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          showLoader();
+          try {
+            const file = gmailFileInput.files[0];
+            if (!file) throw new Error("Please upload a file.");
+            
+            const fileUrl = await readFileAsDataURL(file); // Read file as Base64
+
+            const allRequests = getLocalRequests();
+            const payload = createPayload($('sell-gmail-form').paymentMethodGmail.value, $('gmail-payment-number').value);
+            payload.type = 'gmail-id';
+            payload.fileUrl = fileUrl; // Save Base64 string
+            payload.fileName = file.name;
+            payload.fileSize = file.size;
+
+            allRequests.push(payload);
+            saveLocalRequests(allRequests);
+            
+            tg.showAlert('Request submitted successfully!');
+            e.target.reset();
+            $('remove-gmail-file-btn').click();
+            showPage('page-history');
+          } catch (err) {
+            tg.showAlert(`Submission Failed: ${err.message}`);
+            console.error(err);
+          } finally {
+            hideLoader();
+          }
+        });
+        
         if (telegramUser.id.toString() === ADMIN_TELEGRAM_ID) {
-            $('update-rates-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                showLoader();
-                try {
-                    const nivaRate = parseFloat($('admin-niva-rate').value);
-                    const gmailRate = parseFloat($('admin-gmail-rate').value);
-                    if (isNaN(nivaRate) || isNaN(gmailRate)) throw new Error("Invalid rate values.");
-                    await db.collection('settings').doc('rates').set({ nivaRate, gmailRate });
-                    tg.showAlert('Rates updated successfully!');
-                } catch (err) {
-                    tg.showAlert(`Rate update failed: ${err.message}`);
-                } finally {
-                    hideLoader();
-                }
-            });
+          $('update-rates-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            showLoader();
+            try {
+              const nivaRate = parseFloat($('admin-niva-rate').value);
+              const gmailRate = parseFloat($('admin-gmail-rate').value);
+              if (isNaN(nivaRate) || isNaN(gmailRate)) throw new Error("Invalid rate values.");
+              
+              saveLocalRates({ nivaRate, gmailRate });
+              loadAndDisplayRates();
+              tg.showAlert('Rates updated successfully!');
+            } catch (err) {
+              tg.showAlert(`Rate update failed: ${err.message}`);
+            } finally {
+              hideLoader();
+            }
+          });
         }
       }
       
+      function createPayload(paymentMethod, paymentNumber) {
+        return {
+          id: Date.now(),
+          telegramId: telegramUser.id.toString(),
+          userName: telegramUser.first_name || 'User',
+          userPhotoUrl: telegramUser.photo_url || null,
+          status: 'Processing',
+          requestDate: new Date().toISOString(),
+          paymentMethod,
+          paymentNumber,
+        };
+      }
+
       function showPage(pageId) {
         if (!pageId) return;
+
         document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
         $(pageId)?.classList.add("active");
+        
+        loadDashboardData();
+        loadProfileData();
         if (pageId === "page-history") loadHistoryData();
         if (pageId === "page-profile" && telegramUser.id.toString() === ADMIN_TELEGRAM_ID) loadAdminData();
 
@@ -292,141 +321,121 @@
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
-      function listenForRateChanges() {
-        db.collection("settings").doc("rates").onSnapshot(doc => {
-          const rates = doc.data() || { nivaRate: 7.5, gmailRate: 13 };
-          const nivaRateText = `৳${rates.nivaRate} /k`;
-          const gmailRateText = `৳${rates.gmailRate}`;
-          $("dashboard-niva-rate").textContent = nivaRateText;
-          $("dashboard-gmail-rate").textContent = gmailRateText;
-          $("sell-niva-rate").textContent = nivaRateText;
-          
-          if (telegramUser.id.toString() === ADMIN_TELEGRAM_ID) {
-            $("admin-niva-rate").value = rates.nivaRate;
-            $("admin-gmail-rate").value = rates.gmailRate;
-          }
-
-        }, (error) => {
-          console.error("Error listening for rate changes:", error);
-        });
+      function loadAndDisplayRates() {
+        marketRates = getLocalRates();
+        const nivaRateText = `৳${marketRates.nivaRate} /k`;
+        const gmailRateText = `৳${marketRates.gmailRate}`;
+        $("dashboard-niva-rate").textContent = nivaRateText;
+        $("dashboard-gmail-rate").textContent = gmailRateText;
+        $("sell-niva-rate").textContent = nivaRateText;
+        
+        if (telegramUser.id.toString() === ADMIN_TELEGRAM_ID) {
+          $("admin-niva-rate").value = marketRates.nivaRate;
+          $("admin-gmail-rate").value = marketRates.gmailRate;
+        }
       }
       
       function loadHistoryData() {
         const container = $("history-list-container");
-        db.collection("sellRequests")
-          .where("telegramId", "==", telegramUser.id.toString())
-          .orderBy("requestDate", "desc")
-          .onSnapshot(snapshot => {
-            container.innerHTML = snapshot.empty ? '<p class="text-center text-text-secondary">No requests found.</p>' : "";
-            snapshot.forEach(doc => {
-              const data = doc.data();
-              const icon = data.type === "niva-coin" ? "toll" : "mail";
-              const title = data.type === "niva-coin" ? `${(data.amount || 0).toLocaleString()} Coin` : `${data.fileName}`;
-              const date = data.requestDate ? new Date(data.requestDate.seconds * 1000).toLocaleDateString("en-GB") : "N/A";
-              let statusColor = data.status === "Completed" ? "green" : data.status === "Rejected" ? "red" : "orange";
-              container.insertAdjacentHTML("beforeend", `
-                <div class="flex items-center gap-4 bg-card-background p-3 rounded-xl">
-                  <div class="flex items-center justify-center rounded-lg bg-primary/20 shrink-0 w-12 h-12"><span class="material-symbols-outlined text-primary">${icon}</span></div>
-                  <div class="flex-1 min-w-0"><p class="font-medium truncate">${title}</p><p class="text-zinc-400 text-sm">${date}</p></div>
-                  <div class="shrink-0"><div class="rounded-full px-3 py-1 bg-${statusColor}-400/20 text-${statusColor}-400"><p class="text-xs font-semibold">${data.status}</p></div></div>
-                </div>`);
+        try {
+            const allRequests = getLocalRequests();
+            const userRequests = allRequests.filter(req => req.telegramId === telegramUser.id.toString()).sort((a,b) => new Date(b.requestDate) - new Date(a.requestDate));
+            
+            container.innerHTML = userRequests.length === 0 ? '<p class="text-center text-text-secondary">No requests found.</p>' : "";
+            userRequests.forEach(data => {
+            const icon = data.type === "niva-coin" ? "toll" : "mail";
+            const title = data.type === "niva-coin" ? `${(data.amount || 0).toLocaleString()} Coin` : `${data.fileName}`;
+            const date = new Date(data.requestDate).toLocaleDateString("en-GB");
+            let statusColor = data.status === "Completed" ? "green" : data.status === "Rejected" ? "red" : "orange";
+            container.insertAdjacentHTML("beforeend", `
+              <div class="flex items-center gap-4 bg-card-background p-3 rounded-xl">
+                <div class="flex items-center justify-center rounded-lg bg-primary/20 shrink-0 w-12 h-12"><span class="material-symbols-outlined text-primary">${icon}</span></div>
+                <div class="flex-1 min-w-0"><p class="font-medium truncate">${title}</p><p class="text-zinc-400 text-sm">${date}</p></div>
+                <div class="shrink-0"><div class="rounded-full px-3 py-1 bg-${statusColor}-400/20 text-${statusColor}-400"><p class="text-xs font-semibold">${data.status}</p></div></div>
+              </div>`);
             });
-          }, (error) => {
+        } catch(e) {
             container.innerHTML = '<p class="text-center text-red-400">Could not load history.</p>';
-          });
+            console.error("Error loading history:", e);
+        }
       }
 
       function loadDashboardData() {
-        db.collection("sellRequests")
-          .where("telegramId", "==", telegramUser.id.toString())
-          .onSnapshot(snapshot => {
-            let nivaRequests = 0, nivaTotal = 0, gmailPending = 0;
-            snapshot.forEach(doc => {
-              const data = doc.data();
-              if (data.type === "niva-coin") {
-                nivaRequests++;
-                nivaTotal += Number(data.amount || 0);
-              } else if (data.type === "gmail-id" && data.status === "Processing") {
-                gmailPending++;
-              }
-            });
-            $("dashboard-niva-requests").textContent = `${nivaRequests} Requests`;
-            $("dashboard-niva-total").textContent = `${nivaTotal.toLocaleString()} Coins`;
-            $("dashboard-gmail-pending").textContent = `${gmailPending} IDs Pending`;
-          });
+        const userRequests = getLocalRequests().filter(req => req.telegramId === telegramUser.id.toString());
+        let nivaRequests = 0, nivaTotal = 0, gmailPending = 0;
+        userRequests.forEach(data => {
+            if (data.type === "niva-coin") {
+            nivaRequests++;
+            nivaTotal += Number(data.amount || 0);
+            } else if (data.type === "gmail-id" && data.status === "Processing") {
+            gmailPending++;
+            }
+        });
+        $("dashboard-niva-requests").textContent = `${nivaRequests} Requests`;
+        $("dashboard-niva-total").textContent = `${nivaTotal.toLocaleString()} Coins`;
+        $("dashboard-gmail-pending").textContent = `${gmailPending} IDs Pending`;
       }
       
       function loadProfileData() {
-        db.collection("sellRequests")
-          .where("telegramId", "==", telegramUser.id.toString())
-          .onSnapshot(snapshot => {
-            let coinsSold = 0, gmailSold = 0;
-            snapshot.forEach(doc => {
-              const data = doc.data();
-              if (data.status === "Completed") {
-                if (data.type === "niva-coin") coinsSold += Number(data.amount || 0);
-                else if (data.type === "gmail-id") gmailSold += 1;
-              }
-            });
-            $("profile-coins-sold").textContent = coinsSold.toLocaleString();
-            $("profile-gmail-sold").textContent = gmailSold.toLocaleString();
-          });
+        const userRequests = getLocalRequests().filter(req => req.telegramId === telegramUser.id.toString());
+        let coinsSold = 0, gmailSold = 0;
+        userRequests.forEach(data => {
+            if (data.status === "Completed") {
+            if (data.type === "niva-coin") coinsSold += Number(data.amount || 0);
+            else if (data.type === "gmail-id") gmailSold += 1;
+            }
+        });
+        $("profile-coins-sold").textContent = coinsSold.toLocaleString();
+        $("profile-gmail-sold").textContent = gmailSold.toLocaleString();
       }
 
+      // <<<--- MODIFIED: Admin panel now correctly displays images and provides download links
       function loadAdminData() {
           const container = $('admin-requests-container');
-          db.collection('sellRequests').orderBy('requestDate', 'desc').onSnapshot(snapshot => {
-              container.innerHTML = snapshot.empty ? '<p class="text-center text-text-secondary">No requests found.</p>' : '';
-              snapshot.forEach(doc => {
-                  const request = doc.data();
-                  const requestId = doc.id;
-                  const date = request.requestDate ? new Date(request.requestDate.seconds * 1000).toLocaleString('en-GB') : 'N/A';
-                  
-                  const details = request.type === 'niva-coin' 
-                      ? `<b>Amount:</b> ${(request.amount || 0).toLocaleString()} Niva<br>
-                         <a href="${request.proofImageUrl}" target="_blank" title="Click to view full image">
-                           <img src="${request.proofImageUrl}" alt="Niva Proof" class="mt-2 rounded-lg max-w-full h-auto cursor-pointer" style="max-height: 200px;">
-                         </a>`
-                      : `<b>File:</b> <a href="${request.fileUrl}" target="_blank" class="text-primary underline">${request.fileName}</a>`;
+          const allRequests = getLocalRequests().sort((a,b) => new Date(b.requestDate) - new Date(a.requestDate));
 
-                  container.insertAdjacentHTML('beforeend', `
-                      <div class="bg-background p-3 rounded-lg border border-slate-800">
-                          <div class="flex items-center gap-3">
-                            <img src="${request.userPhotoUrl || 'logo19.jpg'}" class="w-10 h-10 rounded-full object-cover">
-                            <div class="flex-1">
-                                <p class="font-bold">${request.userName}</p>
-                                <p class="text-xs text-text-secondary">${request.telegramId}</p>
-                            </div>
-                            <p class="text-xs text-text-secondary text-right">${date}</p>
-                          </div>
-                          <div class="text-sm my-3">${details}</div>
-                          <p class="text-sm"><b>Payment:</b> ${request.paymentMethod} - ${request.paymentNumber}</p>
-                          <p class="text-sm"><b>Status:</b> ${request.status}</p>
-                          ${request.status === 'Processing' ? `
-                          <div class="flex gap-2 mt-3">
-                              <button class="approve-btn flex-1 bg-green-500/20 text-green-400 text-sm font-bold py-1.5 rounded" data-id="${requestId}">Approve</button>
-                              <button class="reject-btn flex-1 bg-red-500/20 text-red-400 text-sm font-bold py-1.5 rounded" data-id="${requestId}">Reject</button>
-                          </div>` : ''}
-                      </div>
-                  `);
-              });
+          container.innerHTML = allRequests.length === 0 ? '<p class="text-center text-text-secondary">No requests found.</p>' : '';
+          allRequests.forEach(request => {
+              const date = new Date(request.requestDate).toLocaleString('en-GB');
+              const details = request.type === 'niva-coin' 
+                  ? `<b>Amount:</b> ${request.amount} Niva<br><a href="${request.proofImageUrl}" target="_blank" class="text-primary"><img src="${request.proofImageUrl}" class="mt-2 rounded-lg max-w-full h-auto" style="max-height: 200px;"></a>`
+                  : `<b>File:</b> <a href="${request.fileUrl}" download="${request.fileName}" class="text-primary">${request.fileName}</a>`;
 
-              document.querySelectorAll('.approve-btn').forEach(btn => btn.onclick = () => updateRequestStatus(btn.dataset.id, 'Completed'));
-              document.querySelectorAll('.reject-btn').forEach(btn => btn.onclick = () => updateRequestStatus(btn.dataset.id, 'Rejected'));
-
-          }, (error) => {
-              container.innerHTML = '<p class="text-center text-red-400">Could not load requests.</p>';
-              console.error("Error loading admin requests:", error);
+              container.insertAdjacentHTML('beforeend', `
+                  <div class="bg-background p-3 rounded-lg border border-slate-800">
+                      <p class="font-bold">${request.userName} (${request.telegramId})</p>
+                      <p class="text-xs text-text-secondary">${date}</p>
+                      <div class="text-sm my-2">${details}</div>
+                      <p class="text-sm"><b>Payment:</b> ${request.paymentMethod} - ${request.paymentNumber}</p>
+                      <p class="text-sm"><b>Status:</b> ${request.status}</p>
+                      ${request.status === 'Processing' ? `
+                      <div class="flex gap-2 mt-3">
+                          <button class="approve-btn flex-1 bg-green-500/20 text-green-400 text-sm font-bold py-1.5 rounded" data-id="${request.id}">Approve</button>
+                          <button class="reject-btn flex-1 bg-red-500/20 text-red-400 text-sm font-bold py-1.5 rounded" data-id="${request.id}">Reject</button>
+                      </div>` : ''}
+                  </div>
+              `);
           });
+
+          document.querySelectorAll('.approve-btn').forEach(btn => btn.onclick = () => updateRequestStatus(btn.dataset.id, 'Completed'));
+          document.querySelectorAll('.reject-btn').forEach(btn => btn.onclick = () => updateRequestStatus(btn.dataset.id, 'Rejected'));
       }
 
-      async function updateRequestStatus(id, status) {
+      function updateRequestStatus(id, status) {
           showLoader();
           try {
-              await db.collection('sellRequests').doc(id).update({ status: status });
-              tg.showAlert(`Request has been ${status.toLowerCase()}.`);
+              let allRequests = getLocalRequests();
+              const requestIndex = allRequests.findIndex(req => req.id.toString() === id);
+              if (requestIndex !== -1) {
+                  allRequests[requestIndex].status = status;
+                  saveLocalRequests(allRequests);
+                  loadAdminData();
+                  tg.showAlert(`Request has been ${status.toLowerCase()}.`);
+              } else {
+                  throw new Error("Request not found.");
+              }
           } catch (err) {
-              tg.showAlert(`Failed to update status: ${err.message}`);
+            tg.showAlert(`Failed to update status: ${err.message}`);
           } finally {
               hideLoader();
           }
