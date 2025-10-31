@@ -59,6 +59,7 @@
         <section class="flex w-full items-center gap-4 rounded-xl bg-card-background p-4"><div class="shrink-0"><img class="user-profile-pic object-cover rounded-full h-16 w-16 border-2 border-primary" src="logo19.jpg" alt="User Avatar"></div><div class="min-w-0"><p id="profile-name" class="text-lg font-bold truncate">...</p><p id="profile-id" class="text-sm text-text-secondary break-all">...</p></div></section>
         <section><h2 class="px-2 mb-3 text-sm font-semibold uppercase text-text-secondary">Activity Summary</h2><div class="grid grid-cols-2 gap-4"><div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4"><span class="material-symbols-outlined text-primary text-3xl">toll</span><p class="text-xs text-text-secondary">Total Coins Sold</p><p id="profile-coins-sold" class="text-xl font-bold">0</p></div><div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4"><span class="material-symbols-outlined text-primary text-3xl">alternate_email</span><p class="text-xs text-text-secondary">Total Gmail IDs Sold</p><p id="profile-gmail-sold" class="text-xl font-bold">0</p></div></div></section>
         
+        <!-- Admin Panel Section -->
         <section id="admin-panel" class="hidden">
           <h2 class="px-2 mb-3 text-sm font-semibold uppercase text-text-secondary">Admin Panel</h2>
           <div class="bg-card-background rounded-xl p-4 space-y-4">
@@ -106,28 +107,18 @@
       const hideLoader = () => $('loading-overlay').classList.add('hidden');
       
       let telegramUser;
-      let tg;
+      let tg; 
       let marketRates = { nivaRate: 7.5, gmailRate: 13 };
 
       const getLocalRequests = () => JSON.parse(localStorage.getItem('sellRequests')) || [];
       const saveLocalRequests = (requests) => localStorage.setItem('sellRequests', JSON.stringify(requests));
       const getLocalRates = () => JSON.parse(localStorage.getItem('marketRates')) || { nivaRate: 7.5, gmailRate: 13 };
       const saveLocalRates = (rates) => localStorage.setItem('marketRates', JSON.stringify(rates));
-      
-      // <<<--- NEW: Helper function to read file as Base64 Data URL
-      function readFileAsDataURL(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (error) => reject(error);
-            reader.readAsDataURL(file);
-        });
-      }
 
       function startApp() {
         try {
           if (window.Telegram && window.Telegram.WebApp) {
-            tg = window.Telegram.WebApp;
+            tg = window.Telegram.WebApp; 
             tg.ready();
             tg.expand();
             telegramUser = tg.initDataUnsafe?.user;
@@ -189,7 +180,7 @@
           $('niva-preview-container').classList.add('hidden');
         });
         
-        // <<<--- MODIFIED: Niva form submission is now async
+        // UPDATED NIVA SUBMIT FORM
         $('sell-niva-form').addEventListener('submit', async (e) => {
           e.preventDefault();
           showLoader();
@@ -197,13 +188,11 @@
             const file = nivaFileInput.files[0];
             if (!file) throw new Error("Please upload a screenshot.");
             
-            const proofImageUrl = await readFileAsDataURL(file); // Read file as Base64
-            
             const allRequests = getLocalRequests();
             const payload = createPayload($('sell-niva-form').paymentMethodNiva.value, $('niva-payment-number').value);
             payload.type = 'niva-coin';
             payload.amount = parseFloat($('niva-amount-input').value);
-            payload.proofImageUrl = proofImageUrl; // Save Base64 string
+            payload.proofImageUrl = await fileToBase64(file); // Convert file to Base64
             
             allRequests.push(payload);
             saveLocalRequests(allRequests);
@@ -237,7 +226,7 @@
           $('gmail-file-display').classList.add('hidden');
         });
         
-        // <<<--- MODIFIED: Gmail form submission is now async
+        // UPDATED GMAIL SUBMIT FORM
         $('sell-gmail-form').addEventListener('submit', async (e) => {
           e.preventDefault();
           showLoader();
@@ -245,12 +234,10 @@
             const file = gmailFileInput.files[0];
             if (!file) throw new Error("Please upload a file.");
             
-            const fileUrl = await readFileAsDataURL(file); // Read file as Base64
-
             const allRequests = getLocalRequests();
             const payload = createPayload($('sell-gmail-form').paymentMethodGmail.value, $('gmail-payment-number').value);
             payload.type = 'gmail-id';
-            payload.fileUrl = fileUrl; // Save Base64 string
+            payload.fileUrl = await fileToBase64(file); // Convert file to Base64
             payload.fileName = file.name;
             payload.fileSize = file.size;
 
@@ -301,6 +288,16 @@
           paymentMethod,
           paymentNumber,
         };
+      }
+
+      // NEW HELPER FUNCTION TO CONVERT FILE TO BASE64
+      function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = error => reject(error);
+        });
       }
 
       function showPage(pageId) {
@@ -382,14 +379,14 @@
         userRequests.forEach(data => {
             if (data.status === "Completed") {
             if (data.type === "niva-coin") coinsSold += Number(data.amount || 0);
-            else if (data.type === "gmail-id") gmailSold += 1;
+            else if (data.type === "gmail-id") gmailSold += 1; // Each gmail request is 1 unit
             }
         });
         $("profile-coins-sold").textContent = coinsSold.toLocaleString();
         $("profile-gmail-sold").textContent = gmailSold.toLocaleString();
       }
 
-      // <<<--- MODIFIED: Admin panel now correctly displays images and provides download links
+      // UPDATED ADMIN DATA FUNCTION
       function loadAdminData() {
           const container = $('admin-requests-container');
           const allRequests = getLocalRequests().sort((a,b) => new Date(b.requestDate) - new Date(a.requestDate));
@@ -397,9 +394,10 @@
           container.innerHTML = allRequests.length === 0 ? '<p class="text-center text-text-secondary">No requests found.</p>' : '';
           allRequests.forEach(request => {
               const date = new Date(request.requestDate).toLocaleString('en-GB');
+              // Using Base64 data for src (image) and href (file)
               const details = request.type === 'niva-coin' 
                   ? `<b>Amount:</b> ${request.amount} Niva<br><a href="${request.proofImageUrl}" target="_blank" class="text-primary"><img src="${request.proofImageUrl}" class="mt-2 rounded-lg max-w-full h-auto" style="max-height: 200px;"></a>`
-                  : `<b>File:</b> <a href="${request.fileUrl}" download="${request.fileName}" class="text-primary">${request.fileName}</a>`;
+                  : `<b>File:</b> <a href="${request.fileUrl}" download="${request.fileName}" class="text-primary">${request.fileName}</a>`; // Added download attribute
 
               container.insertAdjacentHTML('beforeend', `
                   <div class="bg-background p-3 rounded-lg border border-slate-800">
