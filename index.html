@@ -332,15 +332,27 @@
                   const request = doc.data();
                   const requestId = doc.id;
                   const date = request.requestDate ? new Date(request.requestDate.seconds * 1000).toLocaleString('en-GB') : 'N/A';
+                  
+                  // **MODIFICATION START**
                   const details = request.type === 'niva-coin' 
-                      ? `<b>Amount:</b> ${request.amount} Niva<br><a href="${request.proofImageUrl}" target="_blank" class="text-primary">View Proof</a>`
-                      : `<b>File:</b> <a href="${request.fileUrl}" target="_blank" class="text-primary">${request.fileName}</a>`;
+                      ? `<b>Amount:</b> ${(request.amount || 0).toLocaleString()} Niva<br>
+                         <a href="${request.proofImageUrl}" target="_blank" title="Click to view full image">
+                           <img src="${request.proofImageUrl}" alt="Niva Proof" class="mt-2 rounded-lg max-w-full h-auto cursor-pointer" style="max-height: 200px;">
+                         </a>`
+                      : `<b>File:</b> <a href="${request.fileUrl}" target="_blank" class="text-primary underline">${request.fileName}</a>`;
+                  // **MODIFICATION END**
 
                   container.insertAdjacentHTML('beforeend', `
                       <div class="bg-background p-3 rounded-lg border border-slate-800">
-                          <p class="text-xs text-text-secondary">${date}</p>
-                          <p class="font-bold">${request.userName} (${request.telegramId})</p>
-                          <p class="text-sm my-2">${details}</p>
+                          <div class="flex items-center gap-3">
+                            <img src="${request.userPhotoUrl || 'logo19.jpg'}" class="w-10 h-10 rounded-full object-cover">
+                            <div class="flex-1">
+                                <p class="font-bold">${request.userName}</p>
+                                <p class="text-xs text-text-secondary">${request.telegramId}</p>
+                            </div>
+                            <p class="text-xs text-text-secondary text-right">${date}</p>
+                          </div>
+                          <div class="text-sm my-3 pl-13">${details}</div>
                           <p class="text-sm"><b>Payment:</b> ${request.paymentMethod} - ${request.paymentNumber}</p>
                           <p class="text-sm"><b>Status:</b> ${request.status}</p>
                           ${request.status === 'Processing' ? `
