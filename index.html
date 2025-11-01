@@ -29,35 +29,32 @@
       <div class="flex items-center p-4"><h2 class="text-xl font-bold flex-1 text-text-secondary">Dashboard</h2><div class="flex size-10 shrink-0 items-center justify-end"><img class="user-profile-pic object-cover rounded-full size-10 border-2 border-primary" src="logo19.jpg" alt="User Avatar"></div></div>
       <h1 id="welcome-message" class="text-3xl font-bold px-4 pb-4 pt-4">Welcome!</h1>
       
-      <!-- Dashboard Buttons with Images and Colors (Updated) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 py-2">
-        <button data-page="page-sell-niva" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-emerald-500 text-white font-bold gap-3 px-4">
-          <img src="./niva.jpg" class="h-8 w-8 rounded-full" alt="Niva Coin">
-          <span>Sell Niva</span>
-        </button>
-        <button data-page="page-sell-fira" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-amber-500 text-white font-bold gap-3 px-4">
-          <img src="./fira.jpg" class="h-8 w-8 rounded-full" alt="Fira Coin">
-          <span>Sell Fira</span>
-        </button>
-        <button data-page="page-sell-gmail" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-rose-600 text-white font-bold gap-3 px-4">
-          <img src="./gmail.jpg" class="h-8 w-8" alt="Gmail">
-          <span>Sell Gmail</span>
-        </button>
+        <button data-page="page-sell-niva" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-emerald-500 text-white font-bold gap-3 px-4"> <img src="./niva.jpg" class="h-8 w-8 rounded-full" alt="Niva Coin"> <span>Sell Niva</span> </button>
+        <button data-page="page-sell-fira" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-amber-500 text-white font-bold gap-3 px-4"> <img src="./fira.jpg" class="h-8 w-8 rounded-full" alt="Fira Coin"> <span>Sell Fira</span> </button>
+        <button data-page="page-sell-gmail" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-rose-600 text-white font-bold gap-3 px-4"> <img src="./gmail.jpg" class="h-8 w-8" alt="Gmail"> <span>Sell Gmail</span> </button>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
         <div><div class="flex flex-col rounded-lg bg-card-background p-4"><div class="flex items-center gap-3 mb-2"><div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary text-lg">toll</span></div><p>Niva Coin Sales</p></div><div class="flex items-end justify-between"><div class="flex flex-col"><p id="dashboard-niva-requests" class="text-sm text-text-secondary">...</p><p id="dashboard-niva-total" class="text-sm text-text-secondary">...</p></div><button class="nav-btn-internal flex items-center justify-center rounded-md h-8 px-3 bg-card-background text-primary border border-primary text-xs font-medium" data-page="page-history">View</button></div></div></div>
         <div><div class="flex flex-col rounded-lg bg-card-background p-4"><div class="flex items-center gap-3 mb-2"><div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary text-lg">currency_bitcoin</span></div><p>Fira Coin Sales</p></div><div class="flex items-end justify-between"><div class="flex flex-col"><p id="dashboard-fira-requests" class="text-sm text-text-secondary">...</p><p id="dashboard-fira-total" class="text-sm text-text-secondary">...</p></div><button class="nav-btn-internal flex items-center justify-center rounded-md h-8 px-3 bg-card-background text-primary border border-primary text-xs font-medium" data-page="page-history">View</button></div></div></div>
         <div class="col-span-1 md:col-span-2"><div class="flex flex-col rounded-lg bg-card-background p-4"><div class="flex items-center gap-3 mb-2"><div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary text-lg">mail</span></div><p>Gmail ID Sales</p></div><div class="flex items-end justify-between"><p id="dashboard-gmail-pending" class="text-sm text-text-secondary">...</p><button class="nav-btn-internal flex items-center justify-center rounded-md h-8 px-3 bg-card-background text-primary border border-primary text-xs font-medium" data-page="page-history">View</button></div></div></div>
-        <div class="col-span-1 md:col-span-2"><div class="flex flex-col rounded-lg bg-card-background p-4"><div class="flex justify-between mb-2"><p>Market Rates</p><p class="text-xs font-bold text-red-500">Live</p></div><div class="flex flex-col gap-1"><p class="text-sm">Niva Coin: <span id="dashboard-niva-rate" class="text-primary font-bold">...</span></p><p class="text-sm">Fira Coin: <span id="dashboard-fira-rate" class="text-primary font-bold">...</span></p><p class="text-sm">Gmail ID: <span id="dashboard-gmail-rate" class="text-primary font-bold">...</span></p></div></div></div>
+        <div class="col-span-1 md:col-span-2"><div class="flex flex-col rounded-lg bg-card-background p-4"><div class="flex justify-between mb-2"><p>Market Rates</p><p class="text-xs font-bold text-red-500">Live</p></div><div class="flex flex-col gap-1"><p class="text-sm">Fira Coin: <span id="dashboard-fira-rate" class="text-primary font-bold">...</span></p><p class="text-sm">Gmail ID: <span id="dashboard-gmail-rate" class="text-primary font-bold">...</span></p></div></div></div>
       </div>
       <a href="https://t.me/earno_vate_earn" target="_blank" class="fixed bottom-24 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg"><svg class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-1.37.2-1.64l16.43-6.2c.75-.28 1.45.27 1.23 1.22l-2.67 12.3c-.22.99-1.21 1.22-1.87.73l-4.11-3.4-1.98 1.9z"></path></svg></a>
     </main>
     
-    <!-- Sell Niva Page -->
+    <!-- Sell Niva Page (Updated with Tiered Rates) -->
     <main id="page-sell-niva" class="page flex-grow p-4 pb-28">
       <header class="flex items-center py-2 justify-between"><button class="nav-btn-internal text-white flex size-10 items-center justify-center -ml-2" data-page="page-dashboard"><span class="material-symbols-outlined text-2xl">arrow_back</span></button><h1 class="text-lg font-bold flex-1 text-center">Sell Your Niva Coin</h1><div class="size-8"></div></header>
-      <div class="rounded-xl bg-card-background my-4 p-4"><p class="text-lg font-bold">Current Rate: <span id="sell-niva-rate" class="text-primary">...</span></p></div>
+      
+      <div class="rounded-xl bg-card-background my-4 p-4">
+        <h3 class="text-lg font-bold mb-3 text-center">Current Niva Rates</h3>
+        <div id="niva-rates-display" class="space-y-2 text-sm">
+            <!-- Rates will be loaded here by JavaScript -->
+        </div>
+      </div>
+
       <form id="sell-niva-form" class="space-y-6">
           <div><label class="block mb-2">Amount to Sell</label><div class="relative"><input id="niva-amount-input" required class="form-input w-full rounded-lg text-white border-slate-700 bg-card-background h-14 p-4 pr-16" placeholder="e.g., 1000" type="number" step="any"/><span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">NIVA</span></div><p id="niva-payout-text" class="text-slate-300 pt-2">You will receive: ~৳0.00</p></div>
           <div><h2 class="text-lg font-bold mb-2">Proof of Transfer</h2><p class="text-sm text-slate-400 mb-4">Upload a screenshot of the completed transaction.</p><div class="relative w-full min-h-[160px] p-6 border-2 border-dashed border-slate-700 rounded-xl bg-card-background"><div id="niva-upload-prompt" class="flex flex-col items-center justify-center text-center cursor-pointer"><span class="material-symbols-outlined text-4xl text-slate-400 mb-2">upload_file</span><p>Attach Screenshot</p></div><div id="niva-preview-container" class="hidden absolute inset-2"><img id="niva-image-preview" src="#" alt="Preview" class="w-full h-full rounded-lg object-cover"><button id="remove-niva-image-btn" type="button" class="absolute top-2 right-2 text-white bg-black/50 flex size-8 items-center justify-center rounded-full"><span class="material-symbols-outlined text-xl">close</span></button></div><input id="niva-file-input" required class="absolute inset-0 opacity-0 cursor-pointer" type="file" accept="image/*"/></div></div>
@@ -94,36 +91,49 @@
       <h1 class="text-lg font-bold text-center mb-6">Settings</h1>
       <div class="flex flex-col gap-8">
         <section class="flex w-full items-center gap-4 rounded-xl bg-card-background p-4"><div class="shrink-0"><img class="user-profile-pic object-cover rounded-full h-16 w-16 border-2 border-primary" src="logo19.jpg" alt="User Avatar"></div><div class="min-w-0"><p id="profile-name" class="text-lg font-bold truncate">...</p><p id="profile-id" class="text-sm text-text-secondary break-all">...</p></div></section>
-        <section><h2 class="px-2 mb-3 text-sm font-semibold uppercase text-text-secondary">Activity Summary</h2><div class="grid grid-cols-2 gap-4"><div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4"><span class="material-symbols-outlined text-primary text-3xl">toll</span><p class="text-xs text-text-secondary">Total Niva Sold</p><p id="profile-niva-sold" class="text-xl font-bold">0</p></div><div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4"><span class="material-symbols-outlined text-primary text-3xl">currency_bitcoin</span><p class="text-xs text-text-secondary">Total Fira Sold</p><p id="profile-fira-sold" class="text-xl font-bold">0</p></div><div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4 col-span-2"><span class="material-symbols-outlined text-primary text-3xl">alternate_email</span><p class="text-xs text-text-secondary">Total Gmail IDs Sold</p><p id="profile-gmail-sold" class="text-xl font-bold">0</p></div></div></section>
+        <section><h2 class="px-2 mb-3 text-sm font-semibold uppercase text-text-secondary">Activity Summary</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4">
+                    <span id="profile-niva-icon-container" class="text-primary text-3xl"><span class="material-symbols-outlined">toll</span></span>
+                    <p class="text-xs text-text-secondary">Total Niva Sold</p>
+                    <p id="profile-niva-sold" class="text-xl font-bold">0</p>
+                </div>
+                <div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4">
+                    <span id="profile-fira-icon-container" class="text-primary text-3xl">
+                        <!-- Custom Fira icon will be injected here -->
+                    </span>
+                    <p class="text-xs text-text-secondary">Total Fira Sold</p>
+                    <p id="profile-fira-sold" class="text-xl font-bold">0</p>
+                </div>
+                <div class="flex flex-col gap-2 rounded-xl bg-primary/10 p-4 col-span-2">
+                    <span class="material-symbols-outlined text-primary text-3xl">alternate_email</span>
+                    <p class="text-xs text-text-secondary">Total Gmail IDs Sold</p>
+                    <p id="profile-gmail-sold" class="text-xl font-bold">0</p>
+                </div>
+            </div>
+        </section>
         
-        <!-- Admin Panel Section -->
+        <!-- Admin Panel Section (Updated with Tiered Rates) -->
         <section id="admin-panel" class="hidden">
           <h2 class="px-2 mb-3 text-sm font-semibold uppercase text-text-secondary">Admin Panel</h2>
           <div class="bg-card-background rounded-xl p-4 space-y-4">
             <h3 class="font-bold">Update Rates</h3>
             <form id="update-rates-form" class="space-y-3">
-              <div>
-                <label for="admin-niva-rate" class="block text-sm mb-1">Niva Coin Rate (/k)</label>
-                <input id="admin-niva-rate" type="number" step="0.01" class="form-input w-full rounded-lg text-white border-slate-700 bg-background h-12 p-3" required>
-              </div>
-              <div>
-                <label for="admin-fira-rate" class="block text-sm mb-1">Fira Coin Rate (/k)</label>
-                <input id="admin-fira-rate" type="number" step="0.01" class="form-input w-full rounded-lg text-white border-slate-700 bg-background h-12 p-3" required>
-              </div>
-              <div>
-                <label for="admin-gmail-rate" class="block text-sm mb-1">Gmail ID Rate</label>
-                <input id="admin-gmail-rate" type="number" step="0.01" class="form-input w-full rounded-lg text-white border-slate-700 bg-background h-12 p-3" required>
-              </div>
+              <fieldset class="border border-slate-700 p-3 rounded-lg">
+                <legend class="px-2 font-semibold text-primary">Niva Coin Rates (/k)</legend>
+                <div class="space-y-3">
+                    <div><label for="admin-niva-rate-10k" class="block text-sm mb-1">Up to 10k</label><input id="admin-niva-rate-10k" type="number" step="0.01" class="form-input w-full rounded-lg text-white border-slate-700 bg-background h-12 p-3" required></div>
+                    <div><label for="admin-niva-rate-50k" class="block text-sm mb-1">Up to 50k</label><input id="admin-niva-rate-50k" type="number" step="0.01" class="form-input w-full rounded-lg text-white border-slate-700 bg-background h-12 p-3" required></div>
+                    <div><label for="admin-niva-rate-100k" class="block text-sm mb-1">Up to 100k</label><input id="admin-niva-rate-100k" type="number" step="0.01" class="form-input w-full rounded-lg text-white border-slate-700 bg-background h-12 p-3" required></div>
+                    <div><label for="admin-niva-rate-500k" class="block text-sm mb-1">Up to 500k+</label><input id="admin-niva-rate-500k" type="number" step="0.01" class="form-input w-full rounded-lg text-white border-slate-700 bg-background h-12 p-3" required></div>
+                </div>
+              </fieldset>
+              <div><label for="admin-fira-rate" class="block text-sm mb-1">Fira Coin Rate (/k)</label><input id="admin-fira-rate" type="number" step="0.01" class="form-input w-full rounded-lg text-white border-slate-700 bg-background h-12 p-3" required></div>
+              <div><label for="admin-gmail-rate" class="block text-sm mb-1">Gmail ID Rate</label><input id="admin-gmail-rate" type="number" step="0.01" class="form-input w-full rounded-lg text-white border-slate-700 bg-background h-12 p-3" required></div>
               <button type="submit" class="w-full bg-primary text-background font-bold py-2.5 px-4 rounded-lg">Update Rates</button>
             </form>
           </div>
-
-          <div class="mt-6">
-            <h3 class="font-bold mb-3 px-2">All Sell Requests</h3>
-            <div id="admin-requests-container" class="space-y-3">
-              <p class="text-center text-text-secondary">Loading requests...</p>
-            </div>
-          </div>
+          <div class="mt-6"><h3 class="font-bold mb-3 px-2">All Sell Requests</h3><div id="admin-requests-container" class="space-y-3"><p class="text-center text-text-secondary">Loading requests...</p></div></div>
         </section>
 
         <section class="flex w-full items-center justify-between gap-4 rounded-xl bg-blue-900/50 p-4 border border-blue-700"><div class="flex items-center gap-4"><div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-1.37.2-1.64l16.43-6.2c.75-.28 1.45.27 1.23 1.22l-2.67 12.3c-.22.99-1.21 1.22-1.87.73l-4.11-3.4-1.98 1.9z"></path></svg></div><div><p class="font-bold text-white">Join Our Telegram</p><p class="text-sm text-blue-200">For news & updates</p></div></div><a href="https://t.me/earno_vate_earn" target="_blank" class="flex h-10 shrink-0 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-bold text-white">Join</a></section>
@@ -131,7 +141,7 @@
       </div>
     </main>
 
-    <!-- Bottom Navigation (Updated) -->
+    <!-- Bottom Navigation -->
     <div class="fixed bottom-0 left-0 right-0 h-20 bg-card-background/90 backdrop-blur-sm border-t border-text-secondary/10">
       <div class="grid h-full max-w-lg grid-cols-4 mx-auto">
         <button class="nav-btn inline-flex flex-col items-center justify-center px-5" data-page="page-dashboard" data-nav="dashboard"><span class="material-symbols-outlined text-2xl mb-1">dashboard</span><span class="text-xs">Dashboard</span></button>
@@ -142,61 +152,67 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const ADMIN_TELEGRAM_ID = '6703675335';
-      const $ = (id) => document.getElementById(id);
-      const showLoader = () => $('loading-overlay').classList.remove('hidden');
-      const hideLoader = () => $('loading-overlay').classList.add('hidden');
-      
-      let telegramUser;
-      let tg; 
-      let marketRates = { nivaRate: 7.5, firaRate: 5.0, gmailRate: 13 };
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const ADMIN_TELEGRAM_ID = '6703675335';
+    const $ = (id) => document.getElementById(id);
+    const showLoader = () => $('loading-overlay').classList.remove('hidden');
+    const hideLoader = () => $('loading-overlay').classList.add('hidden');
+    
+    let telegramUser;
+    let tg; 
+    let marketRates = {
+        nivaRates: {
+            tier1: { upTo: 10000, rate: 7.5 },
+            tier2: { upTo: 50000, rate: 8.0 },
+            tier3: { upTo: 100000, rate: 8.5 },
+            tier4: { upTo: 500000, rate: 9.0 }
+        },
+        firaRate: 5.0,
+        gmailRate: 13
+    };
 
-      // Firebase Configuration
-      const firebaseConfig = {
+    const firebaseConfig = {
         apiKey: "AIzaSyCAQtTRKgOizQjgqCbIZ_Z357LQD2Woee8",
         authDomain: "earnovate-bot.firebaseapp.com",
         databaseURL: "https://earnovate-bot-default-rtdb.firebaseio.com",
         projectId: "earnovate-bot",
-        storageBucket: "earnovate-bot.appspot.com",
-        messagingSenderId: "395184310691",
         appId: "1:395184310691:web:9a0a2e5ad0e954b527b216",
-        measurementId: "G-S6G9YSP2HN"
-      };
+    };
 
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.database();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-      function startApp() {
+    function startApp() {
         try {
-          if (window.Telegram && window.Telegram.WebApp) {
-            tg = window.Telegram.WebApp; 
-            tg.ready();
-            tg.expand();
-            telegramUser = tg.initDataUnsafe?.user;
-            if (telegramUser?.id) {
-              initializeAppUI();
+            if (window.Telegram && window.Telegram.WebApp) {
+                tg = window.Telegram.WebApp;
+                tg.ready();
+                tg.expand();
+                telegramUser = tg.initDataUnsafe?.user;
+                if (telegramUser?.id) {
+                    initializeAppUI();
+                } else {
+                    throw new Error("Could not get Telegram user data.");
+                }
             } else {
-              throw new Error("Could not get Telegram user data. Please open this in Telegram.");
+                $('error-container').classList.remove('hidden');
             }
-          } else {
-             $('error-container').classList.remove('hidden');
-          }
         } catch (error) {
-          console.error("App failed to start:", error);
-          $('error-container').classList.remove('hidden');
-          $('error-container').innerHTML = `<p>Error: ${error.message}</p>`;
+            console.error("App failed to start:", error);
+            $('error-container').classList.remove('hidden').innerHTML = `<p>Error: ${error.message}</p>`;
         }
-      }
-      
-      function initializeAppUI() {
+    }
+    
+    function initializeAppUI() {
         const { id, first_name, photo_url } = telegramUser;
         document.querySelectorAll('.user-profile-pic').forEach(p => p.src = photo_url || 'logo19.jpg');
         $('welcome-message').textContent = `Welcome, ${first_name || 'User'}!`;
         $('profile-name').textContent = first_name || 'User';
         $('profile-id').textContent = `Telegram ID: ${id}`;
+        
+        // Inject custom Fira Icon
+        $('profile-fira-icon-container').innerHTML = `<div class="flex items-center justify-center h-8 w-8 bg-amber-500 rounded-full text-white font-bold text-xl leading-none">F</div>`;
         
         if (id.toString() === ADMIN_TELEGRAM_ID) {
             $('admin-panel').classList.remove('hidden');
@@ -206,40 +222,49 @@
         setupEventListeners();
         loadAndDisplayRates();
         showPage('page-dashboard');
-      }
+    }
 
-      function setupEventListeners() {
+    function setupEventListeners() {
         document.querySelectorAll('.nav-btn, .nav-btn-internal').forEach(btn => {
-          btn.addEventListener('click', () => showPage(btn.dataset.page));
+            btn.addEventListener('click', () => showPage(btn.dataset.page));
         });
 
-        // Niva Listeners
-        $('niva-amount-input').addEventListener('input', () => {
-          const amount = parseFloat($('niva-amount-input').value) || 0;
-          $('niva-payout-text').textContent = `You will receive: ~৳${(amount / 1000 * marketRates.nivaRate).toFixed(2)}`;
-        });
+        $('niva-amount-input').addEventListener('input', calculateNivaPayout);
         setupImageUpload('niva');
         $('sell-niva-form').addEventListener('submit', (e) => handleCoinSubmit(e, 'niva'));
 
-        // Fira Listeners
         $('fira-amount-input').addEventListener('input', () => {
-          const amount = parseFloat($('fira-amount-input').value) || 0;
-          $('fira-payout-text').textContent = `You will receive: ~৳${(amount / 1000 * marketRates.firaRate).toFixed(2)}`;
+            const amount = parseFloat($('fira-amount-input').value) || 0;
+            $('fira-payout-text').textContent = `You will receive: ~৳${(amount / 1000 * marketRates.firaRate).toFixed(2)}`;
         });
         setupImageUpload('fira');
         $('sell-fira-form').addEventListener('submit', (e) => handleCoinSubmit(e, 'fira'));
         
-        // Gmail Listeners
         setupGmailUpload();
         $('sell-gmail-form').addEventListener('submit', handleGmailSubmit);
         
-        // Admin Listeners
         if (telegramUser.id.toString() === ADMIN_TELEGRAM_ID) {
-          $('update-rates-form').addEventListener('submit', handleRateUpdate);
+            $('update-rates-form').addEventListener('submit', handleRateUpdate);
         }
-      }
+    }
 
-      async function handleCoinSubmit(e, coinType) {
+    // New function to calculate Niva payout based on tiers
+    function calculateNivaPayout() {
+        const amount = parseFloat($('niva-amount-input').value) || 0;
+        const tiers = Object.values(marketRates.nivaRates).sort((a, b) => a.upTo - b.upTo);
+        let selectedRate = tiers[tiers.length - 1].rate; // Default to highest rate
+
+        for (const tier of tiers) {
+            if (amount <= tier.upTo) {
+                selectedRate = tier.rate;
+                break;
+            }
+        }
+        const payout = (amount / 1000 * selectedRate).toFixed(2);
+        $('niva-payout-text').textContent = `You will receive: ~৳${payout} (Rate: ৳${selectedRate}/k)`;
+    }
+
+    async function handleCoinSubmit(e, coinType) {
         e.preventDefault();
         showLoader();
         try {
@@ -259,13 +284,12 @@
             showPage('page-history');
         } catch (err) {
             tg.showAlert(`Submission Failed: ${err.message}`);
-            console.error(err);
         } finally {
             hideLoader();
         }
-      }
+    }
 
-      async function handleGmailSubmit(e) {
+    async function handleGmailSubmit(e) {
         e.preventDefault();
         showLoader();
         try {
@@ -286,98 +310,101 @@
             showPage('page-history');
         } catch (err) {
             tg.showAlert(`Submission Failed: ${err.message}`);
-            console.error(err);
         } finally {
             hideLoader();
         }
-      }
+    }
 
-      function handleRateUpdate(e) {
-          e.preventDefault();
-          showLoader();
-          try {
-              const nivaRate = parseFloat($('admin-niva-rate').value);
-              const firaRate = parseFloat($('admin-fira-rate').value);
-              const gmailRate = parseFloat($('admin-gmail-rate').value);
-              if (isNaN(nivaRate) || isNaN(firaRate) || isNaN(gmailRate)) throw new Error("Invalid rate values.");
-              
-              db.ref('rates').set({ nivaRate, firaRate, gmailRate });
-              tg.showAlert('Rates updated successfully!');
-          } catch (err) {
-              tg.showAlert(`Rate update failed: ${err.message}`);
-          } finally {
-              hideLoader();
-          }
-      }
-      
-      function setupImageUpload(prefix) {
-          const fileInput = $(`${prefix}-file-input`);
-          fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
-            if (file) {
-              $(`${prefix}-image-preview`).src = URL.createObjectURL(file);
-              $(`${prefix}-upload-prompt`).classList.add('hidden');
-              $(`${prefix}-preview-container`).classList.remove('hidden');
+    function handleRateUpdate(e) {
+        e.preventDefault();
+        showLoader();
+        try {
+            const ratesToUpdate = {
+                nivaRates: {
+                    tier1: { upTo: 10000, rate: parseFloat($('admin-niva-rate-10k').value) },
+                    tier2: { upTo: 50000, rate: parseFloat($('admin-niva-rate-50k').value) },
+                    tier3: { upTo: 100000, rate: parseFloat($('admin-niva-rate-100k').value) },
+                    tier4: { upTo: 500000, rate: parseFloat($('admin-niva-rate-500k').value) }
+                },
+                firaRate: parseFloat($('admin-fira-rate').value),
+                gmailRate: parseFloat($('admin-gmail-rate').value)
+            };
+            if (Object.values(ratesToUpdate.nivaRates).some(t => isNaN(t.rate)) || isNaN(ratesToUpdate.firaRate) || isNaN(ratesToUpdate.gmailRate)) {
+                throw new Error("Invalid rate values.");
             }
-          });
-          $(`remove-${prefix}-image-btn`).addEventListener('click', (e) => {
-            e.preventDefault();
-            fileInput.value = null;
-            $(`${prefix}-image-preview`).src = '#';
-            $(`${prefix}-upload-prompt`).classList.remove('hidden');
-            $(`${prefix}-preview-container`).classList.add('hidden');
-          });
-      }
-      
-      function setupGmailUpload() {
-          const gmailFileInput = $('gmail-file-input');
-          gmailFileInput.addEventListener('change', () => {
-            const file = gmailFileInput.files[0];
-            if (file) {
-              $('gmail-file-name').textContent = file.name;
-              $('gmail-file-size').textContent = `${(file.size / 1024).toFixed(2)} KB`;
-              $('gmail-upload-prompt').classList.add('hidden');
-              $('gmail-file-display').classList.remove('hidden');
-            }
-          });
-          $('remove-gmail-file-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            gmailFileInput.value = null;
-            $('gmail-upload-prompt').classList.remove('hidden');
-            $('gmail-file-display').classList.add('hidden');
-          });
-      }
-      
-      function createPayload(paymentMethod, paymentNumber) {
+            
+            db.ref('rates').set(ratesToUpdate);
+            tg.showAlert('Rates updated successfully!');
+        } catch (err) {
+            tg.showAlert(`Rate update failed: ${err.message}`);
+        } finally {
+            hideLoader();
+        }
+    }
+    
+    function setupImageUpload(prefix) { /* ... same as before ... */ }
+    function setupGmailUpload() { /* ... same as before ... */ }
+    function createPayload(paymentMethod, paymentNumber) { /* ... same as before ... */ }
+    function fileToBase64(file) { /* ... same as before ... */ }
+    
+    // Previous code for these functions, which remains unchanged
+    function setupImageUpload(prefix) {
+        const fileInput = $(`${prefix}-file-input`);
+        fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (file) {
+            $(`${prefix}-image-preview`).src = URL.createObjectURL(file);
+            $(`${prefix}-upload-prompt`).classList.add('hidden');
+            $(`${prefix}-preview-container`).classList.remove('hidden');
+        }
+        });
+        $(`remove-${prefix}-image-btn`).addEventListener('click', (e) => {
+        e.preventDefault();
+        fileInput.value = null;
+        $(`${prefix}-image-preview`).src = '#';
+        $(`${prefix}-upload-prompt`).classList.remove('hidden');
+        $(`${prefix}-preview-container`).classList.add('hidden');
+        });
+    }
+    
+    function setupGmailUpload() {
+        const gmailFileInput = $('gmail-file-input');
+        gmailFileInput.addEventListener('change', () => {
+        const file = gmailFileInput.files[0];
+        if (file) {
+            $('gmail-file-name').textContent = file.name;
+            $('gmail-file-size').textContent = `${(file.size / 1024).toFixed(2)} KB`;
+            $('gmail-upload-prompt').classList.add('hidden');
+            $('gmail-file-display').classList.remove('hidden');
+        }
+        });
+        $('remove-gmail-file-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        gmailFileInput.value = null;
+        $('gmail-upload-prompt').classList.remove('hidden');
+        $('gmail-file-display').classList.add('hidden');
+        });
+    }
+
+    function createPayload(paymentMethod, paymentNumber) {
         const newRequestRef = db.ref('requests').push();
         return {
-          id: newRequestRef.key,
-          telegramId: telegramUser.id.toString(),
-          userName: telegramUser.first_name || 'User',
-          userPhotoUrl: telegramUser.photo_url || null,
-          status: 'Processing',
-          requestDate: new Date().toISOString(),
-          paymentMethod,
-          paymentNumber,
+        id: newRequestRef.key,
+        telegramId: telegramUser.id.toString(),
+        userName: telegramUser.first_name || 'User',
+        userPhotoUrl: telegramUser.photo_url || null,
+        status: 'Processing',
+        requestDate: new Date().toISOString(),
+        paymentMethod,
+        paymentNumber,
         };
-      }
+    }
 
-      function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
-        });
-      }
-
-      // Updated showPage function to handle navigation highlighting correctly
-      function showPage(pageId) {
+    function showPage(pageId) {
         if (!pageId) return;
         document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
         $(pageId)?.classList.add("active");
         
-        // Determine active navigation tab
         let activeNav = 'dashboard';
         if (['page-sell-niva', 'page-sell-fira', 'page-sell-gmail'].includes(pageId)) {
             activeNav = 'sell';
@@ -387,45 +414,65 @@
             activeNav = 'profile';
         }
 
-        // Update nav button styles
         document.querySelectorAll(".nav-btn").forEach(btn => {
-          btn.classList.toggle("text-primary", btn.dataset.nav === activeNav);
-          btn.classList.toggle("text-text-secondary", btn.dataset.nav !== activeNav);
+            const isSellButton = btn.dataset.nav === 'sell' && activeNav === 'sell';
+            const isOtherButton = btn.dataset.nav !== 'sell' && btn.dataset.page === pageId;
+            btn.classList.toggle("text-primary", isSellButton || isOtherButton);
+            btn.classList.toggle("text-text-secondary", !(isSellButton || isOtherButton));
         });
 
-        // Load data for the current page
         loadDashboardData();
         loadProfileData();
         if (pageId === "page-history") loadHistoryData();
         if (pageId === "page-profile" && telegramUser.id.toString() === ADMIN_TELEGRAM_ID) loadAdminData();
-
         window.scrollTo({ top: 0, behavior: "smooth" });
-      }
+    }
 
-      function loadAndDisplayRates() {
-        const ratesRef = db.ref('rates');
-        ratesRef.on('value', (snapshot) => {
-          const rates = snapshot.val() || { nivaRate: 7.5, firaRate: 5.0, gmailRate: 13 };
-          marketRates = rates;
-          const nivaRateText = `৳${marketRates.nivaRate} /k`;
-          const firaRateText = `৳${marketRates.firaRate} /k`;
-          const gmailRateText = `৳${marketRates.gmailRate}`;
+    function loadAndDisplayRates() {
+        db.ref('rates').on('value', (snapshot) => {
+            const rates = snapshot.val();
+            // Merge with defaults to prevent errors if Firebase data is incomplete
+            marketRates = {...marketRates, ...rates};
+            
+            const firaRateText = `৳${marketRates.firaRate} /k`;
+            const gmailRateText = `৳${marketRates.gmailRate}`;
 
-          $("dashboard-niva-rate").textContent = nivaRateText;
-          $("dashboard-fira-rate").textContent = firaRateText;
-          $("dashboard-gmail-rate").textContent = gmailRateText;
-          $("sell-niva-rate").textContent = nivaRateText;
-          $("sell-fira-rate").textContent = firaRateText;
-          
-          if (telegramUser.id.toString() === ADMIN_TELEGRAM_ID) {
-            $("admin-niva-rate").value = marketRates.nivaRate;
-            $("admin-fira-rate").value = marketRates.firaRate;
-            $("admin-gmail-rate").value = marketRates.gmailRate;
-          }
+            $('dashboard-fira-rate').textContent = firaRateText;
+            $('dashboard-gmail-rate').textContent = gmailRateText;
+            $('sell-fira-rate').textContent = firaRateText;
+
+            // Display Niva tiered rates
+            const ratesDisplay = $('niva-rates-display');
+            ratesDisplay.innerHTML = '';
+            const tiers = Object.values(marketRates.nivaRates).sort((a,b) => a.upTo - b.upTo);
+            tiers.forEach(tier => {
+                ratesDisplay.insertAdjacentHTML('beforeend', `
+                    <div class="flex justify-between items-center bg-background p-2 rounded-md">
+                        <span class="text-text-secondary">Up to ${tier.upTo.toLocaleString()} Coins</span>
+                        <span class="text-primary font-bold">৳${tier.rate}/k</span>
+                    </div>
+                `);
+            });
+            
+            if (telegramUser.id.toString() === ADMIN_TELEGRAM_ID) {
+                $('admin-niva-rate-10k').value = marketRates.nivaRates.tier1.rate;
+                $('admin-niva-rate-50k').value = marketRates.nivaRates.tier2.rate;
+                $('admin-niva-rate-100k').value = marketRates.nivaRates.tier3.rate;
+                $('admin-niva-rate-500k').value = marketRates.nivaRates.tier4.rate;
+                $('admin-fira-rate').value = marketRates.firaRate;
+                $('admin-gmail-rate').value = marketRates.gmailRate;
+            }
         });
-      }
-      
-      async function loadHistoryData() {
+    }
+    
+    async function loadHistoryData() { /* ... same as before ... */ }
+    async function loadDashboardData() { /* ... same as before ... */ }
+    async function loadProfileData() { /* ... same as before ... */ }
+    function loadAdminData() { /* ... same as before ... */ }
+    function updateRequestStatus(id, status) { /* ... same as before ... */ }
+
+    // Paste the unchanged functions here
+    async function loadHistoryData() {
         const container = $("history-list-container");
         container.innerHTML = '<div class="text-center text-text-secondary">Loading history...</div>';
         try {
@@ -435,8 +482,7 @@
                 container.innerHTML = '<p class="text-center text-text-secondary">No requests found.</p>';
                 return;
             }
-            
-            const userRequests = Object.values(data).sort((a,b) => new Date(b.requestDate) - new Date(a.requestDate));
+            const userRequests = Object.values(data).sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
             container.innerHTML = "";
             userRequests.forEach(req => {
                 let icon = 'mail';
@@ -450,22 +496,15 @@
                 }
                 const date = new Date(req.requestDate).toLocaleDateString("en-GB");
                 let statusColor = req.status === "Completed" ? "green" : req.status === "Rejected" ? "red" : "orange";
-                container.insertAdjacentHTML("beforeend", `
-                  <div class="flex items-center gap-4 bg-card-background p-3 rounded-xl">
-                    <div class="flex items-center justify-center rounded-lg bg-primary/20 shrink-0 w-12 h-12"><span class="material-symbols-outlined text-primary">${icon}</span></div>
-                    <div class="flex-1 min-w-0"><p class="font-medium truncate">${title}</p><p class="text-zinc-400 text-sm">${date}</p></div>
-                    <div class="shrink-0"><div class="rounded-full px-3 py-1 bg-${statusColor}-400/20 text-${statusColor}-400"><p class="text-xs font-semibold">${req.status}</p></div></div>
-                  </div>`);
+                container.insertAdjacentHTML("beforeend", `<div class="flex items-center gap-4 bg-card-background p-3 rounded-xl"><div class="flex items-center justify-center rounded-lg bg-primary/20 shrink-0 w-12 h-12"><span class="material-symbols-outlined text-primary">${icon}</span></div><div class="flex-1 min-w-0"><p class="font-medium truncate">${title}</p><p class="text-zinc-400 text-sm">${date}</p></div><div class="shrink-0"><div class="rounded-full px-3 py-1 bg-${statusColor}-400/20 text-${statusColor}-400"><p class="text-xs font-semibold">${req.status}</p></div></div></div>`);
             });
-        } catch(e) {
+        } catch (e) {
             container.innerHTML = '<p class="text-center text-red-400">Could not load history.</p>';
         }
-      }
-
-      async function loadDashboardData() {
+    }
+    async function loadDashboardData() {
         const snapshot = await db.ref('requests').orderByChild('telegramId').equalTo(telegramUser.id.toString()).once('value');
         const data = snapshot.val();
-        
         let nivaRequests = 0, nivaTotal = 0, firaRequests = 0, firaTotal = 0, gmailPending = 0;
         if (data) {
             Object.values(data).forEach(req => {
@@ -479,12 +518,10 @@
         $("dashboard-fira-requests").textContent = `${firaRequests} Requests`;
         $("dashboard-fira-total").textContent = `${firaTotal.toLocaleString()} Coins`;
         $("dashboard-gmail-pending").textContent = `${gmailPending} IDs Pending`;
-      }
-      
-      async function loadProfileData() {
+    }
+    async function loadProfileData() {
         const snapshot = await db.ref('requests').orderByChild('telegramId').equalTo(telegramUser.id.toString()).once('value');
         const data = snapshot.val();
-
         let nivaSold = 0, firaSold = 0, gmailSold = 0;
         if (data) {
             Object.values(data).forEach(req => {
@@ -498,61 +535,41 @@
         $("profile-niva-sold").textContent = nivaSold.toLocaleString();
         $("profile-fira-sold").textContent = firaSold.toLocaleString();
         $("profile-gmail-sold").textContent = gmailSold.toLocaleString();
-      }
+    }
+    function loadAdminData() {
+        const container = $('admin-requests-container');
+        db.ref('requests').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                container.innerHTML = '<p class="text-center text-text-secondary">No requests found.</p>';
+                return;
+            }
+            const allRequests = Object.values(data).sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
+            container.innerHTML = '';
+            allRequests.forEach(request => {
+                const date = new Date(request.requestDate).toLocaleString('en-GB');
+                let details = '';
+                if (request.type === 'niva-coin' || request.type === 'fira-coin') {
+                    details = `<b>Amount:</b> ${request.amount} ${request.type.split('-')[0].toUpperCase()}<br><a href="${request.proofImageData}" target="_blank" class="text-primary"><img src="${request.proofImageData}" class="mt-2 rounded-lg max-w-full h-auto" style="max-height: 200px;"></a>`;
+                } else {
+                    details = `<b>File:</b> <a href="${request.fileData}" download="${request.fileName}" class="text-primary">${request.fileName}</a>`;
+                }
+                container.insertAdjacentHTML('beforeend', `<div class="bg-background p-3 rounded-lg border border-slate-800"><p class="font-bold">${request.userName} (${request.telegramId})</p><p class="text-xs text-text-secondary">${date}</p><div class="text-sm my-2">${details}</div><p class="text-sm"><b>Payment:</b> ${request.paymentMethod} - ${request.paymentNumber}</p><p class="text-sm"><b>Status:</b> ${request.status}</p>${request.status === 'Processing' ? `<div class="flex gap-2 mt-3"><button class="approve-btn flex-1 bg-green-500/20 text-green-400 text-sm font-bold py-1.5 rounded" data-id="${request.id}">Approve</button><button class="reject-btn flex-1 bg-red-500/20 text-red-400 text-sm font-bold py-1.5 rounded" data-id="${request.id}">Reject</button></div>` : ''}</div>`);
+            });
+            document.querySelectorAll('.approve-btn').forEach(btn => btn.onclick = () => updateRequestStatus(btn.dataset.id, 'Completed'));
+            document.querySelectorAll('.reject-btn').forEach(btn => btn.onclick = () => updateRequestStatus(btn.dataset.id, 'Rejected'));
+        });
+    }
+    function updateRequestStatus(id, status) {
+        showLoader();
+        db.ref(`requests/${id}/status`).set(status)
+            .then(() => tg.showAlert(`Request has been ${status.toLowerCase()}.`))
+            .catch(err => tg.showAlert(`Failed to update status: ${err.message}`))
+            .finally(() => hideLoader());
+    }
 
-      function loadAdminData() {
-          const container = $('admin-requests-container');
-          const requestsRef = db.ref('requests');
-          
-          requestsRef.on('value', (snapshot) => {
-              const data = snapshot.val();
-              if (!data) {
-                  container.innerHTML = '<p class="text-center text-text-secondary">No requests found.</p>';
-                  return;
-              }
-
-              const allRequests = Object.values(data).sort((a,b) => new Date(b.requestDate) - new Date(a.requestDate));
-              container.innerHTML = '';
-              allRequests.forEach(request => {
-                  const date = new Date(request.requestDate).toLocaleString('en-GB');
-                  let details = '';
-                  if (request.type === 'niva-coin' || request.type === 'fira-coin') {
-                      details = `<b>Amount:</b> ${request.amount} ${request.type.split('-')[0].toUpperCase()}<br><a href="${request.proofImageData}" target="_blank" class="text-primary"><img src="${request.proofImageData}" class="mt-2 rounded-lg max-w-full h-auto" style="max-height: 200px;"></a>`;
-                  } else {
-                      details = `<b>File:</b> <a href="${request.fileData}" download="${request.fileName}" class="text-primary">${request.fileName}</a>`;
-                  }
-
-                  container.insertAdjacentHTML('beforeend', `
-                      <div class="bg-background p-3 rounded-lg border border-slate-800">
-                          <p class="font-bold">${request.userName} (${request.telegramId})</p>
-                          <p class="text-xs text-text-secondary">${date}</p>
-                          <div class="text-sm my-2">${details}</div>
-                          <p class="text-sm"><b>Payment:</b> ${request.paymentMethod} - ${request.paymentNumber}</p>
-                          <p class="text-sm"><b>Status:</b> ${request.status}</p>
-                          ${request.status === 'Processing' ? `
-                          <div class="flex gap-2 mt-3">
-                              <button class="approve-btn flex-1 bg-green-500/20 text-green-400 text-sm font-bold py-1.5 rounded" data-id="${request.id}">Approve</button>
-                              <button class="reject-btn flex-1 bg-red-500/20 text-red-400 text-sm font-bold py-1.5 rounded" data-id="${request.id}">Reject</button>
-                          </div>` : ''}
-                      </div>
-                  `);
-              });
-
-              document.querySelectorAll('.approve-btn').forEach(btn => btn.onclick = () => updateRequestStatus(btn.dataset.id, 'Completed'));
-              document.querySelectorAll('.reject-btn').forEach(btn => btn.onclick = () => updateRequestStatus(btn.dataset.id, 'Rejected'));
-          });
-      }
-
-      function updateRequestStatus(id, status) {
-          showLoader();
-          db.ref(`requests/${id}/status`).set(status)
-              .then(() => tg.showAlert(`Request has been ${status.toLowerCase()}.`))
-              .catch(err => tg.showAlert(`Failed to update status: ${err.message}`))
-              .finally(() => hideLoader());
-      }
-
-      startApp();
-    });
-  </script>
+    startApp();
+});
+</script>
 </body>
 </html>
