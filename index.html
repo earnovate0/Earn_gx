@@ -28,11 +28,23 @@
     <main id="page-dashboard" class="page flex-1 pb-28">
       <div class="flex items-center p-4"><h2 class="text-xl font-bold flex-1 text-text-secondary">Dashboard</h2><div class="flex size-10 shrink-0 items-center justify-end"><img class="user-profile-pic object-cover rounded-full size-10 border-2 border-primary" src="logo19.jpg" alt="User Avatar"></div></div>
       <h1 id="welcome-message" class="text-3xl font-bold px-4 pb-4 pt-4">Welcome!</h1>
+      
+      <!-- Dashboard Buttons with Images and Colors (Updated) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 py-2">
-        <button id="goto-sell-niva-btn" data-page="page-sell-niva" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-primary text-background font-bold gap-2"><span class="material-symbols-outlined">toll</span><span>Sell Niva</span></button>
-        <button id="goto-sell-fira-btn" data-page="page-sell-fira" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-primary text-background font-bold gap-2"><span class="material-symbols-outlined">currency_bitcoin</span><span>Sell Fira</span></button>
-        <button id="goto-sell-gmail-btn" data-page="page-sell-gmail" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-primary text-background font-bold gap-2"><span class="material-symbols-outlined">mail</span><span>Sell Gmail</span></button>
+        <button data-page="page-sell-niva" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-emerald-500 text-white font-bold gap-3 px-4">
+          <img src="./niva.jpg" class="h-8 w-8 rounded-full" alt="Niva Coin">
+          <span>Sell Niva</span>
+        </button>
+        <button data-page="page-sell-fira" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-amber-500 text-white font-bold gap-3 px-4">
+          <img src="./fira.jpg" class="h-8 w-8 rounded-full" alt="Fira Coin">
+          <span>Sell Fira</span>
+        </button>
+        <button data-page="page-sell-gmail" class="nav-btn-internal flex w-full items-center justify-center rounded-lg h-14 bg-rose-600 text-white font-bold gap-3 px-4">
+          <img src="./gmail.jpg" class="h-8 w-8" alt="Gmail">
+          <span>Sell Gmail</span>
+        </button>
       </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
         <div><div class="flex flex-col rounded-lg bg-card-background p-4"><div class="flex items-center gap-3 mb-2"><div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary text-lg">toll</span></div><p>Niva Coin Sales</p></div><div class="flex items-end justify-between"><div class="flex flex-col"><p id="dashboard-niva-requests" class="text-sm text-text-secondary">...</p><p id="dashboard-niva-total" class="text-sm text-text-secondary">...</p></div><button class="nav-btn-internal flex items-center justify-center rounded-md h-8 px-3 bg-card-background text-primary border border-primary text-xs font-medium" data-page="page-history">View</button></div></div></div>
         <div><div class="flex flex-col rounded-lg bg-card-background p-4"><div class="flex items-center gap-3 mb-2"><div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary text-lg">currency_bitcoin</span></div><p>Fira Coin Sales</p></div><div class="flex items-end justify-between"><div class="flex flex-col"><p id="dashboard-fira-requests" class="text-sm text-text-secondary">...</p><p id="dashboard-fira-total" class="text-sm text-text-secondary">...</p></div><button class="nav-btn-internal flex items-center justify-center rounded-md h-8 px-3 bg-card-background text-primary border border-primary text-xs font-medium" data-page="page-history">View</button></div></div></div>
@@ -54,7 +66,7 @@
       </form>
     </main>
 
-    <!-- Sell Fira Page (New) -->
+    <!-- Sell Fira Page -->
     <main id="page-sell-fira" class="page flex-grow p-4 pb-28">
       <header class="flex items-center py-2 justify-between"><button class="nav-btn-internal text-white flex size-10 items-center justify-center -ml-2" data-page="page-dashboard"><span class="material-symbols-outlined text-2xl">arrow_back</span></button><h1 class="text-lg font-bold flex-1 text-center">Sell Your Fira Coin</h1><div class="size-8"></div></header>
       <div class="rounded-xl bg-card-background my-4 p-4"><p class="text-lg font-bold">Current Rate: <span id="sell-fira-rate" class="text-primary">...</span></p></div>
@@ -119,13 +131,13 @@
       </div>
     </main>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (Updated) -->
     <div class="fixed bottom-0 left-0 right-0 h-20 bg-card-background/90 backdrop-blur-sm border-t border-text-secondary/10">
       <div class="grid h-full max-w-lg grid-cols-4 mx-auto">
-        <button class="nav-btn inline-flex flex-col items-center justify-center px-5 text-primary" data-page="page-dashboard"><span class="material-symbols-outlined text-2xl mb-1">dashboard</span><span class="text-xs">Dashboard</span></button>
-        <button class="nav-btn inline-flex flex-col items-center justify-center px-5 text-text-secondary" data-page="page-dashboard"><span class="material-symbols-outlined text-2xl mb-1">add_circle</span><span class="text-xs">Sell</span></button>
-        <button class="nav-btn inline-flex flex-col items-center justify-center px-5 text-text-secondary" data-page="page-history"><span class="material-symbols-outlined text-2xl mb-1">history</span><span class="text-xs">History</span></button>
-        <button class="nav-btn inline-flex flex-col items-center justify-center px-5 text-text-secondary" data-page="page-profile"><span class="material-symbols-outlined text-2xl mb-1">person</span><span class="text-xs">Profile</span></button>
+        <button class="nav-btn inline-flex flex-col items-center justify-center px-5" data-page="page-dashboard" data-nav="dashboard"><span class="material-symbols-outlined text-2xl mb-1">dashboard</span><span class="text-xs">Dashboard</span></button>
+        <button class="nav-btn inline-flex flex-col items-center justify-center px-5" data-page="page-dashboard" data-nav="sell"><span class="material-symbols-outlined text-2xl mb-1">add_circle</span><span class="text-xs">Sell</span></button>
+        <button class="nav-btn inline-flex flex-col items-center justify-center px-5" data-page="page-history" data-nav="history"><span class="material-symbols-outlined text-2xl mb-1">history</span><span class="text-xs">History</span></button>
+        <button class="nav-btn inline-flex flex-col items-center justify-center px-5" data-page="page-profile" data-nav="profile"><span class="material-symbols-outlined text-2xl mb-1">person</span><span class="text-xs">Profile</span></button>
       </div>
     </div>
   </div>
@@ -171,7 +183,6 @@
             }
           } else {
              $('error-container').classList.remove('hidden');
-             $('error-container').innerHTML = '<p>This app must be used inside Telegram.</p>';
           }
         } catch (error) {
           console.error("App failed to start:", error);
@@ -210,7 +221,7 @@
         setupImageUpload('niva');
         $('sell-niva-form').addEventListener('submit', (e) => handleCoinSubmit(e, 'niva'));
 
-        // Fira Listeners (New)
+        // Fira Listeners
         $('fira-amount-input').addEventListener('input', () => {
           const amount = parseFloat($('fira-amount-input').value) || 0;
           $('fira-payout-text').textContent = `You will receive: ~৳${(amount / 1000 * marketRates.firaRate).toFixed(2)}`;
@@ -228,7 +239,6 @@
         }
       }
 
-      // Reusable function for Coin form submissions (Niva & Fira)
       async function handleCoinSubmit(e, coinType) {
         e.preventDefault();
         showLoader();
@@ -255,7 +265,6 @@
         }
       }
 
-      // Reusable function for Gmail form submission
       async function handleGmailSubmit(e) {
         e.preventDefault();
         showLoader();
@@ -283,7 +292,6 @@
         }
       }
 
-      // Reusable function for Admin rate updates
       function handleRateUpdate(e) {
           e.preventDefault();
           showLoader();
@@ -302,7 +310,6 @@
           }
       }
       
-      // Reusable function for setting up image upload previews
       function setupImageUpload(prefix) {
           const fileInput = $(`${prefix}-file-input`);
           fileInput.addEventListener('change', () => {
@@ -322,7 +329,6 @@
           });
       }
       
-      // Reusable function for setting up Gmail file upload display
       function setupGmailUpload() {
           const gmailFileInput = $('gmail-file-input');
           gmailFileInput.addEventListener('change', () => {
@@ -365,20 +371,34 @@
         });
       }
 
+      // Updated showPage function to handle navigation highlighting correctly
       function showPage(pageId) {
         if (!pageId) return;
         document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
         $(pageId)?.classList.add("active");
         
+        // Determine active navigation tab
+        let activeNav = 'dashboard';
+        if (['page-sell-niva', 'page-sell-fira', 'page-sell-gmail'].includes(pageId)) {
+            activeNav = 'sell';
+        } else if (pageId === 'page-history') {
+            activeNav = 'history';
+        } else if (pageId === 'page-profile') {
+            activeNav = 'profile';
+        }
+
+        // Update nav button styles
+        document.querySelectorAll(".nav-btn").forEach(btn => {
+          btn.classList.toggle("text-primary", btn.dataset.nav === activeNav);
+          btn.classList.toggle("text-text-secondary", btn.dataset.nav !== activeNav);
+        });
+
+        // Load data for the current page
         loadDashboardData();
         loadProfileData();
         if (pageId === "page-history") loadHistoryData();
         if (pageId === "page-profile" && telegramUser.id.toString() === ADMIN_TELEGRAM_ID) loadAdminData();
 
-        document.querySelectorAll(".nav-btn").forEach(btn => {
-          btn.classList.toggle("text-primary", btn.dataset.page === pageId);
-          btn.classList.toggle("text-text-secondary", btn.dataset.page !== pageId);
-        });
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
 
@@ -387,7 +407,6 @@
         ratesRef.on('value', (snapshot) => {
           const rates = snapshot.val() || { nivaRate: 7.5, firaRate: 5.0, gmailRate: 13 };
           marketRates = rates;
-          // Update Dashboard and Sell Pages
           const nivaRateText = `৳${marketRates.nivaRate} /k`;
           const firaRateText = `৳${marketRates.firaRate} /k`;
           const gmailRateText = `৳${marketRates.gmailRate}`;
@@ -398,7 +417,6 @@
           $("sell-niva-rate").textContent = nivaRateText;
           $("sell-fira-rate").textContent = firaRateText;
           
-          // Update Admin Panel
           if (telegramUser.id.toString() === ADMIN_TELEGRAM_ID) {
             $("admin-niva-rate").value = marketRates.nivaRate;
             $("admin-fira-rate").value = marketRates.firaRate;
@@ -441,7 +459,6 @@
             });
         } catch(e) {
             container.innerHTML = '<p class="text-center text-red-400">Could not load history.</p>';
-            console.error("Error loading history:", e);
         }
       }
 
@@ -451,17 +468,10 @@
         
         let nivaRequests = 0, nivaTotal = 0, firaRequests = 0, firaTotal = 0, gmailPending = 0;
         if (data) {
-            const userRequests = Object.values(data);
-            userRequests.forEach(req => {
-                if (req.type === "niva-coin") {
-                    nivaRequests++;
-                    nivaTotal += Number(req.amount || 0);
-                } else if (req.type === "fira-coin") {
-                    firaRequests++;
-                    firaTotal += Number(req.amount || 0);
-                } else if (req.type === "gmail-id" && req.status === "Processing") {
-                    gmailPending++;
-                }
+            Object.values(data).forEach(req => {
+                if (req.type === "niva-coin") { nivaRequests++; nivaTotal += Number(req.amount || 0); } 
+                else if (req.type === "fira-coin") { firaRequests++; firaTotal += Number(req.amount || 0); } 
+                else if (req.type === "gmail-id" && req.status === "Processing") { gmailPending++; }
             });
         }
         $("dashboard-niva-requests").textContent = `${nivaRequests} Requests`;
@@ -477,8 +487,7 @@
 
         let nivaSold = 0, firaSold = 0, gmailSold = 0;
         if (data) {
-            const userRequests = Object.values(data);
-            userRequests.forEach(req => {
+            Object.values(data).forEach(req => {
                 if (req.status === "Completed") {
                     if (req.type === "niva-coin") nivaSold += Number(req.amount || 0);
                     else if (req.type === "fira-coin") firaSold += Number(req.amount || 0);
@@ -537,15 +546,9 @@
       function updateRequestStatus(id, status) {
           showLoader();
           db.ref(`requests/${id}/status`).set(status)
-              .then(() => {
-                  tg.showAlert(`Request has been ${status.toLowerCase()}.`);
-              })
-              .catch(err => {
-                  tg.showAlert(`Failed to update status: ${err.message}`);
-              })
-              .finally(() => {
-                  hideLoader();
-              });
+              .then(() => tg.showAlert(`Request has been ${status.toLowerCase()}.`))
+              .catch(err => tg.showAlert(`Failed to update status: ${err.message}`))
+              .finally(() => hideLoader());
       }
 
       startApp();
